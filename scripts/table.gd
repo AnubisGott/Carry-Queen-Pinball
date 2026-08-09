@@ -43,8 +43,8 @@ static func build(parent: Node2D) -> Dictionary:
 	refs["flipper_l"] = fl
 	refs["flipper_r"] = fr
 
-	parent.add_child(Slingshot.new([Vector2(140, 730), Vector2(208, 818), Vector2(158, 808)], Vector2(88, -68)))
-	parent.add_child(Slingshot.new([Vector2(372, 730), Vector2(282, 818), Vector2(338, 806)], Vector2(-88, -90)))
+	parent.add_child(Slingshot.new([Vector2(137, 712), Vector2(200, 790), Vector2(155, 786)], Vector2(78, -63)))
+	parent.add_child(Slingshot.new([Vector2(380, 712), Vector2(290, 790), Vector2(347, 786)], Vector2(-78, -90)))
 
 	for b in [["W", Vector2(270, 300)], ["A", Vector2(175, 350)], ["D", Vector2(365, 350)], ["S", Vector2(270, 415)]]:
 		parent.add_child(Bumper.new(b[1], b[0]))

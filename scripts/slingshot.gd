@@ -52,7 +52,7 @@ func _draw() -> void:
 	draw_polyline(closed, col, 3.0)
 	var c := _centroid()
 	for p in pts:
-		draw_line(c, c + (p - c) * 1.1, Color(col.r, col.g, col.b, 0.35), 1.5)
+		draw_line(c, c + (p - c) * 0.95, Color(col.r, col.g, col.b, 0.35), 1.5)
 
 
 func _on_hit(body: Node2D) -> void:
