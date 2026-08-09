@@ -23,8 +23,8 @@ godot-engine\Godot_v4.7.1-stable_win64.exe -e --path .
 | Linker Flipper    | Pfeil links oder `A`                   |
 | Rechter Flipper   | Pfeil rechts oder `D`                  |
 | Abschuss          | `Leertaste` halten und loslassen       |
-| Anstoßen links    | `Y` (Taste unten links)                |
-| Anstoßen rechts   | `M`                                    |
+| Anstoßen links    | `Q`                                    |
+| Anstoßen rechts   | `E`                                    |
 | Weiter (Popups)   | `Leertaste` / Klick                    |
 | Touch (Mobil)     | linke/rechte Bildschirmhälfte = Flipper, unten rechts halten = Abschuss |
 

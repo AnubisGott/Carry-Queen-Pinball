@@ -122,9 +122,8 @@ func _setup_actions() -> void:
 	_add_action("flip_left", [KEY_LEFT, KEY_A])
 	_add_action("flip_right", [KEY_RIGHT, KEY_D])
 	_add_action("launch", [KEY_SPACE, KEY_DOWN, KEY_ENTER])
-	# Physische Tasten: KEY_Z = "Y" auf deutschem Layout (unten links), M unten rechts
-	_add_action("nudge_left", [KEY_Z])
-	_add_action("nudge_right", [KEY_M])
+	_add_action("nudge_left", [KEY_Q])
+	_add_action("nudge_right", [KEY_E])
 
 
 func _add_action(action_name: String, keys: Array) -> void:
