@@ -43,10 +43,10 @@ static func build(parent: Node2D) -> Dictionary:
 	refs["flipper_l"] = fl
 	refs["flipper_r"] = fr
 
-	# Frei stehende Slingshots: Rueckseite parallel zur Inlane-Wand mit ~34 px
-	# Roll-Rinne dahinter, Unterkante klar oberhalb des Flipper-Schwungbereichs.
-	parent.add_child(Slingshot.new([Vector2(158, 696), Vector2(230, 788), Vector2(179, 782)], Vector2(92, -72)))
-	parent.add_child(Slingshot.new([Vector2(360, 700), Vector2(265, 788), Vector2(322, 786)], Vector2(-88, -95)))
+	# Frei stehende Slingshots (Viereck-Form): lange Kick-Kante zum Spielfeld,
+	# Rueckseite mit Roll-Rinne zur Inlane-Wand, Unterkante klar ueber den Flippern.
+	parent.add_child(Slingshot.new([Vector2(158, 696), Vector2(230, 788), Vector2(192, 794), Vector2(167, 748)], Vector2(92, -72)))
+	parent.add_child(Slingshot.new([Vector2(360, 700), Vector2(265, 788), Vector2(303, 792), Vector2(347, 748)], Vector2(-88, -95)))
 
 	for b in [["W", Vector2(270, 300)], ["A", Vector2(175, 350)], ["D", Vector2(365, 350)], ["S", Vector2(270, 415)]]:
 		parent.add_child(Bumper.new(b[1], b[0]))
