@@ -31,9 +31,9 @@ static func build(parent: Node2D) -> Dictionary:
 	_wall(parent, [Vector2(160, 150), Vector2(82, 232)], NEON_CYAN)
 	# Linke Seite: Ablenk-Leiste (wie die schraege Bande der Vorlage) + Inlane
 	_wall(parent, [Vector2(24, 598), Vector2(92, 508)], NEON_GREEN)
-	_wall(parent, [Vector2(95, 690), Vector2(154, 830)], NEON_GREEN)
+	_bar(parent, Vector2(95, 690), Vector2(154, 830), NEON_GREEN)
 	# Rechte Inlane ("KEIN PLAN")
-	_wall(parent, [Vector2(410, 700), Vector2(336, 830)], NEON_GREEN)
+	_bar(parent, Vector2(410, 700), Vector2(336, 830), NEON_GREEN)
 	# Thron-Pfosten
 	_wall(parent, [Vector2(250, 82), Vector2(250, 160)], NEON_GOLD)
 	_wall(parent, [Vector2(290, 82), Vector2(290, 160)], NEON_GOLD)
@@ -54,9 +54,9 @@ static func build(parent: Node2D) -> Dictionary:
 	refs["flipper_l"] = fl
 	refs["flipper_r"] = fr
 
-	# Schlanke Viereck-Slingshots mit Laufrinne dahinter
-	parent.add_child(Slingshot.new([Vector2(127, 676), Vector2(190, 765), Vector2(168, 777), Vector2(139, 722)], Vector2(89, -63)))
-	parent.add_child(Slingshot.new([Vector2(362, 691), Vector2(297, 771), Vector2(315, 783), Vector2(346, 731)], Vector2(-80, -65)))
+	# Schlanke Viereck-Slingshots mit Laufrinne hinter den breiten Baendern
+	parent.add_child(Slingshot.new([Vector2(133, 674), Vector2(196, 763), Vector2(174, 775), Vector2(145, 720)], Vector2(89, -63)))
+	parent.add_child(Slingshot.new([Vector2(356, 689), Vector2(291, 769), Vector2(309, 781), Vector2(340, 729)], Vector2(-80, -65)))
 
 	# WASD-Bumper auf dem Pad, S liegt tiefer und fuettert die Mulde
 	for b in [["W", Vector2(270, 300)], ["A", Vector2(175, 350)], ["D", Vector2(365, 350)], ["S", Vector2(270, 395)]]:
@@ -163,6 +163,45 @@ static func _wall(parent: Node2D, pts: Array, color: Color) -> void:
 	line.begin_cap_mode = Line2D.LINE_CAP_ROUND
 	line.end_cap_mode = Line2D.LINE_CAP_ROUND
 	parent.add_child(line)
+
+
+static func _bar(parent: Node2D, a: Vector2, b: Vector2, color: Color) -> void:
+	# Breites, kapselfoermiges Band mit echter physischer Dicke
+	var body := StaticBody2D.new()
+	var pm := PhysicsMaterial.new()
+	pm.bounce = 0.28
+	pm.friction = 0.1
+	body.physics_material_override = pm
+	var cs := CollisionShape2D.new()
+	var cap := CapsuleShape2D.new()
+	cap.radius = 6.0
+	cap.height = a.distance_to(b)
+	cs.shape = cap
+	body.position = (a + b) * 0.5
+	body.rotation = (b - a).angle() - PI / 2.0
+	body.add_child(cs)
+	parent.add_child(body)
+	var under := Line2D.new()
+	under.points = PackedVector2Array([a, b])
+	under.width = 24.0
+	under.default_color = Color(color.r, color.g, color.b, 0.16)
+	under.begin_cap_mode = Line2D.LINE_CAP_ROUND
+	under.end_cap_mode = Line2D.LINE_CAP_ROUND
+	parent.add_child(under)
+	var line := Line2D.new()
+	line.points = PackedVector2Array([a, b])
+	line.width = 14.0
+	line.default_color = Color(color.r, color.g, color.b, 0.9)
+	line.begin_cap_mode = Line2D.LINE_CAP_ROUND
+	line.end_cap_mode = Line2D.LINE_CAP_ROUND
+	parent.add_child(line)
+	var core := Line2D.new()
+	core.points = PackedVector2Array([a, b])
+	core.width = 4.0
+	core.default_color = Color(1.5, 1.5, 1.5, 0.55)
+	core.begin_cap_mode = Line2D.LINE_CAP_ROUND
+	core.end_cap_mode = Line2D.LINE_CAP_ROUND
+	parent.add_child(core)
 
 
 static func _background(parent: Node2D) -> void:
