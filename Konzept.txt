@@ -1,0 +1,148 @@
+================================================================
+CARRY QUEEN PINBALL – "Ich bin die Beste"
+Flipper-Konzept (kostenlose Zugabe zum Song / Musikvideo)
+================================================================
+
+GRUNDIDEE
+---------
+Ein browserbasiertes Flipperspiel im Look des Musikvideos: dunkles
+Spielfeld, Neon-Linien in Pink / Grün / Cyan (wie die Leuchtstreifen
+am Outfit), oben thront die Carry Queen auf ihrem Gaming-Thron und
+kommentiert ALLES herablassend. Der Witz des Songs wird zur
+Spielmechanik: Egal wie gut der Spieler spielt – am Ende hat die
+Queen es "für ihn" gewonnen. Nichts zu danken. Gern geschehen.
+
+Das ganze Spiel ist als Twitch-Stream inszeniert: Das Spielfeld
+steckt in einem Stream-Overlay ("EMPRESS LIVE!"), rechts läuft ein
+Fake-Chat, der auf jedes Ereignis reagiert ("gg ez", "OP!",
+"carry us pls", "sie hat schon wieder recht...").
+
+
+LOOK & STIL
+-----------
+- Farbwelt: Schwarz + Neonpink (#FF2D95), Giftgrün (#39FF14),
+  Cyan (#00E5FF), Violett – exakt die Palette aus carryQueen02.jpg.
+- Spielfeld: schwarzer Hochglanz-Look, alle Bahnen und Ramps als
+  leuchtende Neon-Röhren (wie die Kabel am Thron).
+- Die Queen: freigestelltes Character-Artwork (face.jpg /
+  Character03-Full-Body.jpg) sitzt oben im Backglass auf dem Thron,
+  reagiert mit wechselnden Posen/Sprüchen (Augenrollen, Gähnen,
+  Krone richten).
+- Flipperfinger: schwarz mit Neon-Piping, Nieten wie ihre Armbänder.
+- Pop-Bumper: als RGB-Tastatur-Tasten W / A / S / D gestaltet.
+- Slingshots: ihre Spike-Schulterpolster.
+- Der Ball: Standard = Chromkugel ("Team"), Spezialball = pink
+  glühende Kugel ("ICH" – der Carry-Ball).
+- Lichtshow beat-synchron zum Song (135–145 BPM, vgl. beatviz).
+
+
+SPIELFELD-LAYOUT (Portrait, Handy & Desktop)
+--------------------------------------------
+        [ THRON-KICKER ]          <- Ball-Lock für Ko-op-Multiball
+   [W] [A]     [S] [D]            <- 4 Pop-Bumper (Tastatur-Tasten)
+  /== CARRY-RAMP ==\              <- Linksramp: Ego-Multiplikator
+  |  (O P)-Spinner  |             <- Spinner mit "OP"-Neonschild
+  [D][A][M][A][G][E]              <- Drop-Target-Bank "DAMAGE"
+     (I) (C) (H)                  <- 3 Standup-Targets "ICH"
+  KEIN     \    /      KEIN
+  HEAL      \  /       PLAN       <- Outlanes (links/rechts)
+   [FLIP]  DRAIN  [FLIP]
+         "Kein Skill."            <- Kommentar beim Ballverlust
+
+
+MECHANIK = SONGTEXT
+-------------------
+1) BALL-SAVER "MEIN CARRY RETTET"
+   Einmal pro Ball rettet die Queen die Kugel aus dem Drain
+   (Magnet zieht sie hoch). Voice-Line: "Mein Carry rettet,
+   wenn euer Plan zerbricht." Danach: "Gern geschehen."
+
+2) EGO-METER (Multiplikator)
+   Combos und Ramp-Loops füllen das Ego-Meter: x2, x3 ... x10.
+   Bei Ego x10 blinkt das ganze Feld: "UND NOCH BESSER BIN ICH."
+   Tilt heißt hier "RAGEQUIT" und leert das Ego-Meter komplett.
+
+3) KO-OP-MULTIBALL – "Vier Spieler. Ein Carry. Ich."
+   3 Bälle im Thron locken -> 4-Ball-Multiball startet mit dem
+   Intro-Whisper. Der Gag: Nur die pinke Carry-Kugel zählt 10-fach,
+   die drei "Teammate"-Kugeln bringen fast nichts (1x) und werden
+   im Chat verspottet ("was macht der Ball eigentlich?").
+
+4) DIE VIER DISZIPLINEN (Modi, je durch Ziele gestartet)
+   - DAMAGE : Drop-Bank D-A-M-A-G-E räumen -> Frenzy, alles zählt
+              doppelt, Industrial-Beat zieht an.
+   - KILLS  : Kill-Streak – Ramps in Serie (5-Sek-Fenster),
+              jeder Treffer = "KILL +1", Chat eskaliert.
+   - CARRY  : Ko-op-Multiball überleben (s.o.).
+   - ICH    : I-C-H Targets komplett -> Hurry-Up-Jackpot am Thron.
+
+5) WIZARD-MODE "DER BERICHT"
+   Alle vier Disziplinen geschafft -> Spoken-Breakdown-Sample:
+   "Wer macht den Schaden? ICH. ..." Jede Zeile schaltet einen
+   Mega-Jackpot frei. Finale: "Am Ende steht mein Name."
+
+6) BREAKDOWN-GEFAHR "KEIN HEAL. KEIN PLAN. KEIN SKILL. KEIN SIEG."
+   Zufällig getriggerte Druckphase: Licht aus, nur mechanischer
+   Puls, Outlanes weit offen, 20 Sekunden überleben. Wer draint,
+   hört das Flüstern: "Ohne mich."
+
+7) BONUS-AUSWERTUNG "GERN GESCHEHEN."
+   Nach jedem Ball erscheint ein Match-Report wie im MOBA:
+   Damage / Kills / Carry-Anteil. Der Anteil der Queen ist immer
+   98 %, "Team-Beitrag" (= der Spieler) 2 %. Trotzdem gibt es die
+   Punkte gutgeschrieben – "Nichts zu danken."
+
+8) HIGHSCORE-GAG "EURE NAMEN STEHEN NICHT."
+   Platz 1 der Highscore-Liste gehört fest und unschlagbar "ICH"
+   (immer 1 Punkt mehr als der beste Spieler). Spielernamen werden
+   beim Eintragen zu "Team" umbenannt – der echte Name steht nur
+   klein in Klammern dahinter.
+
+9) GAME OVER = OUTRO
+   "Ihr wart auch dabei. Das war bestimmt schön für euch.
+   Nichts zu danken. Gern geschehen." + Kuss-Handbewegung der Queen.
+
+
+SOUND & MUSIK
+-------------
+- Instrumental-Loop des Songs als Grundmusik, Intensität steigt
+  mit dem Ego-Meter (Layer: Drums -> Synths -> volle Breitseite).
+- Voice-Lines direkt aus den Song-Stems als Event-Sounds:
+  Ballstart: "Ko-op Modus." | Ballsave: "Mein Carry rettet."
+  Jackpot: "Ich bin die Beste." | Drain: "Kein Skill."
+  Tilt: "Kein Plan." | Multiball: "Vier Spieler. Ein Carry. Ich."
+- Bumper/Targets: metallisch-industrielle Percussion-Hits im
+  Song-Tempo gequantelt, damit alles rhythmisch klingt.
+
+
+TECHNIK (Zugabe = niedrige Hürde)
+---------------------------------
+- Godot Engine 4.7 (kostenlos, liegt in game/godot-engine/ bei).
+- Start per "Spiel starten.bat" oder im Editor öffnen (README.md).
+- Export als eigenständige Windows-EXE oder als Web-Version
+  (itch.io etc.) direkt aus dem Godot-Editor möglich.
+- Steuerung: Pfeiltasten oder A/D, Leertaste = Abschuss;
+  Mobil/Touch: linke/rechte Bildschirmhälfte = Flipper.
+- Portrait-Format 540x960, skaliert auf Desktop und Handy.
+- Kein Server, kein Tracking, keine Kosten.
+
+
+BENÖTIGTE ASSETS
+----------------
+- Queen freigestellt (aus face.jpg + Character03-Full-Body.jpg),
+  2–3 Posen für Reaktionen.
+- Logo/Schriftzug "CARRY QUEEN PINBALL" im Neon-Stil des
+  "GAMING EMPRESS"-Schilds.
+- Song-Stems bzw. geschnittene Voice-Lines (s.o., ca. 10 Stück).
+- Instrumental-Loop (16 oder 32 Takte, nahtlos).
+- Optional: kurze Chat-Sprüche-Liste (30–50 Zeilen) für den
+  Fake-Twitch-Chat.
+
+UMSETZUNGSSCHRITTE
+------------------
+1. Spielfeld-Prototyp mit Physik (Flipper, Ball, Bumper, Ramps).
+2. Layout + Neon-Look, Queen-Artwork einbauen.
+3. Mechaniken 1–4 (Ballsave, Ego, Multiball, Disziplinen).
+4. Sound-Einbau (Loop + Voice-Lines, beat-sync Lichter).
+5. Gags: Chat, Match-Report, Highscore, Outro.
+6. Mobile-Steuerung + Feinschliff, alles in eine HTML-Datei packen.

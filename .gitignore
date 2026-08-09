@@ -1,0 +1,5 @@
+# Godot Import-Cache
+.godot/
+
+# Portable Engine-Binaries (179 MB, kein Quellcode)
+godot-engine/
