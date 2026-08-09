@@ -25,8 +25,10 @@ static func build(parent: Node2D) -> Dictionary:
 	_wall(parent, [Vector2(DIVIDER, 960), Vector2(DIVIDER, 300)], NEON_VIOLET)
 	_wall(parent, [Vector2(DIVIDER, 305), Vector2(445, 335)], NEON_VIOLET)
 	_wall(parent, [Vector2(DIVIDER, 935), Vector2(RIGHT, 935)], NEON_VIOLET)
-	# Linke Orbit-Wand: Spinner-Bahn, fuehrt sicher zur Inlane ("Mein Carry rettet")
-	_wall(parent, [Vector2(85, 210), Vector2(85, 540), Vector2(160, 848)], NEON_CYAN)
+	# Linke Orbit-Wand: Spinner-Bahn mit breitem Eingang und Fang-Trichter,
+	# am Ende faengt eine Mulde (Scoop) die Kugel und wirft sie zur Mitte zurueck.
+	_wall(parent, [Vector2(85, 285), Vector2(85, 540), Vector2(160, 848)], NEON_CYAN)
+	_wall(parent, [Vector2(160, 150), Vector2(82, 232)], NEON_CYAN)
 	# Rechte Outlane ("KEIN PLAN")
 	_wall(parent, [Vector2(DIVIDER, 690), Vector2(415, 775)], NEON_GREEN)
 	_wall(parent, [Vector2(395, 700), Vector2(330, 848)], NEON_GREEN)
@@ -76,6 +78,7 @@ static func build(parent: Node2D) -> Dictionary:
 	refs["throne"] = throne
 
 	parent.add_child(LaneGate.new(Vector2(495, 276)))
+	parent.add_child(Scoop.new(Vector2(57, 568)))
 
 	_deco(parent, "KEIN HEAL", Vector2(38, 240), Color(0.35, 1.8, 0.25, 0.4), 11, 90.0)
 	_deco(parent, "KEIN PLAN", Vector2(412, 698), Color(0.35, 1.8, 0.25, 0.5), 11, 62.0)

@@ -259,6 +259,8 @@ func _cleanup_lost_balls() -> void:
 
 
 func _on_event(kind: String, data: Dictionary) -> void:
+	if autotest and kind in ["spinner", "scoop"]:
+		print("AUTOTEST event ", kind)
 	match kind:
 		"bumper":
 			_on_bumper(data.get("letter", ""))
@@ -268,6 +270,8 @@ func _on_event(kind: String, data: Dictionary) -> void:
 			_check_ich()
 		"all_disciplines":
 			_start_wizard()
+		"scoop":
+			hud.show_message("ZURUECK INS SPIEL.", "Gern geschehen.", 1.8)
 
 
 func _on_bumper(letter: String) -> void:

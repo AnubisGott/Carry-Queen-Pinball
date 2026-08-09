@@ -1,0 +1,4 @@
+- sound dateien
+- spinner: Punkte pro umdrehung
+- Punkte aufsteigen lassen, damit man Ursache wirkung bessert sieht
+
