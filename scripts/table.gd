@@ -29,8 +29,8 @@ static func build(parent: Node2D) -> Dictionary:
 	_wall(parent, [Vector2(DIVIDER, 935), Vector2(RIGHT, 935)], NEON_VIOLET)
 	# Fang-Trichter oben links: leitet Baelle in die Hochbahn-Einfahrt
 	_wall(parent, [Vector2(160, 150), Vector2(82, 232)], NEON_CYAN)
-	# Linke Inlane/Outlane ("KEIN HEAL")
-	_wall(parent, [Vector2(LEFT, 640), Vector2(60, 720)], NEON_GREEN)
+	# Linke Seite: Ablenk-Leiste (wie die schraege Bande der Vorlage) + Inlane
+	_wall(parent, [Vector2(24, 598), Vector2(92, 508)], NEON_GREEN)
 	_wall(parent, [Vector2(95, 690), Vector2(154, 830)], NEON_GREEN)
 	# Rechte Inlane/Outlane ("KEIN PLAN")
 	_wall(parent, [Vector2(DIVIDER, 690), Vector2(415, 775)], NEON_GREEN)
@@ -41,6 +41,10 @@ static func build(parent: Node2D) -> Dictionary:
 	# Hoerner der Mulde (Trichter unter dem S-Bumper)
 	_wall(parent, [Vector2(240, 455), Vector2(252, 492)], NEON_GOLD)
 	_wall(parent, [Vector2(300, 455), Vector2(288, 492)], NEON_GOLD)
+	# Schuerze (Apron): V-Bahnen unter den Flippern - Outlane-Baelle rutschen
+	# sichtbar zur Mitte in den Drain (wie in der Vorlage)
+	_wall(parent, [Vector2(LEFT, 880), Vector2(228, 948)], NEON_PINK)
+	_wall(parent, [Vector2(DIVIDER, 880), Vector2(262, 948)], NEON_PINK)
 
 	var refs := {}
 
@@ -98,7 +102,10 @@ static func build(parent: Node2D) -> Dictionary:
 	# Dekos im Stil der Vorlage
 	parent.add_child(TableDeco.new("pad", Vector2(270, 350), NEON_CYAN))
 	parent.add_child(TableDeco.new("spiral", Vector2(270, 640)))
-	parent.add_child(TableDeco.new("rays", Vector2(245, 928), NEON_PINK))
+	parent.add_child(TableDeco.new("rays", Vector2(245, 944), NEON_PINK))
+	parent.add_child(TableDeco.new("spring", Vector2(495, 904), NEON_VIOLET))
+	parent.add_child(TableDeco.new("star", Vector2(218, 705), Color(1.6, 1.5, 1.2)))
+	parent.add_child(TableDeco.new("star", Vector2(322, 668), Color(1.6, 1.5, 1.2), 0.7))
 	parent.add_child(TableDeco.new("comet", Vector2(38, 540), NEON_GOLD, 1.0, 15.0))
 	parent.add_child(TableDeco.new("comet", Vector2(448, 580), NEON_GOLD, 1.0, -15.0))
 	parent.add_child(TableDeco.new("saturn", Vector2(60, 610), NEON_GOLD))
@@ -111,7 +118,7 @@ static func build(parent: Node2D) -> Dictionary:
 
 	_deco(parent, "KEIN HEAL", Vector2(30, 745), Color(0.35, 1.8, 0.25, 0.5), 11, 72.0)
 	_deco(parent, "KEIN PLAN", Vector2(412, 698), Color(0.35, 1.8, 0.25, 0.5), 11, 62.0)
-	_deco(parent, "KEIN SKILL.", Vector2(214, 934), Color(1.0, 0.3, 0.6, 0.55), 12, 0.0)
+	_deco(parent, "KEIN SKILL.", Vector2(208, 900), Color(1.0, 0.3, 0.6, 0.55), 12, 0.0)
 	_deco(parent, "CARRY QUEEN", Vector2(225, 655), Color(1.0, 0.24, 0.62, 0.75), 12, 0.0)
 	_deco(parent, "SPACE HALTEN", Vector2(505, 740), Color(1.1, 0.4, 1.9, 0.5), 10, 90.0)
 

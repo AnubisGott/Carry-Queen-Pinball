@@ -59,6 +59,17 @@ func _draw() -> void:
 		"bolt":
 			draw_arc(Vector2.ZERO, 16.0 * deco_size, 0, TAU, 24, col, 2.0)
 			draw_polyline(PackedVector2Array([Vector2(-3, -9), Vector2(3, -2), Vector2(-1, -2), Vector2(3, 9)]), col, 2.0)
+		"spring":
+			var coil := PackedVector2Array()
+			for i in 7:
+				coil.append(Vector2((-8.0 if i % 2 == 0 else 8.0) * deco_size, i * 5.0 * deco_size))
+			draw_polyline(coil, col, 2.0)
+			draw_line(Vector2(-10 * deco_size, 31 * deco_size), Vector2(10 * deco_size, 31 * deco_size), col, 3.0)
+		"star":
+			draw_line(Vector2(0, -7 * deco_size), Vector2(0, 7 * deco_size), col, 2.0)
+			draw_line(Vector2(-7 * deco_size, 0), Vector2(7 * deco_size, 0), col, 2.0)
+			draw_line(Vector2(-3, -3) * deco_size, Vector2(3, 3) * deco_size, Color(col.r, col.g, col.b, 0.5), 1.5)
+			draw_line(Vector2(-3, 3) * deco_size, Vector2(3, -3) * deco_size, Color(col.r, col.g, col.b, 0.5), 1.5)
 		"arrow":
 			var a := PackedVector2Array([
 				Vector2(0, -20), Vector2(13, -2), Vector2(6, -2), Vector2(6, 16),
