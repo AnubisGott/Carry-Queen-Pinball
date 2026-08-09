@@ -20,7 +20,7 @@ const NEON_VIOLET := Color(1.1, 0.4, 1.9)
 static func build(parent: Node2D) -> Dictionary:
 	_background(parent)
 	# Aussenwaende
-	_wall(parent, [Vector2(LEFT, 960), Vector2(LEFT, 330)], NEON_PINK)
+	_wall(parent, [Vector2(LEFT, 760), Vector2(LEFT, 330)], NEON_PINK)
 	_wall(parent, _arch_points(), NEON_PINK)
 	_wall(parent, [Vector2(RIGHT, 330), Vector2(RIGHT, 960)], NEON_PINK)
 	# Abschussbahn (rechts) mit Abweiser oben
@@ -32,8 +32,7 @@ static func build(parent: Node2D) -> Dictionary:
 	# Linke Seite: Ablenk-Leiste (wie die schraege Bande der Vorlage) + Inlane
 	_wall(parent, [Vector2(24, 598), Vector2(92, 508)], NEON_GREEN)
 	_wall(parent, [Vector2(95, 690), Vector2(154, 830)], NEON_GREEN)
-	# Rechte Inlane/Outlane ("KEIN PLAN")
-	_wall(parent, [Vector2(DIVIDER, 690), Vector2(415, 775)], NEON_GREEN)
+	# Rechte Inlane ("KEIN PLAN")
 	_wall(parent, [Vector2(410, 700), Vector2(336, 830)], NEON_GREEN)
 	# Thron-Pfosten
 	_wall(parent, [Vector2(250, 82), Vector2(250, 160)], NEON_GOLD)
@@ -41,10 +40,10 @@ static func build(parent: Node2D) -> Dictionary:
 	# Hoerner der Mulde (Trichter unter dem S-Bumper)
 	_wall(parent, [Vector2(240, 455), Vector2(252, 492)], NEON_GOLD)
 	_wall(parent, [Vector2(300, 455), Vector2(288, 492)], NEON_GOLD)
-	# Schuerze (Apron): V-Bahnen unter den Flippern - Outlane-Baelle rutschen
-	# sichtbar zur Mitte in den Drain (wie in der Vorlage)
-	_wall(parent, [Vector2(LEFT, 880), Vector2(228, 948)], NEON_PINK)
-	_wall(parent, [Vector2(DIVIDER, 880), Vector2(262, 948)], NEON_PINK)
+	# Untere Bogen-Banden: sanfte Kurven fuehren aussen herum zur
+	# Drain-Oeffnung in der Mitte (Skizze des Nutzers)
+	_wall(parent, [Vector2(LEFT, 760), Vector2(25, 820), Vector2(40, 875), Vector2(65, 915), Vector2(100, 940), Vector2(140, 952), Vector2(180, 956), Vector2(210, 956)], NEON_PINK)
+	_wall(parent, [Vector2(DIVIDER, 600), Vector2(462, 680), Vector2(445, 750), Vector2(420, 810), Vector2(385, 865), Vector2(340, 910), Vector2(300, 940), Vector2(285, 948)], NEON_PINK)
 
 	var refs := {}
 
