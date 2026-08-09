@@ -1,6 +1,8 @@
 class_name Table
 extends RefCounted
-## Baut die komplette Tisch-Geometrie im Neon-Look auf (alles aus Code, keine Assets).
+## Tisch-Geometrie nach der Weltraum-Vorlage, im Carry-Queen-Neon-Schema:
+## Draht-Hochbahn ueber dem Tisch (2. Ebene), Mulde mit Hoernern in der Mitte,
+## Bumper-Pad, I-C-H-Bank links, In-/Outlanes beidseitig, Spiral-Scheibe unten.
 
 const LEFT := 20.0
 const RIGHT := 520.0
@@ -25,18 +27,20 @@ static func build(parent: Node2D) -> Dictionary:
 	_wall(parent, [Vector2(DIVIDER, 960), Vector2(DIVIDER, 300)], NEON_VIOLET)
 	_wall(parent, [Vector2(DIVIDER, 305), Vector2(445, 335)], NEON_VIOLET)
 	_wall(parent, [Vector2(DIVIDER, 935), Vector2(RIGHT, 935)], NEON_VIOLET)
-	# Linke Orbit-Wand: Spinner-Bahn mit breitem Eingang und Fang-Trichter,
-	# am Ende faengt eine Mulde (Scoop) die Kugel und wirft sie zur Mitte zurueck.
-	# Wand endet oberhalb der hinteren Flipper-Ecke, damit die Kugel auf die
-	# Hebel-Oberseite rollt statt hinter dem Hebel zu verklemmen
-	_wall(parent, [Vector2(85, 285), Vector2(85, 540), Vector2(154, 830)], NEON_CYAN)
+	# Fang-Trichter oben links: leitet Baelle in die Hochbahn-Einfahrt
 	_wall(parent, [Vector2(160, 150), Vector2(82, 232)], NEON_CYAN)
-	# Rechte Outlane ("KEIN PLAN")
+	# Linke Inlane/Outlane ("KEIN HEAL")
+	_wall(parent, [Vector2(LEFT, 640), Vector2(60, 720)], NEON_GREEN)
+	_wall(parent, [Vector2(95, 690), Vector2(154, 830)], NEON_GREEN)
+	# Rechte Inlane/Outlane ("KEIN PLAN")
 	_wall(parent, [Vector2(DIVIDER, 690), Vector2(415, 775)], NEON_GREEN)
 	_wall(parent, [Vector2(410, 700), Vector2(336, 830)], NEON_GREEN)
 	# Thron-Pfosten
 	_wall(parent, [Vector2(250, 82), Vector2(250, 160)], NEON_GOLD)
 	_wall(parent, [Vector2(290, 82), Vector2(290, 160)], NEON_GOLD)
+	# Hoerner der Mulde (Trichter unter dem S-Bumper)
+	_wall(parent, [Vector2(240, 455), Vector2(252, 492)], NEON_GOLD)
+	_wall(parent, [Vector2(300, 455), Vector2(288, 492)], NEON_GOLD)
 
 	var refs := {}
 
@@ -47,31 +51,33 @@ static func build(parent: Node2D) -> Dictionary:
 	refs["flipper_l"] = fl
 	refs["flipper_r"] = fr
 
-	# Schlanke Viereck-Slingshots mit ~35 px Laufrinne dahinter: Die Kugel kann
-	# hinter dem Slingshot an der Inlane-Wand entlang auf den Flipperhebel rollen.
-	parent.add_child(Slingshot.new([Vector2(157, 692), Vector2(206, 777), Vector2(184, 787), Vector2(167, 735)], Vector2(85, -49)))
+	# Schlanke Viereck-Slingshots mit Laufrinne dahinter
+	parent.add_child(Slingshot.new([Vector2(127, 676), Vector2(190, 765), Vector2(168, 777), Vector2(139, 722)], Vector2(89, -63)))
 	parent.add_child(Slingshot.new([Vector2(362, 691), Vector2(297, 771), Vector2(315, 783), Vector2(346, 731)], Vector2(-80, -65)))
 
-	for b in [["W", Vector2(270, 300)], ["A", Vector2(175, 350)], ["D", Vector2(365, 350)], ["S", Vector2(270, 415)]]:
+	# WASD-Bumper auf dem Pad, S liegt tiefer und fuettert die Mulde
+	for b in [["W", Vector2(270, 300)], ["A", Vector2(175, 350)], ["D", Vector2(365, 350)], ["S", Vector2(270, 395)]]:
 		parent.add_child(Bumper.new(b[1], b[0]))
 
 	var drops := []
 	var letters := ["D", "A", "M", "A", "G", "E"]
 	for i in 6:
-		var d := DropTarget.new(Vector2(150 + i * 38, 560), letters[i])
+		var d := DropTarget.new(Vector2(150 + i * 38, 545), letters[i])
 		parent.add_child(d)
 		drops.append(d)
 	refs["drops"] = drops
 
+	# I-C-H-Bank an der linken Aussenwand (wie die Pillen-Bank der Vorlage)
 	var standups := []
 	var ich := ["I", "C", "H"]
 	for i in 3:
-		var s := Standup.new(Vector2(93, 300 + i * 65), ich[i])
+		var s := Standup.new(Vector2(31, 310 + i * 60), ich[i])
 		parent.add_child(s)
 		standups.append(s)
 	refs["standups"] = standups
 
-	var sp := Spinner.new(Vector2(52, 430))
+	# OP-Spinner in der Hochbahn-Einfahrt oben links
+	var sp := Spinner.new(Vector2(55, 222))
 	parent.add_child(sp)
 	refs["spinner"] = sp
 
@@ -80,13 +86,33 @@ static func build(parent: Node2D) -> Dictionary:
 	refs["throne"] = throne
 
 	parent.add_child(LaneGate.new(Vector2(495, 276)))
-	parent.add_child(Scoop.new(Vector2(57, 568)))
 
-	_deco(parent, "KEIN HEAL", Vector2(38, 240), Color(0.35, 1.8, 0.25, 0.4), 11, 90.0)
+	# Mulde in der Mitte (schwarzes Loch der Vorlage)
+	parent.add_child(Scoop.new(Vector2(270, 505)))
+
+	# Draht-Hochbahn (2. Ebene) ueber den Tisch
+	var ramp := WireRamp.new()
+	parent.add_child(ramp)
+	refs["ramp"] = ramp
+
+	# Dekos im Stil der Vorlage
+	parent.add_child(TableDeco.new("pad", Vector2(270, 350), NEON_CYAN))
+	parent.add_child(TableDeco.new("spiral", Vector2(270, 640)))
+	parent.add_child(TableDeco.new("rays", Vector2(245, 928), NEON_PINK))
+	parent.add_child(TableDeco.new("comet", Vector2(38, 540), NEON_GOLD, 1.0, 15.0))
+	parent.add_child(TableDeco.new("comet", Vector2(448, 580), NEON_GOLD, 1.0, -15.0))
+	parent.add_child(TableDeco.new("saturn", Vector2(60, 610), NEON_GOLD))
+	parent.add_child(TableDeco.new("bolt", Vector2(445, 185), NEON_GOLD))
+	parent.add_child(TableDeco.new("arrow", Vector2(375, 520), NEON_CYAN, 1.0, -35.0))
+	for i in 5:
+		parent.add_child(TableDeco.new("chevron", Vector2(495, 540 + i * 60), NEON_GOLD))
+	parent.add_child(TableDeco.new("chevron", Vector2(105, 170), NEON_PINK, 1.0, 225.0))
+	parent.add_child(TableDeco.new("chevron", Vector2(85, 200), NEON_PINK, 1.0, 225.0))
+
+	_deco(parent, "KEIN HEAL", Vector2(30, 745), Color(0.35, 1.8, 0.25, 0.5), 11, 72.0)
 	_deco(parent, "KEIN PLAN", Vector2(412, 698), Color(0.35, 1.8, 0.25, 0.5), 11, 62.0)
 	_deco(parent, "KEIN SKILL.", Vector2(214, 934), Color(1.0, 0.3, 0.6, 0.55), 12, 0.0)
-	_deco(parent, "CARRY QUEEN PINBALL", Vector2(146, 620), Color(1.0, 0.24, 0.62, 0.35), 18, 0.0)
-	_deco(parent, "gern geschehen.", Vector2(206, 648), Color(0.2, 0.85, 0.95, 0.3), 11, 0.0)
+	_deco(parent, "CARRY QUEEN", Vector2(225, 655), Color(1.0, 0.24, 0.62, 0.75), 12, 0.0)
 	_deco(parent, "SPACE HALTEN", Vector2(505, 740), Color(1.1, 0.4, 1.9, 0.5), 10, 90.0)
 
 	return refs

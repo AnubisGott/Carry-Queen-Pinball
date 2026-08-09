@@ -1,8 +1,4 @@
 - sound dateien
 - spinner: Punkte pro umdrehung
 - Punkte aufsteigen lassen, damit man Ursache wirkung bessert sieht
-
 - Kugel größer machen
-- Ausspucken verbessern
-- Game over
-- Hinter den Reflektoren soll die Kugel langlaufen können

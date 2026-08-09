@@ -32,6 +32,7 @@ const CHAT := {
 	"launch": ["da fliegt er", "neuer Ball, gleiche Queen"],
 	"tilt": ["RAGEQUIT lmaooo", "er schuettelt den Tisch, peinlich", "tilt wie im Ranked"],
 	"scoop": ["die Mulde carried", "Taxi zurueck ins Spiel", "Heal? nein. Wurf? ja."],
+	"ramp": ["UEBERFLUG lol", "sie nimmt die Abkuerzung oben", "zwei Ebenen, ein Ego"],
 	"ego_level": ["ihr EGO skaliert besser als wir", "x-fach?? okay"],
 }
 const CHAT_PROB := {"bumper": 0.06, "sling": 0.15, "spinner": 0.3, "drop_target": 0.25, "standup": 0.4, "ego_level": 0.5}
