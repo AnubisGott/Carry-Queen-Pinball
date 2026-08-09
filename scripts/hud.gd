@@ -48,6 +48,7 @@ var _msg_label: Label
 var _sub_label: Label
 var _power_fill: ColorRect
 var _power_bg: ColorRect
+var _go_label: Label
 var _popup: PanelContainer
 var _popup_title: Label
 var _popup_body: Label
@@ -184,6 +185,12 @@ func _build_messages() -> void:
 	_sub_label.add_theme_constant_override("outline_size", 6)
 	_sub_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.85))
 	_sub_label.modulate.a = 0.0
+	_go_label = _label("GAME OVER", Vector2(0, 370), 56, PINK)
+	_go_label.size = Vector2(540, 90)
+	_go_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_go_label.add_theme_constant_override("outline_size", 14)
+	_go_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
+	_go_label.visible = false
 
 
 func show_message(big: String, sub: String = "", dur: float = 2.5) -> void:
@@ -272,16 +279,15 @@ func _build_popup() -> void:
 	_popup.grow_vertical = Control.GROW_DIRECTION_BOTH
 
 
-func show_report(stats: Dictionary) -> void:
-	popup_kind = "report"
-	_popup_title.text = "MATCH REPORT – BALL %d" % stats.get("ball", 1)
-	_popup_body.text = "DAMAGE  " + fmt(stats.get("damage", 0)) + "\nKILLS  %d" % stats.get("kills", 0) + "\n\nCARRY-ANTEIL\nICH  ..............  98%\nTEAM (DU)  ....  2%\n\nNichts zu danken.\nGERN GESCHEHEN."
-	_popup_hint.text = "LEERTASTE = WEITER"
-	_overlay.visible = true
-	_popup.visible = true
+func show_big_gameover() -> void:
+	_go_label.visible = true
+	_go_label.modulate.a = 0.0
+	var tw := create_tween()
+	tw.tween_property(_go_label, "modulate:a", 1.0, 0.5)
 
 
 func show_gameover(score: int, best: int) -> void:
+	_go_label.visible = false
 	popup_kind = "gameover"
 	var top: int = maxi(score, best)
 	_popup_title.text = "STREAM BEENDET."
@@ -334,6 +340,8 @@ func _on_game_event(kind: String, _data: Dictionary) -> void:
 	match kind:
 		"score", "ego", "ego_level", "save", "reset", "drain", "launch":
 			_update_stats()
+			if kind == "reset":
+				_go_label.visible = false
 		"discipline", "disciplines_reset", "all_disciplines":
 			_update_disciplines()
 			_update_stats()

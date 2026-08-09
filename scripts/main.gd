@@ -483,24 +483,16 @@ func _after_drain() -> void:
 	else:
 		Sfx.say("kein_skill")
 	Game.emit("drain")
-	_show_report()
-
-
-func _show_report() -> void:
-	get_tree().paused = true
-	hud.show_report({"ball": Game.ball_number, "damage": Game.damage_points, "kills": Game.kills})
+	if Game.ball_number >= Game.balls_per_game:
+		_game_over()
+	else:
+		# Naechster Ball wird automatisch rechts unten eingelegt
+		Game.ball_number += 1
+		_start_ball()
 
 
 func _on_continue() -> void:
-	if hud.popup_kind == "report":
-		hud.hide_popup()
-		get_tree().paused = false
-		if Game.ball_number >= Game.balls_per_game:
-			_game_over()
-		else:
-			Game.ball_number += 1
-			_start_ball()
-	elif hud.popup_kind == "gameover":
+	if hud.popup_kind == "gameover":
 		hud.hide_popup()
 		get_tree().paused = false
 		_restart()
@@ -512,6 +504,8 @@ func _game_over() -> void:
 	Sfx.play("over")
 	Sfx.say("outro")
 	Game.emit("gameover")
+	hud.show_big_gameover()
+	await get_tree().create_timer(2.2, false).timeout
 	get_tree().paused = true
 	hud.show_gameover(Game.score, Game.best_score)
 
@@ -546,7 +540,7 @@ func _start_ball(first: bool = false) -> void:
 		hud.show_message("KO-OP MODUS.", "Vier Spieler. Ein Carry. Ich.", 3.0)
 		Sfx.say("koop")
 	else:
-		hud.show_message("BALL %d" % Game.ball_number, "Mal sehen, wie lange du es diesmal schaffst.", 2.5)
+		hud.show_message("BALL %d" % Game.ball_number, "Liegt rechts unten bereit. Dein Anteil bisher: 2 %.", 2.5)
 
 
 func _spawn_ball(pos: Vector2, carry: bool = false, impulse: Vector2 = Vector2.ZERO) -> PinBall:

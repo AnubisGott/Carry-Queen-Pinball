@@ -22,7 +22,7 @@ func _ready() -> void:
 	var c := _centroid()
 	var grow := PackedVector2Array()
 	for p in pts:
-		grow.append(c + (p - c) * 1.25)
+		grow.append(c + (p - c) * 1.12)
 	acol.polygon = grow
 	area.add_child(acol)
 	add_child(area)

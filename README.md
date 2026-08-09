@@ -41,7 +41,8 @@ Zu häufiges Anstoßen kassiert einen **RAGEQUIT** (Tilt): Flipper und Punkte si
   - **ICH** – die I-C-H-Targets komplett machen, dann Hurry-Up am Thron kassieren
 - Alle 4 Disziplinen → Wizard-Mode **„DER BERICHT"** (alles x5, Thron = Mega-Jackpot).
 - Zufällige Gefahrenphase **„KEIN HEAL. KEIN PLAN. KEIN SKILL. KEIN SIEG."**: Licht aus, kein Ego-Zuwachs, kein Carry-Save.
-- Nach jedem Ball: **Match-Report** (Carry-Anteil: ICH 98 %, Team 2 %).
+- Ballverlust: Der nächste Ball liegt **automatisch rechts unten** bereit (kein Unterbrechen).
+- Sind alle Bälle weg: großes **GAME OVER**, dann die Abrechnung der Queen.
 - Highscore-Liste: Platz 1 gehört immer **ICH** – mit genau 1 Punkt Vorsprung.
 
 ## Song-Audio einbinden (optional)

@@ -43,10 +43,11 @@ func _on_enter(body: Node2D) -> void:
 func _eject_later(ball: PinBall) -> void:
 	await get_tree().create_timer(0.9, false).timeout
 	if is_instance_valid(ball):
-		ball.global_position = global_position + Vector2(10, -8)
+		ball.global_position = global_position + Vector2(12, -14)
 		ball.freeze = false
 		ball.show()
-		ball.linear_velocity = Vector2(250 + randf_range(-30, 30), -620)
+		# Auswurf im Bogen nach rechts oben Richtung Bumper / DAMAGE-Bank
+		ball.linear_velocity = Vector2(randf_range(270, 340), -710)
 		Sfx.play("eject", -4.0)
 	await get_tree().create_timer(1.0, false).timeout
 	_busy = false

@@ -2,7 +2,7 @@ class_name PinBall
 extends RigidBody2D
 ## Die Kugel. "is_carry" = die pinke Carry-Kugel (zaehlt im Multiball x10).
 
-const RADIUS := 11.0
+const RADIUS := 13.0
 const MAX_SPEED := 2400.0
 
 var is_carry := false
