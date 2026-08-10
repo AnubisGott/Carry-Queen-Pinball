@@ -174,7 +174,10 @@ static func build(parent: Node2D) -> Dictionary:
 	parent.add_child(TableDeco.new("pad", Vector2(270, 350), NEON_CYAN))
 	parent.add_child(TableDeco.new("spiral", Vector2(270, 640)))
 	parent.add_child(TableDeco.new("rays", Vector2(245, 944), NEON_PINK))
-	parent.add_child(TableDeco.new("spring", Vector2(495, 904), NEON_VIOLET))
+	# Echte Abschuss-Feder statt Deko: Ball sitzt sichtbar auf dem Teller
+	var plunger := Plunger.new()
+	parent.add_child(plunger)
+	refs["plunger"] = plunger
 	parent.add_child(TableDeco.new("star", Vector2(218, 705), Color(1.6, 1.5, 1.2)))
 	parent.add_child(TableDeco.new("star", Vector2(322, 668), Color(1.6, 1.5, 1.2), 0.7))
 	parent.add_child(TableDeco.new("comet", Vector2(38, 540), NEON_GOLD, 1.0, 15.0))

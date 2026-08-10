@@ -1,7 +1,7 @@
 extends Node2D
 ## Spielsteuerung: Ballfluss, Disziplinen/Modi, Plunger, Blackout, Match-Report.
 
-const SPAWN := Vector2(495, 905)
+const SPAWN := Vector2(495, 880)
 
 const WIZARD_LINES := [
 	"WER MACHT DEN SCHADEN? ICH.",
@@ -14,6 +14,7 @@ var hud: Hud
 var flipper_l: Flipper
 var flipper_r: Flipper
 var throne: Throne
+var plunger: Plunger
 var drops: Array = []
 var standups: Array = []
 var ggez: Array = []
@@ -59,6 +60,7 @@ func _ready() -> void:
 	standups = refs["standups"]
 	ggez = refs.get("ggez", [])
 	throne = refs["throne"]
+	plunger = refs["plunger"]
 	throne.captured.connect(_on_throne_captured)
 	_make_drain()
 	hud = Hud.new()
@@ -209,13 +211,17 @@ func _update_plunger(delta: float) -> void:
 		if pressed:
 			charging = true
 			charge = minf(1.0, charge + delta * 0.8)
+			plunger.compress(charge)
 		elif charging:
+			plunger.release()
 			lane_ball.apply_central_impulse(Vector2(0, -(750.0 + 1350.0 * charge)))
 			Sfx.play("launch", -4.0)
 			Game.emit("launch")
 			charging = false
 			charge = 0.0
 	else:
+		if charging:
+			plunger.release()
 		charging = false
 		charge = 0.0
 	hud.set_power(charge, charging)
