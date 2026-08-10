@@ -59,15 +59,16 @@ static func build(parent: Node2D) -> Dictionary:
 	# zum OP-Spinner bleibt von unten her erreichbar.
 	_wall(parent, [Vector2(230, 96), Vector2(203, 104), Vector2(185, 122),
 			Vector2(183, 144), Vector2(192, 162), Vector2(207, 172)], NEON_CYAN)
-	# Leit-Bogen oben links (Nutzer-Skizze): dickes Band, das flach unter dem
-	# Aussenbogen durchlaeuft und an der Haken-Aussenseite muendet.  Beide
-	# Enden sitzen dichter als eine Kugelbreite an Bande bzw. Haken - der
-	# Zwischenraum darueber ist unerreichbar, keine Keil-Falle.  Orbit-
-	# Baelle rutschen an der Unterseite entlang in die Gassen.
-	var guide_pts := [Vector2(114, 155), Vector2(140, 149), Vector2(166, 142),
-			Vector2(183, 135), Vector2(196, 128)]
+	# Leit-Band oben links (Nutzer-Skizze): dickes, fast waagerechtes Band
+	# unter dem Aussenbogen, das am Haken endet.  Eine unsichtbare
+	# Versiegelung schliesst den Keil zwischen Band, Bogen und Haken, damit
+	# sich dort keine Kugel verklemmen kann.  Orbit-Baelle rutschen an der
+	# Unterseite entlang in die Gassen.
+	var guide_pts := [Vector2(114, 155), Vector2(140, 150), Vector2(166, 146),
+			Vector2(190, 143), Vector2(210, 140)]
 	_wall(parent, guide_pts, NEON_CYAN, false, true)
 	_thick_band(parent, guide_pts, NEON_CYAN)
+	_wall(parent, [Vector2(199, 110), Vector2(209, 139)], NEON_CYAN, false, true)
 	# Linke Inlane ("KEIN HEAL").  Oberes Ende weit genug vom Slingshot weg,
 	# damit die Einfahrt in die Laufrinne mehr als eine Kugelbreite bietet.
 	# Untere Enden ueberlappen den Schwenkkreis der hinteren Flipper-Ecke -
@@ -156,16 +157,10 @@ static func build(parent: Node2D) -> Dictionary:
 		standups.append(s)
 	refs["standups"] = standups
 
-	# E-G-O-Standup-Bank schraeg an der Unterseite der Trichterwand
-	# (FEATURE_EGO): alle drei -> Ego-Level rauf (Logik in main.gd)
+	# Einzelner EGO-Knopf (FEATURE_EGO): jeder Treffer = Ego-Stufe rauf
 	var ego_bank := []
 	if FEATURE_EGO:
-		var ego_letters := ["E", "G", "O"]
-		var ego_pos := [Vector2(104, 230), Vector2(131, 201), Vector2(158, 172)]
-		for i in 3:
-			var e := Standup.new(ego_pos[i], ego_letters[i], 43.6)
-			parent.add_child(e)
-			ego_bank.append(e)
+		parent.add_child(EgoButton.new(Vector2(131, 201), "EGO", 43.6))
 	refs["ego_bank"] = ego_bank
 
 	# OP-Spinner in der Einfahrt oben links

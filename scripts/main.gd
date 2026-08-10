@@ -296,7 +296,6 @@ func _on_event(kind: String, data: Dictionary) -> void:
 			_check_bank()
 		"standup":
 			_check_ich()
-			_check_ego_bank()
 		"rollover":
 			_check_ggez()
 		"all_disciplines":
@@ -352,25 +351,7 @@ func _check_bank() -> void:
 	Sfx.play("mode", -3.0)
 	hud.show_message("DAMAGE-FRENZY!", "Alles zaehlt doppelt. +" + Hud.fmt(pts), 2.5)
 	Game.emit("frenzy")
-	await get_tree().create_timer(1.2, false).timeout
-	for d in drops:
-		d.reset()
-
-
-func _check_ego_bank() -> void:
-	if ego_bank.is_empty():
-		return
-	for s in ego_bank:
-		if not s.lit:
-			return
-	# +12 Ego-Punkte heben den Multiplikator garantiert um eine Stufe
-	Game.add_ego(12)
-	Game.add_score(2500)
-	Sfx.play("mode", -4.0)
-	hud.show_message("E-G-O KOMPLETT.", "Skaliert. Natuerlich.", 2.0)
-	await get_tree().create_timer(1.0, false).timeout
-	for s in ego_bank:
-		s.reset()
+	# Die volle Bank bleibt bis zum Ballverlust an (Reset in _start_ball)
 
 
 func _check_ggez() -> void:
@@ -699,10 +680,12 @@ func _start_ball(first: bool = false) -> void:
 	Game.damage_points = 0
 	Game.tilted = false
 	nudge_heat = 0.0
-	# Kill-Serie erlischt erst beim Ballwechsel
+	# Kill-Serie und volle DAMAGE-Bank erloeschen erst beim Ballwechsel
 	streak_letters.clear()
 	_streak_done = false
 	_update_bumper_marks()
+	for d in drops:
+		d.reset()
 	plunger.release()
 	Game.emit("save_armed")
 	_spawn_ball(SPAWN)

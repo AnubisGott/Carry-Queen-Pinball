@@ -124,6 +124,8 @@ func _build_all() -> void:
 	_streams["count_go"] = _mix([_tone(784, 0.09, 0.45, "square"), _tone(1047, 0.16, 0.5, "square")])
 	_streams["rumble"] = _mix([_tone(65, 0.45, 0.5, "saw", 30), _tone(85, 0.5, 0.55, "saw", 150)])
 	_streams["crank"] = _mix([_tone(150, 0.035, 0.4, "square", -40)])
+	_streams["ego_up"] = _mix([_tone(330, 0.07, 0.5, "square"), _tone(415, 0.07, 0.5, "square"),
+			_tone(523, 0.07, 0.5, "square"), _tone(659, 0.18, 0.55, "square", 80)])
 
 
 func _load_optional_audio() -> void:
