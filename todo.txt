@@ -14,3 +14,9 @@ e:\multimed\Musikideen\work\SunoAI\Der Beste\game
 Resume this session with:
 claude --resume 94101305-1426-4398-8d2f-8ad07fde1b03
 
+1. E-G-O-Standup-Bank (links oben) – drei Standup-Targets schräg am Bogen entlang (wie die I-C-H-Bank, die Klasse existiert schon). Alle drei getroffen → Ego-Multiplikator sofort +1, Chat: „ihr EGO skaliert besser als wir". Geringster Aufwand, füllt die linke Zone sinnvoll.
+2. Skill-Shot-Schale (rechts oben) – kleine Leucht-Schale bei ~(430, 200): Wer den Abschuss mit dem Power-Balken so dosiert, dass die Kugel direkt hineinfällt, bekommt „PERFEKTER START. NATÜRLICH." (+5000). Gibt dem Federkraft-Balken endlich einen Sinn und belebt genau die rechte Zone, durch die die Kugel bisher nur durchfällt.
+3. Captive Ball „Der Teammate" (links oben) – eine kurze, geschlossene Gasse mit einer zweiten, dauerhaft gefangenen Kugel. Man schießt sie an, sie knallt ans Gassenende (Punkte je nach Wucht), kommt aber nie frei. Bester Song-Gag: das Team ist da, kann aber nichts tun.
+4. G-G-E-Z-Rollover-Gassen (rechts oben) – 3–4 kurze parallele Gassen mit Leuchtbuchstaben, durch die die Kugel von oben durchrollt. G-G-E-Z vollständig → Bonus + Ego-Level, Chat spammt „gg ez". Der Pinball-Klassiker für Top-Lanes.
+5. Speedrun-Loop (links, ohne neues Bauteil) – die bestehende Bahn links um das Pad als Orbit werten: Lichtschranke oben, jede volle Passage zählt „RUNDE ×" mit steigenden Punkten, drei in Folge zünden Frenzy. Nur Logik + zwei Leucht-Pfeile.
+

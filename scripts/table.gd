@@ -18,9 +18,9 @@ const ARCH_C := Vector2(270, 330)
 const ARCH_R := 250.0
 
 const NEON_PINK := Color(1.7, 0.28, 1.0)
-const NEON_GREEN := Color(0.35, 1.8, 0.25)
+const NEON_GREEN := Color(0.3, 1.35, 0.22)
 const NEON_CYAN := Color(0.15, 1.6, 1.8)
-const NEON_GOLD := Color(1.9, 1.3, 0.2)
+const NEON_GOLD := Color(1.5, 1.08, 0.22)
 const NEON_VIOLET := Color(1.1, 0.4, 1.9)
 
 ## Aufbau der Banden nach dem Vorbild von Flipper03 (_draw_rails):
@@ -163,8 +163,8 @@ static func build(parent: Node2D) -> Dictionary:
 	parent.add_child(TableDeco.new("chevron", Vector2(105, 170), NEON_PINK, 1.0, 225.0))
 	parent.add_child(TableDeco.new("chevron", Vector2(85, 200), NEON_PINK, 1.0, 225.0))
 
-	_deco(parent, "KEIN HEAL", Vector2(30, 745), Color(0.35, 1.8, 0.25, 0.5), 11, 72.0)
-	_deco(parent, "KEIN PLAN", Vector2(412, 698), Color(0.35, 1.8, 0.25, 0.5), 11, 62.0)
+	_deco(parent, "KEIN HEAL", Vector2(30, 745), Color(0.3, 1.35, 0.22, 0.5), 11, 72.0)
+	_deco(parent, "KEIN PLAN", Vector2(412, 698), Color(0.3, 1.35, 0.22, 0.5), 11, 62.0)
 	_deco(parent, "KEIN SKILL.", Vector2(208, 900), Color(1.0, 0.3, 0.6, 0.55), 12, 0.0)
 	_deco(parent, "CARRY QUEEN", Vector2(225, 655), Color(1.0, 0.24, 0.62, 0.75), 12, 0.0)
 	_deco(parent, "SPACE HALTEN", Vector2(505, 740), Color(1.1, 0.4, 1.9, 0.5), 10, 90.0)

@@ -5,10 +5,10 @@ extends Node2D
 
 var kind := "comet"
 var deco_size := 1.0
-var col := Color(1.9, 1.3, 0.2)
+var col := Color(1.5, 1.08, 0.22)
 
 
-func _init(k: String, pos: Vector2, c: Color = Color(1.9, 1.3, 0.2), s: float = 1.0, rot_deg: float = 0.0) -> void:
+func _init(k: String, pos: Vector2, c: Color = Color(1.5, 1.08, 0.22), s: float = 1.0, rot_deg: float = 0.0) -> void:
 	kind = k
 	position = pos
 	col = c
@@ -26,7 +26,7 @@ func _draw() -> void:
 	match kind:
 		"spiral":
 			draw_circle(Vector2.ZERO, 74.0 * deco_size, Color(0.10, 0.04, 0.10, 0.9))
-			var arm_cols := [Color(1.5, 0.3, 0.75, 0.55), Color(1.7, 1.15, 0.2, 0.5), Color(0.2, 1.4, 1.6, 0.45)]
+			var arm_cols := [Color(1.5, 0.3, 0.75, 0.55), Color(1.4, 0.95, 0.2, 0.5), Color(0.2, 1.4, 1.6, 0.45)]
 			for arm in 3:
 				var pts := PackedVector2Array()
 				for i in 30:
@@ -34,8 +34,8 @@ func _draw() -> void:
 					var th := arm * TAU / 3.0 + rr * 0.055
 					pts.append(Vector2(cos(th), sin(th)) * rr * deco_size)
 				draw_polyline(pts, arm_cols[arm], 3.0)
-			draw_arc(Vector2.ZERO, 74.0 * deco_size, 0, TAU, 48, Color(1.7, 1.15, 0.2, 0.5), 2.0)
-			draw_circle(Vector2.ZERO, 10.0 * deco_size, Color(1.7, 1.15, 0.2, 0.8))
+			draw_arc(Vector2.ZERO, 74.0 * deco_size, 0, TAU, 48, Color(1.4, 0.95, 0.2, 0.5), 2.0)
+			draw_circle(Vector2.ZERO, 10.0 * deco_size, Color(1.4, 0.95, 0.2, 0.8))
 		"comet":
 			draw_circle(Vector2.ZERO, 5.0 * deco_size, col)
 			for i in 3:

@@ -519,7 +519,7 @@ func _save_return() -> void:
 		return
 	var lbl := Label.new()
 	lbl.add_theme_font_size_override("font_size", 26)
-	lbl.add_theme_color_override("font_color", Color(1.9, 1.3, 0.2))
+	lbl.add_theme_color_override("font_color", Color(1.5, 1.08, 0.22))
 	lbl.add_theme_constant_override("outline_size", 7)
 	lbl.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.85))
 	lbl.position = Vector2(207, 894)
