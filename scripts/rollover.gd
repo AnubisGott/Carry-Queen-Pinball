@@ -55,7 +55,6 @@ func _on_pass(body: Node2D) -> void:
 	set_lit(true)
 	Sfx.play("standup", -6.0)
 	Game.add_score(500, body)
-	Game.add_ego(1)
 	Game.emit("rollover")
 
 

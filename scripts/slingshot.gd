@@ -63,6 +63,5 @@ func _on_hit(body: Node2D) -> void:
 	body.apply_central_impulse(kick_normal * 520.0)
 	Sfx.play("sling", -6.0)
 	Game.add_score(60, body)
-	Game.add_ego(1)
 	Game.emit("sling")
 	queue_redraw()

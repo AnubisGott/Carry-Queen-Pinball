@@ -361,7 +361,6 @@ func _check_ggez() -> void:
 		if not r.lit:
 			return
 	Game.add_score(5000)
-	Game.add_ego(4)
 	Sfx.play("jackpot", -4.0)
 	Game.emit("ggez")
 	if Game.multiball:
@@ -680,12 +679,14 @@ func _start_ball(first: bool = false) -> void:
 	Game.damage_points = 0
 	Game.tilted = false
 	nudge_heat = 0.0
-	# Kill-Serie und volle DAMAGE-Bank erloeschen erst beim Ballwechsel
+	# Kill-Serie, volle DAMAGE-Bank und EGO-Multiplikator erloeschen erst
+	# beim Ballwechsel
 	streak_letters.clear()
 	_streak_done = false
 	_update_bumper_marks()
 	for d in drops:
 		d.reset()
+	Game.reset_ego()
 	plunger.release()
 	Game.emit("save_armed")
 	_spawn_ball(SPAWN)

@@ -46,7 +46,6 @@ func _on_enter(body: Node2D) -> void:
 	ball.set_deferred("global_position", global_position + Vector2(0, -6))
 	Sfx.play("lock", -6.0)
 	Game.add_score(1000, ball)
-	Game.add_ego(2)
 	Game.emit("scoop")
 	_eject_later(ball)
 

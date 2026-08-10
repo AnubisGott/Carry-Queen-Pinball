@@ -69,7 +69,6 @@ func _on_hit(body: Node2D) -> void:
 	Sfx.play("target", -4.0)
 	var pts := Game.add_score(500, body)
 	Game.damage_points += pts
-	Game.add_ego(2)
 	Game.emit("drop_target", {"letter": letter})
 
 

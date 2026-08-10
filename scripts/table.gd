@@ -59,16 +59,7 @@ static func build(parent: Node2D) -> Dictionary:
 	# zum OP-Spinner bleibt von unten her erreichbar.
 	_wall(parent, [Vector2(230, 96), Vector2(203, 104), Vector2(185, 122),
 			Vector2(183, 144), Vector2(192, 162), Vector2(207, 172)], NEON_CYAN)
-	# Leit-Band oben links (Nutzer-Skizze): dickes, fast waagerechtes Band
-	# unter dem Aussenbogen, das am Haken endet.  Eine unsichtbare
-	# Versiegelung schliesst den Keil zwischen Band, Bogen und Haken, damit
-	# sich dort keine Kugel verklemmen kann.  Orbit-Baelle rutschen an der
-	# Unterseite entlang in die Gassen.
-	var guide_pts := [Vector2(114, 155), Vector2(140, 150), Vector2(166, 146),
-			Vector2(190, 143), Vector2(210, 140)]
-	_wall(parent, guide_pts, NEON_CYAN, false, true)
-	_thick_band(parent, guide_pts, NEON_CYAN)
-	_wall(parent, [Vector2(199, 110), Vector2(209, 139)], NEON_CYAN, false, true)
+	# (Leit-Band wieder entfernt - hat optisch nicht gepasst)
 	# Linke Inlane ("KEIN HEAL").  Oberes Ende weit genug vom Slingshot weg,
 	# damit die Einfahrt in die Laufrinne mehr als eine Kugelbreite bietet.
 	# Untere Enden ueberlappen den Schwenkkreis der hinteren Flipper-Ecke -

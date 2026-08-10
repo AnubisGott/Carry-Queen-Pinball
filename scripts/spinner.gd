@@ -46,5 +46,4 @@ func _on_pass(body: Node2D) -> void:
 	_spin_speed = clampf(pb.linear_velocity.length() / 30.0, 8.0, 60.0)
 	Sfx.play("spin", -8.0)
 	Game.add_score(200, body)
-	Game.add_ego(2)
 	Game.emit("spinner")

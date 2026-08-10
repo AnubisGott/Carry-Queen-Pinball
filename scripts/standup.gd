@@ -55,7 +55,6 @@ func _on_hit(body: Node2D) -> void:
 	_cool = 0.4
 	Sfx.play("standup", -5.0)
 	Game.add_score(300, body)
-	Game.add_ego(1)
 	if not lit:
 		lit = true
 		queue_redraw()

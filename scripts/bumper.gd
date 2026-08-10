@@ -101,6 +101,5 @@ func _on_hit(body: Node2D) -> void:
 	body.apply_central_impulse(dir * kick)
 	Sfx.play(sfx_name, -6.0)
 	Game.add_score(150, body)
-	Game.add_ego(1)
 	Game.emit("bumper", {"letter": letter})
 	queue_redraw()

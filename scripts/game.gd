@@ -72,14 +72,20 @@ func add_score(base: int, source_ball: Node = null) -> int:
 	return pts
 
 
-func add_ego(n: int) -> void:
+## Nur der EGO-Knopf hebt den Multiplikator - genau eine Stufe pro Treffer.
+func ego_level_up() -> void:
 	if blackout or game_over or tilted:
 		return
-	ego += n
-	var lvl := clampi(1 + ego / 12, 1, 10)
-	if lvl != ego_mult:
-		ego_mult = lvl
+	if ego_mult < 10:
+		ego_mult += 1
 		emit("ego_level", {"mult": ego_mult})
+	emit("ego")
+
+
+## Ballverlust setzt den Multiplikator auf x1 zurueck.
+func reset_ego() -> void:
+	ego = 0
+	ego_mult = 1
 	emit("ego")
 
 

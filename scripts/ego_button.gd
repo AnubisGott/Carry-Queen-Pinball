@@ -10,8 +10,7 @@ func _on_hit(body: Node2D) -> void:
 	_cool = 0.5
 	Sfx.play("ego_up", -2.0)
 	Game.add_score(1000, body)
-	# Genau eine Stufe rauf: bis zum naechsten Vielfachen von 12 auffuellen
-	Game.add_ego(12 - (Game.ego % 12))
+	Game.ego_level_up()
 	lit = true
 	queue_redraw()
 	_unlight()
