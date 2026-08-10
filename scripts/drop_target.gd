@@ -41,23 +41,24 @@ func _process(delta: float) -> void:
 
 
 func _draw() -> void:
-	# Getroffene Targets "versinken": bleiben lesbar, aber dunkel und ohne Glow.
+	# Einheitliche Bank-Logik im ganzen Spiel: getroffen = leuchtet.
+	# Stehende Targets sind gedimmt, gefallene leuchten kraeftig rot.
 	var r := Rect2(-W / 2, -H / 2, W, H)
 	var bg: Color
 	var border: Color
 	var letter_col: Color
 	if dropped:
-		bg = Color(0.05, 0.02, 0.04)
-		border = Color(0.42, 0.10, 0.18)
-		letter_col = Color(0.55, 0.16, 0.28)
-	else:
 		bg = Color(0.1, 0.03, 0.08)
 		border = Color(1.8, 0.3, 0.5)
 		letter_col = Color(2.0, 0.5, 0.8)
+	else:
+		bg = Color(0.05, 0.02, 0.04)
+		border = Color(0.5, 0.12, 0.2)
+		letter_col = Color(0.62, 0.2, 0.32)
 	border = border.lerp(Color(2.2, 2.2, 2.2), _flash)
 	letter_col = letter_col.lerp(Color(2.2, 1.6, 1.8), _flash)
 	draw_rect(r, bg)
-	draw_rect(r, border, false, 1.5 if dropped else 2.0)
+	draw_rect(r, border, false, 2.0 if dropped else 1.5)
 	var f := ThemeDB.fallback_font
 	draw_string(f, Vector2(-5, 4), letter, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, letter_col)
 

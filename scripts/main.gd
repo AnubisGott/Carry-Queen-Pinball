@@ -20,6 +20,7 @@ var standups: Array = []
 var ggez: Array = []
 var ego_bank: Array = []
 var lane_chevrons: Array = []
+var bumpers: Dictionary = {}
 var locked_balls: Array = []
 var dim: CanvasModulate
 
@@ -64,6 +65,7 @@ func _ready() -> void:
 	ggez = refs.get("ggez", [])
 	ego_bank = refs.get("ego_bank", [])
 	lane_chevrons = refs.get("lane_chevrons", [])
+	bumpers = refs.get("bumpers", {})
 	throne = refs.get("throne", null)
 	plunger = refs["plunger"]
 	if throne:
@@ -251,6 +253,7 @@ func _update_timers(delta: float) -> void:
 		streak_time -= delta
 		if streak_time <= 0.0:
 			streak_letters.clear()
+			_update_bumper_marks()
 	if hurry_active:
 		hurry_time -= delta
 		hurry_value = maxi(5000, hurry_value - int(1600.0 * delta))
@@ -331,6 +334,14 @@ func _on_bumper(letter: String) -> void:
 		Game.emit("kill")
 		if Game.kills >= 3:
 			Game.discipline_done("KILLS")
+	_update_bumper_marks()
+
+
+## Goldene Markierung an allen Bumpern, die in der laufenden Kill-Serie
+## schon getroffen wurden.
+func _update_bumper_marks() -> void:
+	for letter in bumpers:
+		bumpers[letter].set_marked(streak_letters.has(letter))
 
 
 func _check_bank() -> void:
@@ -675,6 +686,7 @@ func _restart() -> void:
 	if throne:
 		throne.release_ready()
 	streak_letters.clear()
+	_update_bumper_marks()
 	hurry_active = false
 	frenzy_time = 0.0
 	wizard_time = 0.0

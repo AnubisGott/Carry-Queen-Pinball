@@ -51,24 +51,14 @@ static func build(parent: Node2D) -> Dictionary:
 	_wall(parent, [Vector2(466, 960), Vector2(466, 300)], NEON_VIOLET, false, true)
 	_wall(parent, [Vector2(DIVIDER, 305), Vector2(445, 335)], NEON_VIOLET)
 	_wall(parent, [Vector2(DIVIDER, 935), Vector2(RIGHT, 935)], NEON_VIOLET)
-	# Fang-Trichter oben links: leitet Baelle durch den Spinner nach unten.
-	# Als Bogen konzentrisch zum Aussenbogen (r~211 um die Bogenmitte) statt
-	# als gerader Stab - der Kanal hat so ueberall gleiche Breite.
-	_wall(parent, [Vector2(160, 150), Vector2(140, 164), Vector2(123, 178),
-			Vector2(108, 194), Vector2(95, 212), Vector2(83, 232)], NEON_CYAN)
-	# Zweite Trichterwand (Symmetrie-Wunsch): fasst den Kanal zum OP-Spinner
-	# von unten ein - die E-G-O-Targets liegen mitten in der Gasse.  Beide
-	# Enden halten mehr als Kugelbreite Abstand zu Haken und Steg 1, damit
-	# dort keine Ruhe-Tasche entsteht.
-	_wall(parent, [Vector2(185, 195), Vector2(148, 237), Vector2(116, 267)],
-			NEON_CYAN, false, false, true)
+	# Die beiden Trichterwaende wurden auf Nutzerwunsch entfernt - die
+	# E-G-O-Targets stehen frei, der Bereich zum OP-Spinner ist offen.
 	# Sanfte Ablenkung am linken Bogen-Abstieg (Nutzer-Skizze, rotes Kreuz):
 	# ein Haken-Bogen faengt den ueber den Scheitel kommenden Ball ab und
 	# schickt ihn nach rechts unten in die G-G-E-Z-Gassen.  Der Trichter
 	# zum OP-Spinner bleibt von unten her erreichbar.
 	_wall(parent, [Vector2(230, 96), Vector2(203, 104), Vector2(185, 122),
-			Vector2(183, 144), Vector2(192, 162), Vector2(207, 172)],
-			NEON_CYAN, false, false, true)
+			Vector2(183, 144), Vector2(192, 162), Vector2(207, 172)], NEON_CYAN)
 	# Linke Inlane ("KEIN HEAL").  Oberes Ende weit genug vom Slingshot weg,
 	# damit die Einfahrt in die Laufrinne mehr als eine Kugelbreite bietet.
 	# Untere Enden ueberlappen den Schwenkkreis der hinteren Flipper-Ecke -
@@ -133,8 +123,12 @@ static func build(parent: Node2D) -> Dictionary:
 	parent.add_child(Slingshot.new([Vector2(356, 689), Vector2(291, 769), Vector2(309, 781), Vector2(340, 729)], Vector2(-80, -65)))
 
 	# WASD-Bumper auf dem Pad, S liegt tiefer und fuettert die Mulde
+	var bumpers := {}
 	for b in [["W", Vector2(270, 300)], ["A", Vector2(175, 350)], ["D", Vector2(365, 350)], ["S", Vector2(270, 395)]]:
-		parent.add_child(Bumper.new(b[1], b[0]))
+		var bu := Bumper.new(b[1], b[0])
+		parent.add_child(bu)
+		bumpers[b[0]] = bu
+	refs["bumpers"] = bumpers
 
 	var drops := []
 	var letters := ["D", "A", "M", "A", "G", "E"]
