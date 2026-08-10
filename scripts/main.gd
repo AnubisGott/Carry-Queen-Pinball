@@ -1,7 +1,7 @@
 extends Node2D
 ## Spielsteuerung: Ballfluss, Disziplinen/Modi, Plunger, Blackout, Match-Report.
 
-const SPAWN := Vector2(495, 848)
+const SPAWN := Vector2(495, 854)
 
 const WIZARD_LINES := [
 	"WER MACHT DEN SCHADEN? ICH.",
@@ -639,6 +639,7 @@ func _start_ball(first: bool = false) -> void:
 	Game.damage_points = 0
 	Game.tilted = false
 	nudge_heat = 0.0
+	plunger.release()
 	Game.emit("save_armed")
 	_spawn_ball(SPAWN)
 	if first:

@@ -18,6 +18,13 @@ func _init() -> void:
 
 func _ready() -> void:
 	sync_to_physics = true
+	# Absorbierend: zieht die Sprungkraft des Balls ab, damit die frisch
+	# eingelegte Kugel nicht auf dem Teller herumdopst.
+	var pm := PhysicsMaterial.new()
+	pm.bounce = 0.32
+	pm.absorbent = true
+	pm.friction = 0.6
+	physics_material_override = pm
 	var cs := CollisionShape2D.new()
 	var cap := CapsuleShape2D.new()
 	cap.radius = 5.0
