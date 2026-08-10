@@ -42,7 +42,8 @@ func _on_enter(body: Node2D) -> void:
 	queue_redraw()
 	var ball := body as PinBall
 	ball.set_deferred("freeze", true)
-	ball.hide()
+	# Sichtbar in der Schale liegen lassen - nicht verstecken
+	ball.set_deferred("global_position", global_position + Vector2(0, -6))
 	Sfx.play("lock", -6.0)
 	Game.add_score(1000, ball)
 	Game.add_ego(2)
@@ -55,7 +56,6 @@ func _eject_later(ball: PinBall) -> void:
 	if is_instance_valid(ball):
 		ball.global_position = global_position + Vector2(0, -20)
 		ball.freeze = false
-		ball.show()
 		# Auswurf nach oben, zufaellig links oder rechts an den Hoernern vorbei
 		var side := 1.0 if randf() < 0.5 else -1.0
 		ball.linear_velocity = Vector2(side * randf_range(180, 260), -580)
