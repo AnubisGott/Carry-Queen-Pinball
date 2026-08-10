@@ -102,10 +102,11 @@ func _mix(parts: Array) -> AudioStreamWAV:
 
 func _build_all() -> void:
 	_streams["flip"] = _mix([_tone(180, 0.05, 0.5, "square", 60)])
-	_streams["bump_w"] = _mix([_tone(520, 0.09, 0.5, "square", 180)])
-	_streams["bump_a"] = _mix([_tone(440, 0.09, 0.5, "square", 160)])
-	_streams["bump_s"] = _mix([_tone(392, 0.09, 0.5, "square", 140)])
-	_streams["bump_d"] = _mix([_tone(587, 0.09, 0.5, "square", 200)])
+	# Tiefe, pro Bumper unterschiedliche Toene (S am tiefsten, D am hoechsten)
+	_streams["bump_w"] = _mix([_tone(233, 0.12, 0.55, "square", 60)])
+	_streams["bump_a"] = _mix([_tone(196, 0.12, 0.55, "square", 50)])
+	_streams["bump_s"] = _mix([_tone(165, 0.12, 0.55, "square", 40)])
+	_streams["bump_d"] = _mix([_tone(262, 0.12, 0.55, "square", 70)])
 	_streams["sling"] = _mix([_tone(240, 0.07, 0.5, "saw", 120)])
 	_streams["spin"] = _mix([_tone(880, 0.03, 0.25, "square")])
 	_streams["target"] = _mix([_tone(300, 0.08, 0.5, "square", -80)])

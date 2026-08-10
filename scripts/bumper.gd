@@ -2,7 +2,7 @@ class_name Bumper
 extends StaticBody2D
 ## Pop-Bumper im RGB-Tastatur-Look (W / A / S / D).
 
-const RADIUS := 26.0
+const RADIUS := 30.0
 const KICK := 620.0
 
 var letter := "W"
