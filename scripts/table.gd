@@ -59,12 +59,14 @@ static func build(parent: Node2D) -> Dictionary:
 	# zum OP-Spinner bleibt von unten her erreichbar.
 	_wall(parent, [Vector2(230, 96), Vector2(203, 104), Vector2(185, 122),
 			Vector2(183, 144), Vector2(192, 162), Vector2(207, 172)], NEON_CYAN)
-	# Leit-Bogen oben links (Nutzer-Skizze): schliesst links buendig an die
-	# Aussenbande an und muendet versiegelt am Haken - Kugeln, die den linken
-	# Orbit hochlaufen, werden so ebenfalls in die Gassen gefuehrt.  Beide
-	# Enden unter Kugelbreite Abstand, damit keine Keil-Tasche entsteht.
-	_wall(parent, [Vector2(222, 110), Vector2(196, 120), Vector2(170, 132),
-			Vector2(145, 143), Vector2(116, 154)], NEON_CYAN)
+	# Leit-Bogen oben links (Nutzer-Skizze): laeuft als verdickte Bande
+	# konzentrisch 12px innerhalb des Aussenbogens (ueberall unter
+	# Kugelbreite Abstand - versiegelt, keine Falle) und endet dicht am
+	# Haken.  Orbit- und Ueberkopf-Baelle rutschen so in die Gassen.
+	var guide_pts := [Vector2(210, 104), Vector2(185, 112), Vector2(160, 124),
+			Vector2(136, 138), Vector2(114, 156)]
+	_wall(parent, guide_pts, NEON_CYAN, false, true)
+	_thick_band(parent, guide_pts, NEON_CYAN)
 	# Linke Inlane ("KEIN HEAL").  Oberes Ende weit genug vom Slingshot weg,
 	# damit die Einfahrt in die Laufrinne mehr als eine Kugelbreite bietet.
 	# Untere Enden ueberlappen den Schwenkkreis der hinteren Flipper-Ecke -
@@ -331,6 +333,31 @@ static func _wall(parent: Node2D, pts: Array, color: Color, sharp: bool = false,
 			node.position = pts[i]
 			node.color = Color(color.r, color.g, color.b, 0.95)
 			parent.add_child(node)
+
+
+## Dickes Kapsel-Band entlang einer Polylinie - die Optik der Inlane-
+## Leisten fuer geschwungene Leit-Bahnen (Kollision kommt separat).
+static func _thick_band(parent: Node2D, pts: Array, color: Color) -> void:
+	var packed := PackedVector2Array(pts)
+	var shifted := PackedVector2Array()
+	for p in pts:
+		shifted.append(p + SHADOW_OFF)
+	var layers := [
+		[shifted, 16.0, Color(0, 0, 0, 0.7)],
+		[packed, 20.0, Color(color.r, color.g, color.b, 0.15)],
+		[packed, 12.0, CORE_DARK],
+		[packed, 9.0, Color(color.r, color.g, color.b, 0.55)],
+		[packed, 3.0, Color(1.1, 1.1, 1.1, 0.5)],
+	]
+	for l in layers:
+		var line := Line2D.new()
+		line.points = l[0]
+		line.width = l[1]
+		line.default_color = l[2]
+		line.joint_mode = Line2D.LINE_JOINT_ROUND
+		line.begin_cap_mode = Line2D.LINE_CAP_ROUND
+		line.end_cap_mode = Line2D.LINE_CAP_ROUND
+		parent.add_child(line)
 
 
 ## Rein dekorativer Winkel in einer Ecke: zwei Schenkel im rechten Winkel und
