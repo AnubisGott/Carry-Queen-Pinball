@@ -304,7 +304,17 @@ func _on_event(kind: String, data: Dictionary) -> void:
 		"all_disciplines":
 			_start_wizard()
 		"scoop":
-			hud.show_message("ZURUECK INS SPIEL.", "Gern geschehen.", 1.8)
+			if hurry_active:
+				# Hurry-Up wird seit dem Thron-Abriss an der Mulde abgeholt
+				var pts := Game.add_score(hurry_value)
+				_end_hurry()
+				Game.discipline_done("ICH")
+				hud.show_message("ICH. WER SONST.", "+" + Hud.fmt(pts), 2.2)
+				Sfx.play("jackpot")
+				Sfx.say("beste")
+				Game.emit("jackpot")
+			else:
+				hud.show_message("ZURUECK INS SPIEL.", "Gern geschehen.", 1.8)
 
 
 func _on_bumper(letter: String) -> void:
@@ -364,11 +374,33 @@ func _check_ggez() -> void:
 	Game.add_score(5000)
 	Game.add_ego(4)
 	Sfx.play("jackpot", -4.0)
-	hud.show_message("G-G-E-Z.", "Waren ja auch nur vier Gassen.", 2.2)
 	Game.emit("ggez")
+	if Game.multiball:
+		hud.show_message("G-G-E-Z.", "Waren ja auch nur vier Gassen.", 2.2)
+	else:
+		# Komplette Bank ersetzt das Thron-Parken: Ko-op-Multiball + CARRY
+		_start_ggez_multiball()
 	await get_tree().create_timer(1.0, false).timeout
 	for r in ggez:
 		r.set_lit(false)
+
+
+## Multiball ohne Thron: die komplette G-G-E-Z-Bank ruft das "Team" aufs
+## Feld - nur die pinke Carry-Kugel zaehlt richtig (x10).
+func _start_ggez_multiball() -> void:
+	Game.multiball = true
+	Game.discipline_done("CARRY")
+	Sfx.play("mode")
+	Sfx.say("koop")
+	hud.show_message("G-G-E-Z: KO-OP-MULTIBALL!", "Vier Spieler. Ein Carry. Ich.", 3.0)
+	Game.emit("multiball")
+	for b in get_tree().get_nodes_in_group("balls"):
+		if b is PinBall and not b.freeze and not b.is_queued_for_deletion():
+			b.set_carry(true)
+			break
+	for i in 2:
+		await get_tree().create_timer(0.5, false).timeout
+		_spawn_ball(Vector2(270, 185), false, Vector2(randf_range(-60, 60), 300))
 
 
 func _check_ich() -> void:
@@ -382,7 +414,7 @@ func _check_ich() -> void:
 	hurry_value = 25000
 	hurry_time = 12.0
 	Sfx.play("mode", -3.0)
-	hud.show_message("I-C-H KOMPLETT!", "Hurry-Up: Triff den THRON!", 2.5)
+	hud.show_message("I-C-H KOMPLETT!", "Hurry-Up: Triff die MULDE in der Mitte!", 2.5)
 
 
 func _end_hurry() -> void:
