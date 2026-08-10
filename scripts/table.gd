@@ -55,10 +55,9 @@ static func build(parent: Node2D) -> Dictionary:
 	# rot (119,152) - gruen (161,153) - blau (195,162).  Sie faengt Baelle,
 	# die ueber den Bogenscheitel kommen, und leitet sie nach rechts unten.
 	_wall(parent, [Vector2(119, 152), Vector2(161, 153), Vector2(195, 162)], NEON_CYAN)
-	# Ablenker am linken Bogen-Abstieg, auf sein oberes Stueck gekuerzt:
-	# sein absteigender Arm stand sonst quer auf der neuen Leitplanke.  So
-	# rutscht der Ball ueber den Ablenker und faellt auf die Planke.
-	_wall(parent, [Vector2(230, 96), Vector2(203, 104), Vector2(185, 122)], NEON_CYAN)
+	# Ablenker am linken Bogen-Abstieg
+	_wall(parent, [Vector2(230, 96), Vector2(203, 104), Vector2(185, 122),
+			Vector2(183, 144), Vector2(192, 162), Vector2(207, 172)], NEON_CYAN)
 	# (Leit-Band wieder entfernt - hat optisch nicht gepasst)
 	# Linke Inlane ("KEIN HEAL").  Oberes Ende weit genug vom Slingshot weg,
 	# damit die Einfahrt in die Laufrinne mehr als eine Kugelbreite bietet.
