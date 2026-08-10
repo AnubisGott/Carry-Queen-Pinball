@@ -29,7 +29,7 @@ var charging := false
 var _crank_step := 0
 
 var streak_letters := {}
-var streak_time := 0.0
+var _streak_done := false
 
 var hurry_active := false
 var hurry_value := 0
@@ -249,11 +249,6 @@ func _update_plunger(delta: float) -> void:
 
 
 func _update_timers(delta: float) -> void:
-	if streak_time > 0.0:
-		streak_time -= delta
-		if streak_time <= 0.0:
-			streak_letters.clear()
-			_update_bumper_marks()
 	if hurry_active:
 		hurry_time -= delta
 		hurry_value = maxi(5000, hurry_value - int(1600.0 * delta))
@@ -324,9 +319,10 @@ func _on_bumper(letter: String) -> void:
 	if letter == "":
 		return
 	streak_letters[letter] = true
-	streak_time = 6.0
-	if streak_letters.size() >= 4:
-		streak_letters.clear()
+	# Keine 6-Sekunden-Regel: die Markierungen bleiben bis zum Ballverlust.
+	# Der Kill zuendet beim vierten Bumper genau einmal pro Ball.
+	if streak_letters.size() >= 4 and not _streak_done:
+		_streak_done = true
 		Game.kills += 1
 		var pts := Game.add_score(3000)
 		Sfx.play("jackpot", -6.0)
@@ -686,6 +682,7 @@ func _restart() -> void:
 	if throne:
 		throne.release_ready()
 	streak_letters.clear()
+	_streak_done = false
 	_update_bumper_marks()
 	hurry_active = false
 	frenzy_time = 0.0
@@ -701,6 +698,10 @@ func _start_ball(first: bool = false) -> void:
 	Game.damage_points = 0
 	Game.tilted = false
 	nudge_heat = 0.0
+	# Kill-Serie erlischt erst beim Ballwechsel
+	streak_letters.clear()
+	_streak_done = false
+	_update_bumper_marks()
 	plunger.release()
 	Game.emit("save_armed")
 	_spawn_ball(SPAWN)
