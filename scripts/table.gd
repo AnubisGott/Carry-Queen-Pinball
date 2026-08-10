@@ -65,11 +65,6 @@ static func build(parent: Node2D) -> Dictionary:
 	# Thron-Pfosten
 	_wall(parent, [Vector2(250, 82), Vector2(250, 160)], NEON_GOLD)
 	_wall(parent, [Vector2(290, 82), Vector2(290, 160)], NEON_GOLD)
-	# Thron-Dach: Leitbanden fuehren den Einwurf rechts oder links am Thron
-	# vorbei ins Feld - in den Thron kommt man nur noch von unten.  Die
-	# oberen Enden schliessen an den Bogen an (kein kugelbreiter Spalt).
-	_wall(parent, [Vector2(346, 96), Vector2(298, 168)], NEON_GOLD, false, false, true)
-	_wall(parent, [Vector2(194, 96), Vector2(242, 168)], NEON_GOLD, false, false, true)
 	# Hoerner der Mulde (Trichter unter dem S-Bumper); blitzen bei Beruehrung
 	_wall(parent, [Vector2(240, 455), Vector2(252, 492)], NEON_GOLD, false, false, true)
 	_wall(parent, [Vector2(300, 455), Vector2(288, 492)], NEON_GOLD, false, false, true)
@@ -167,13 +162,6 @@ static func build(parent: Node2D) -> Dictionary:
 	refs["throne"] = throne
 
 	parent.add_child(LaneGate.new(Vector2(495, 276)))
-
-	# Streu-Pins am rechten Bogen-Abstieg: der Einwurf trifft sie je nach
-	# Tempo unterschiedlich (oder faedelt zwischen ihnen durch) - damit
-	# endet nicht mehr jeder Start im Thron.
-	_pin(parent, Vector2(436, 170))
-	_pin(parent, Vector2(386, 132))
-	_pin(parent, Vector2(336, 111))
 
 	# G-G-E-Z-Rollover-Gassen oben rechts unter dem Bogen (FEATURE_GGEZ):
 	# vier parallele Stege bilden G-G-E, die Z-Gasse ist der offene Korridor
@@ -322,31 +310,6 @@ static func _wall(parent: Node2D, pts: Array, color: Color, sharp: bool = false,
 			node.position = pts[i]
 			node.color = Color(color.r, color.g, color.b, 0.95)
 			parent.add_child(node)
-
-
-## Kleiner runder Streu-Poller im Nieten-Look: lenkt die Kugel je nach
-## Auftreffwinkel unterschiedlich ab.
-static func _pin(parent: Node2D, at: Vector2) -> void:
-	var body := StaticBody2D.new()
-	body.position = at
-	var pm := PhysicsMaterial.new()
-	pm.bounce = 0.55
-	body.physics_material_override = pm
-	var cs := CollisionShape2D.new()
-	var sh := CircleShape2D.new()
-	sh.radius = 5.0
-	cs.shape = sh
-	body.add_child(cs)
-	parent.add_child(body)
-	var vis := Node2D.new()
-	vis.position = at
-	vis.z_index = 4
-	vis.draw.connect(func() -> void:
-		vis.draw_circle(Vector2(1.5, 2.0), 5.5, Color(0, 0, 0, 0.6))
-		vis.draw_circle(Vector2.ZERO, 5.0, Color(0.10, 0.14, 0.18))
-		vis.draw_arc(Vector2.ZERO, 5.0, 0, TAU, 16, Color(0.78, 0.83, 0.92), 1.5)
-		vis.draw_circle(Vector2.ZERO, 1.6, Color(1.1, 0.4, 1.9)))
-	parent.add_child(vis)
 
 
 ## Rein dekorativer Winkel in einer Ecke: zwei Schenkel im rechten Winkel und
