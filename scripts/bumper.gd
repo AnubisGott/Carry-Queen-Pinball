@@ -9,6 +9,8 @@ var letter := "W"
 var sfx_name := "bump_w"
 var _cool := 0.0
 var _flash := 0.0
+var _repeat := 0
+var _repeat_t := 0.0
 
 
 func _init(pos: Vector2, l: String) -> void:
@@ -45,6 +47,9 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	_cool = maxf(0.0, _cool - delta)
+	_repeat_t = maxf(0.0, _repeat_t - delta)
+	if _repeat_t <= 0.0:
+		_repeat = 0
 	if _flash > 0.0:
 		_flash = maxf(0.0, _flash - delta * 4.0)
 		queue_redraw()
@@ -66,7 +71,18 @@ func _on_hit(body: Node2D) -> void:
 	var dir := (body.global_position - global_position).normalized()
 	if dir == Vector2.ZERO:
 		dir = Vector2.UP
-	body.apply_central_impulse(dir * KICK)
+	# Kleine seitliche Streuung: verhindert endloses Senkrecht-Pingpong
+	# zwischen Bumper und Bogendecke (z.B. in einer Gassen-Mündung)
+	dir = (dir + Vector2(randf_range(-0.22, 0.22), 0.0)).normalized()
+	# Schnelle Wiederholungs-Treffer werden schwaecher: ein Dauer-Zyklus
+	# zwischen Bumper und Decke verliert so Energie und bricht von selbst ab
+	if _repeat_t > 0.0:
+		_repeat += 1
+	else:
+		_repeat = 1
+	_repeat_t = 1.1
+	var kick := maxf(KICK * pow(0.72, _repeat - 1), 140.0)
+	body.apply_central_impulse(dir * kick)
 	Sfx.play(sfx_name, -6.0)
 	Game.add_score(150, body)
 	Game.add_ego(1)

@@ -53,6 +53,13 @@ static func build(parent: Node2D) -> Dictionary:
 	_wall(parent, [Vector2(DIVIDER, 935), Vector2(RIGHT, 935)], NEON_VIOLET)
 	# Fang-Trichter oben links: leitet Baelle durch den Spinner nach unten
 	_wall(parent, [Vector2(160, 150), Vector2(82, 232)], NEON_CYAN)
+	# Sanfte Ablenkung am linken Bogen-Abstieg (Nutzer-Skizze, rotes Kreuz):
+	# ein Haken-Bogen faengt den ueber den Scheitel kommenden Ball ab und
+	# schickt ihn nach rechts unten in die G-G-E-Z-Gassen.  Der Trichter
+	# zum OP-Spinner bleibt von unten her erreichbar.
+	_wall(parent, [Vector2(230, 96), Vector2(203, 104), Vector2(185, 122),
+			Vector2(183, 144), Vector2(192, 162), Vector2(207, 172)],
+			NEON_CYAN, false, false, true)
 	# Linke Inlane ("KEIN HEAL").  Oberes Ende weit genug vom Slingshot weg,
 	# damit die Einfahrt in die Laufrinne mehr als eine Kugelbreite bietet.
 	# Untere Enden ueberlappen den Schwenkkreis der hinteren Flipper-Ecke -
@@ -162,16 +169,21 @@ static func build(parent: Node2D) -> Dictionary:
 	# faellt vom Bogen kommend von oben hindurch aufs Bumper-Pad.
 	var ggez := []
 	if FEATURE_GGEZ:
+		# Der mittlere Steg steht exakt ueber dem W-Bumper: kein Gassen-
+		# Ausgang muendet auf die Bumper-Kuppe (sonst verstopft er die Gasse
+		# und pingpongt die Kugel endlos senkrecht zwischen Bumper und Bogen).
+		# Stege enden bei y=248: die Gassen-Ausgaenge links und rechts des
+		# Plug-Stegs haben so gut 34px Abstand zur Bumper-Kuppe (Kugel: 26).
 		var lane_dir := Vector2(0.483, -0.877)
-		for w in [[Vector2(200, 260), Vector2(222, 220)],
-				[Vector2(238, 260), Vector2(260, 220)],
-				[Vector2(276, 260), Vector2(298, 220)],
-				[Vector2(314, 260), Vector2(336, 220)],
-				[Vector2(352, 260), Vector2(374, 220)]]:
+		for w in [[Vector2(231, 248), Vector2(216, 220)],
+				[Vector2(269, 248), Vector2(254, 220)],
+				[Vector2(307, 248), Vector2(292, 220)],
+				[Vector2(345, 248), Vector2(330, 220)],
+				[Vector2(383, 248), Vector2(368, 220)]]:
 			_wall(parent, w, NEON_VIOLET, false, false, true)
 		var ggez_letters := ["G", "G", "E", "Z"]
-		var centers := [Vector2(230, 240), Vector2(268, 240),
-				Vector2(306, 240), Vector2(344, 240)]
+		var centers := [Vector2(243, 234), Vector2(281, 234),
+				Vector2(319, 234), Vector2(357, 234)]
 		for i in 4:
 			var r := RolloverLane.new(centers[i], ggez_letters[i], lane_dir)
 			parent.add_child(r)
@@ -198,7 +210,6 @@ static func build(parent: Node2D) -> Dictionary:
 	parent.add_child(TableDeco.new("comet", Vector2(38, 540), NEON_GOLD, 1.0, 15.0))
 	parent.add_child(TableDeco.new("comet", Vector2(445, 500), NEON_GOLD, 1.0, -15.0))
 	parent.add_child(TableDeco.new("saturn", Vector2(82, 475), NEON_GOLD))
-	parent.add_child(TableDeco.new("bolt", Vector2(205, 175), NEON_GOLD))
 	parent.add_child(TableDeco.new("arrow", Vector2(375, 520), NEON_CYAN, 1.0, -35.0))
 	# Lane-Pfeile: blinken, solange ein Ball abschussbereit ist (main.gd)
 	var lane_chevrons := []
