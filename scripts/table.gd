@@ -59,12 +59,13 @@ static func build(parent: Node2D) -> Dictionary:
 	# zum OP-Spinner bleibt von unten her erreichbar.
 	_wall(parent, [Vector2(230, 96), Vector2(203, 104), Vector2(185, 122),
 			Vector2(183, 144), Vector2(192, 162), Vector2(207, 172)], NEON_CYAN)
-	# Leit-Bogen oben links (Nutzer-Skizze): laeuft als verdickte Bande
-	# konzentrisch 12px innerhalb des Aussenbogens (ueberall unter
-	# Kugelbreite Abstand - versiegelt, keine Falle) und endet dicht am
-	# Haken.  Orbit- und Ueberkopf-Baelle rutschen so in die Gassen.
-	var guide_pts := [Vector2(210, 104), Vector2(185, 112), Vector2(160, 124),
-			Vector2(136, 138), Vector2(114, 156)]
+	# Leit-Bogen oben links (Nutzer-Skizze): dickes Band, das flach unter dem
+	# Aussenbogen durchlaeuft und an der Haken-Aussenseite muendet.  Beide
+	# Enden sitzen dichter als eine Kugelbreite an Bande bzw. Haken - der
+	# Zwischenraum darueber ist unerreichbar, keine Keil-Falle.  Orbit-
+	# Baelle rutschen an der Unterseite entlang in die Gassen.
+	var guide_pts := [Vector2(114, 155), Vector2(140, 149), Vector2(166, 142),
+			Vector2(183, 135), Vector2(196, 128)]
 	_wall(parent, guide_pts, NEON_CYAN, false, true)
 	_thick_band(parent, guide_pts, NEON_CYAN)
 	# Linke Inlane ("KEIN HEAL").  Oberes Ende weit genug vom Slingshot weg,
