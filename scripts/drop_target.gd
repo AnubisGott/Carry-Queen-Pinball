@@ -7,7 +7,6 @@ const H := 12.0
 
 var letter := "D"
 var dropped := false
-var _col: CollisionShape2D
 var _area: Area2D
 var _flash := 0.0
 
@@ -18,11 +17,8 @@ func _init(pos: Vector2, l: String) -> void:
 
 
 func _ready() -> void:
-	_col = CollisionShape2D.new()
-	var sh := RectangleShape2D.new()
-	sh.size = Vector2(W, H)
-	_col.shape = sh
-	add_child(_col)
+	# Kein physischer Koerper: die Kugel rollt immer ueber die Buchstaben,
+	# nichts prallt ab - getroffen wird rein per Sensor-Flaeche.
 	_area = Area2D.new()
 	var acs := CollisionShape2D.new()
 	var ash := RectangleShape2D.new()
@@ -68,7 +64,6 @@ func _on_hit(body: Node2D) -> void:
 		return
 	dropped = true
 	_flash = 1.0
-	_col.set_deferred("disabled", true)
 	_area.set_deferred("monitoring", false)
 	queue_redraw()
 	Sfx.play("target", -4.0)
@@ -82,6 +77,5 @@ func reset() -> void:
 	if dropped:
 		_flash = 1.0
 	dropped = false
-	_col.set_deferred("disabled", false)
 	_area.set_deferred("monitoring", true)
 	queue_redraw()
