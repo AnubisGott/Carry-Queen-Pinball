@@ -328,8 +328,9 @@ func _on_bumper(letter: String) -> void:
 		Sfx.play("jackpot", -6.0)
 		hud.show_message("KILL BESTAETIGT (%d)" % Game.kills, "+" + Hud.fmt(pts), 1.6)
 		Game.emit("kill")
-		if Game.kills >= 3:
-			Game.discipline_done("KILLS")
+		# Eine komplette W-A-S-D-Serie genuegt - seit die Markierungen bis
+		# zum Ballverlust stehen, gibt es nur noch einen Kill pro Ball.
+		Game.discipline_done("KILLS")
 	_update_bumper_marks()
 
 
