@@ -29,9 +29,9 @@ const NEON_VIOLET := Color(1.1, 0.4, 1.9)
 const CORE_DARK := Color(0.08, 0.13, 0.16)
 const SHADOW_OFF := Vector2(2, 3)
 
-## Feature-Schalter: G-G-E-Z-Rollover-Gassen oben rechts unter dem Bogen.
+## Feature-Schalter: G-G-E-Z-Rollover-Gassen oben mitte (Ex-Thron-Platz).
 ## Auf false setzen, um die Bank samt Logik komplett abzuschalten.
-const FEATURE_GGEZ := false
+const FEATURE_GGEZ := true
 
 ## Feature-Schalter: E-G-O-Standup-Bank schraeg an der Trichterwand oben
 ## links.  Alle drei getroffen -> Ego-Multiplikator steigt sofort.
@@ -157,20 +157,21 @@ static func build(parent: Node2D) -> Dictionary:
 	# Thron auf Nutzerwunsch entfernt - die Mitte oben ist frei
 	parent.add_child(LaneGate.new(Vector2(495, 276)))
 
-	# G-G-E-Z-Rollover-Gassen oben rechts unter dem Bogen (FEATURE_GGEZ):
-	# vier parallele Stege bilden G-G-E, die Z-Gasse ist der offene Korridor
-	# rechts daneben, durch den auch die Klappen-Umlenkung fuehrt.
+	# G-G-E-Z-Rollover-Gassen oben mitte auf dem Ex-Thron-Platz
+	# (FEATURE_GGEZ): fuenf schraege Stege nach Nutzer-Skizze, die Kugel
+	# faellt vom Bogen kommend von oben hindurch aufs Bumper-Pad.
 	var ggez := []
 	if FEATURE_GGEZ:
-		var lane_dir := Vector2(-0.629, 0.777)
-		for w in [[Vector2(343.9, 127.0), Vector2(312.4, 165.9)],
-				[Vector2(376.4, 142.0), Vector2(344.9, 180.9)],
-				[Vector2(405.9, 162.1), Vector2(374.4, 201.0)],
-				[Vector2(431.8, 186.9), Vector2(400.3, 225.8)]]:
+		var lane_dir := Vector2(0.483, -0.877)
+		for w in [[Vector2(200, 260), Vector2(222, 220)],
+				[Vector2(238, 260), Vector2(260, 220)],
+				[Vector2(276, 260), Vector2(298, 220)],
+				[Vector2(314, 260), Vector2(336, 220)],
+				[Vector2(352, 260), Vector2(374, 220)]]:
 			_wall(parent, w, NEON_VIOLET, false, false, true)
 		var ggez_letters := ["G", "G", "E", "Z"]
-		var centers := [Vector2(344.5, 154.0), Vector2(375.5, 171.6),
-				Vector2(403.2, 194.0), Vector2(444.0, 245.0)]
+		var centers := [Vector2(230, 240), Vector2(268, 240),
+				Vector2(306, 240), Vector2(344, 240)]
 		for i in 4:
 			var r := RolloverLane.new(centers[i], ggez_letters[i], lane_dir)
 			parent.add_child(r)
