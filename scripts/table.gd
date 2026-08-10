@@ -47,20 +47,20 @@ static func build(parent: Node2D) -> Dictionary:
 	# Untere Enden ueberlappen den Schwenkkreis der hinteren Flipper-Ecke -
 	# sonst bildet sich dort je nach Flipperstellung eine Kerbe, in der die
 	# Kugel liegen bleibt statt aufs Blatt zu rollen.
-	_bar(parent, Vector2(86, 702), Vector2(151, 833), NEON_GREEN)
+	_bar(parent, Vector2(86, 702), Vector2(151, 833), NEON_GREEN, true)
 	# Rechte Inlane ("KEIN PLAN")
-	_bar(parent, Vector2(410, 700), Vector2(339, 834), NEON_GREEN)
+	_bar(parent, Vector2(410, 700), Vector2(339, 834), NEON_GREEN, true)
 	# Thron-Pfosten
 	_wall(parent, [Vector2(250, 82), Vector2(250, 160)], NEON_GOLD)
 	_wall(parent, [Vector2(290, 82), Vector2(290, 160)], NEON_GOLD)
-	# Hoerner der Mulde (Trichter unter dem S-Bumper)
-	_wall(parent, [Vector2(240, 455), Vector2(252, 492)], NEON_GOLD)
-	_wall(parent, [Vector2(300, 455), Vector2(288, 492)], NEON_GOLD)
+	# Hoerner der Mulde (Trichter unter dem S-Bumper); blitzen bei Beruehrung
+	_wall(parent, [Vector2(240, 455), Vector2(252, 492)], NEON_GOLD, false, false, true)
+	_wall(parent, [Vector2(300, 455), Vector2(288, 492)], NEON_GOLD, false, false, true)
 	# Hoerner der Fang-Mulden beidseitig: leiten die Seitenlaeufe in die Schalen
-	_wall(parent, [Vector2(408, 576), Vector2(421, 602)], NEON_GOLD)
-	_wall(parent, [Vector2(468, 572), Vector2(455, 598)], NEON_GOLD)
-	_wall(parent, [Vector2(82, 576), Vector2(69, 602)], NEON_GOLD)
-	_wall(parent, [Vector2(22, 572), Vector2(35, 598)], NEON_GOLD)
+	_wall(parent, [Vector2(408, 576), Vector2(421, 602)], NEON_GOLD, false, false, true)
+	_wall(parent, [Vector2(468, 572), Vector2(455, 598)], NEON_GOLD, false, false, true)
+	_wall(parent, [Vector2(82, 576), Vector2(69, 602)], NEON_GOLD, false, false, true)
+	_wall(parent, [Vector2(22, 572), Vector2(35, 598)], NEON_GOLD, false, false, true)
 	# Untere Banden: kantig gefast statt rund gebogen - wenige lange Geraden
 	# mit scharfen Knicken, wie die Ecken der Vorlage.  Die Drain-Oeffnung in
 	# der Mitte (210..285) bleibt unveraendert.
@@ -185,7 +185,7 @@ static func _arch_points() -> Array:
 ## `hidden` baut nur die Kollision, ohne Linie - fuer Banden, deren Optik ein
 ## darueberliegendes Element traegt.
 static func _wall(parent: Node2D, pts: Array, color: Color, sharp: bool = false,
-		hidden: bool = false) -> void:
+		hidden: bool = false, flash: bool = false) -> void:
 	var body := StaticBody2D.new()
 	var pm := PhysicsMaterial.new()
 	pm.bounce = 0.28
@@ -247,6 +247,11 @@ static func _wall(parent: Node2D, pts: Array, color: Color, sharp: bool = false,
 	line.begin_cap_mode = cap
 	line.end_cap_mode = cap
 	parent.add_child(line)
+	if flash:
+		var tf := TouchFlash.new(pts, 6.0)
+		tf.watch(under)
+		tf.watch(line)
+		parent.add_child(tf)
 	# Knotenpunkte als kleine Quadrate betonen
 	if sharp:
 		for i in range(1, pts.size() - 1):
@@ -287,7 +292,8 @@ static func _corner_bracket(parent: Node2D, at: Vector2, dir: Vector2, color: Co
 	parent.add_child(box)
 
 
-static func _bar(parent: Node2D, a: Vector2, b: Vector2, color: Color) -> void:
+static func _bar(parent: Node2D, a: Vector2, b: Vector2, color: Color,
+		flash: bool = false) -> void:
 	# Breites, kapselfoermiges Band mit echter physischer Dicke
 	var body := StaticBody2D.new()
 	var pm := PhysicsMaterial.new()
@@ -339,6 +345,12 @@ static func _bar(parent: Node2D, a: Vector2, b: Vector2, color: Color) -> void:
 	core.begin_cap_mode = Line2D.LINE_CAP_ROUND
 	core.end_cap_mode = Line2D.LINE_CAP_ROUND
 	parent.add_child(core)
+	if flash:
+		var tf := TouchFlash.new([a, b], 8.0)
+		tf.watch(under)
+		tf.watch(line)
+		tf.watch(core)
+		parent.add_child(tf)
 
 
 static func _background(parent: Node2D) -> void:
