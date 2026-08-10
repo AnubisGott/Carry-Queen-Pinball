@@ -2,6 +2,10 @@
 - spinner: Punkte pro umdrehung
 - Punkte aufsteigen lassen, damit man Ursache wirkung bessert sieht
 - Kugel größer machen
+- Wenn bestimmte Modi aktiv sind leuchten lassen. 
+- In manchen Fällen die Leuchtkraft verstärken, wenn man einem Ziel näher kommt.
+- Die Bumper spitzer machen. Sie stören, wenn man hoch schießen möchte.
+- Den Bogen oben hinzufügen
 
 To continue this session, run codex resume 019fe73f-ff94-72e2-862a-f500a5904c5e
 d:\daten\development\gaming\Flipper02Codex>

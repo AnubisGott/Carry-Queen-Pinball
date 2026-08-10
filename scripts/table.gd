@@ -51,8 +51,8 @@ static func build(parent: Node2D) -> Dictionary:
 	_wall(parent, [Vector2(466, 960), Vector2(466, 300)], NEON_VIOLET, false, true)
 	_wall(parent, [Vector2(DIVIDER, 305), Vector2(445, 335)], NEON_VIOLET)
 	_wall(parent, [Vector2(DIVIDER, 935), Vector2(RIGHT, 935)], NEON_VIOLET)
-	# Die beiden Trichterwaende wurden auf Nutzerwunsch entfernt - die
-	# E-G-O-Targets stehen frei, der Bereich zum OP-Spinner ist offen.
+	# Der Bereich oben links bleibt offen - Trichterwaende, Leit-Band und
+	# Innen-Bogen wurden alle wieder verworfen.
 	# Sanfte Ablenkung am linken Bogen-Abstieg (Nutzer-Skizze, rotes Kreuz):
 	# ein Haken-Bogen faengt den ueber den Scheitel kommenden Ball ab und
 	# schickt ihn nach rechts unten in die G-G-E-Z-Gassen.  Der Trichter
