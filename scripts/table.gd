@@ -56,6 +56,9 @@ static func build(parent: Node2D) -> Dictionary:
 	# Hoerner der Mulde (Trichter unter dem S-Bumper)
 	_wall(parent, [Vector2(240, 455), Vector2(252, 492)], NEON_GOLD)
 	_wall(parent, [Vector2(300, 455), Vector2(288, 492)], NEON_GOLD)
+	# Hoerner der Fang-Mulde rechts: leiten den Lauf am Trenner in die Schale
+	_wall(parent, [Vector2(408, 576), Vector2(421, 602)], NEON_GOLD)
+	_wall(parent, [Vector2(468, 572), Vector2(455, 598)], NEON_GOLD)
 	# Untere Banden: kantig gefast statt rund gebogen - wenige lange Geraden
 	# mit scharfen Knicken, wie die Ecken der Vorlage.  Die Drain-Oeffnung in
 	# der Mitte (210..285) bleibt unveraendert.
@@ -137,6 +140,9 @@ static func build(parent: Node2D) -> Dictionary:
 	# Mulde in der Mitte (schwarzes Loch der Vorlage)
 	parent.add_child(Scoop.new(Vector2(270, 505)))
 
+	# Fang-Mulde am rechten Lauf: Countdown 3-2-1, dann Schuss zurueck ins Feld
+	parent.add_child(SidePocket.new(Vector2(438, 612)))
+
 	# Dekos im Stil der Vorlage
 	parent.add_child(TableDeco.new("pad", Vector2(270, 350), NEON_CYAN))
 	parent.add_child(TableDeco.new("spiral", Vector2(270, 640)))
@@ -145,7 +151,7 @@ static func build(parent: Node2D) -> Dictionary:
 	parent.add_child(TableDeco.new("star", Vector2(218, 705), Color(1.6, 1.5, 1.2)))
 	parent.add_child(TableDeco.new("star", Vector2(322, 668), Color(1.6, 1.5, 1.2), 0.7))
 	parent.add_child(TableDeco.new("comet", Vector2(38, 540), NEON_GOLD, 1.0, 15.0))
-	parent.add_child(TableDeco.new("comet", Vector2(448, 580), NEON_GOLD, 1.0, -15.0))
+	parent.add_child(TableDeco.new("comet", Vector2(445, 500), NEON_GOLD, 1.0, -15.0))
 	parent.add_child(TableDeco.new("saturn", Vector2(60, 610), NEON_GOLD))
 	parent.add_child(TableDeco.new("bolt", Vector2(445, 185), NEON_GOLD))
 	parent.add_child(TableDeco.new("arrow", Vector2(375, 520), NEON_CYAN, 1.0, -35.0))

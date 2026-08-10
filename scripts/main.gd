@@ -262,7 +262,7 @@ func _cleanup_lost_balls() -> void:
 
 
 func _on_event(kind: String, data: Dictionary) -> void:
-	if autotest and kind in ["spinner", "scoop"]:
+	if autotest and kind in ["spinner", "scoop", "save", "pocket"]:
 		print("AUTOTEST event ", kind)
 	match kind:
 		"bumper":
@@ -446,6 +446,10 @@ func _end_blackout() -> void:
 func _on_drain(body: Node2D) -> void:
 	if not body is PinBall:
 		return
+	# Aufwaerts fliegende Baelle sind der Carry-Save-Einwurf von unten -
+	# die duerfen die Drain-Zone nach oben durchqueren.
+	if body.linear_velocity.y < -100.0:
+		return
 	body.queue_free()
 	call_deferred("_after_drain")
 
@@ -476,7 +480,7 @@ func _after_drain() -> void:
 		Sfx.say("carry_rettet")
 		hud.show_message("MEIN CARRY RETTET.", "Gern geschehen.", 2.5)
 		Game.emit("save")
-		_spawn_ball(SPAWN)
+		_save_return()
 		return
 	Sfx.play("drain", -2.0)
 	if Game.blackout:
@@ -492,6 +496,55 @@ func _after_drain() -> void:
 		# Naechster Ball wird automatisch rechts unten eingelegt
 		Game.ball_number += 1
 		_start_ball()
+
+
+## Carry-Save-Inszenierung: der Ball bleibt sichtbar in der Drain-Oeffnung
+## liegen, zittert mit Grollen, Countdown 3-2-1 - und erst dann kommt er
+## zwischen den Flippern hochgeschossen.
+func _save_return() -> void:
+	var b := _spawn_ball(Vector2(247, 946))
+	b.freeze = true
+	var home := b.position
+	await get_tree().create_timer(0.55, false).timeout
+	if not is_instance_valid(b):
+		return
+	Sfx.play("rumble", -2.0)
+	var tw := create_tween()
+	for i in 10:
+		tw.tween_property(b, "position",
+				home + Vector2(randf_range(-3.0, 3.0), randf_range(-2.0, 2.0)), 0.06)
+	tw.tween_property(b, "position", home, 0.06)
+	await tw.finished
+	if not is_instance_valid(b):
+		return
+	var lbl := Label.new()
+	lbl.add_theme_font_size_override("font_size", 26)
+	lbl.add_theme_color_override("font_color", Color(1.9, 1.3, 0.2))
+	lbl.add_theme_constant_override("outline_size", 7)
+	lbl.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.85))
+	lbl.position = Vector2(207, 894)
+	lbl.size = Vector2(80, 32)
+	lbl.pivot_offset = Vector2(40, 16)
+	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lbl.z_index = 60
+	add_child(lbl)
+	for n in [3, 2, 1]:
+		if not is_instance_valid(b):
+			break
+		lbl.text = str(n)
+		lbl.scale = Vector2(1.4, 1.4)
+		var tw2 := create_tween()
+		tw2.tween_property(lbl, "scale", Vector2.ONE, 0.2)
+		Sfx.play("count", -3.0)
+		b.position = home + Vector2(randf_range(-2.0, 2.0), 0)
+		await get_tree().create_timer(0.5, false).timeout
+	lbl.queue_free()
+	if is_instance_valid(b):
+		b.position = home
+		b.freeze = false
+		b.linear_velocity = Vector2(randf_range(-35, 35), randf_range(-1400, -1250))
+		Sfx.play("count_go", -2.0)
+		Sfx.play("launch", -4.0)
 
 
 func _on_continue() -> void:
@@ -537,7 +590,7 @@ func _start_ball(first: bool = false) -> void:
 	Game.damage_points = 0
 	Game.tilted = false
 	nudge_heat = 0.0
-	Game.emit("save")
+	Game.emit("save_armed")
 	_spawn_ball(SPAWN)
 	if first:
 		hud.show_message("KO-OP MODUS.", "Vier Spieler. Ein Carry. Ich.", 3.0)

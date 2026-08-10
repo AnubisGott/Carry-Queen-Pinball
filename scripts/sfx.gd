@@ -119,6 +119,9 @@ func _build_all() -> void:
 	_streams["mode"] = _mix([_tone(262, 0.12, 0.5, "saw"), _tone(330, 0.12, 0.5, "saw"), _tone(392, 0.2, 0.5, "saw")])
 	_streams["over"] = _mix([_tone(300, 0.2, 0.4, "saw", -80), _tone(250, 0.2, 0.4, "saw", -80), _tone(200, 0.4, 0.45, "saw", -80)])
 	_streams["tick"] = _mix([_tone(1200, 0.02, 0.2, "square")])
+	_streams["count"] = _mix([_tone(520, 0.1, 0.45, "square")])
+	_streams["count_go"] = _mix([_tone(784, 0.09, 0.45, "square"), _tone(1047, 0.16, 0.5, "square")])
+	_streams["rumble"] = _mix([_tone(65, 0.45, 0.5, "saw", 30), _tone(85, 0.5, 0.55, "saw", 150)])
 
 
 func _load_optional_audio() -> void:
