@@ -51,13 +51,15 @@ static func build(parent: Node2D) -> Dictionary:
 	_wall(parent, [Vector2(466, 960), Vector2(466, 300)], NEON_VIOLET, false, true)
 	_wall(parent, [Vector2(DIVIDER, 305), Vector2(445, 335)], NEON_VIOLET)
 	_wall(parent, [Vector2(DIVIDER, 935), Vector2(RIGHT, 935)], NEON_VIOLET)
-	# Leitplanke oben links, Form nach dem eingezeichneten Schwung des
-	# Nutzers: setzt oben an der Bande an (Spalt dort kleiner als die Kugel)
-	# und schwingt nach rechts unten in den Ablenker hinein, mit dem sie
-	# eine durchgehende Linie bildet.
-	_wall(parent, [Vector2(124, 141), Vector2(140, 143), Vector2(155, 147),
-			Vector2(169, 152), Vector2(180, 158), Vector2(188, 164),
-			Vector2(194, 169)], NEON_CYAN)
+	# Leitplanke oben links nach der eingezeichneten Form: eine Kuppe, die
+	# links unten an der Bande ansetzt, ueber ihren Scheitel steigt und dann
+	# bis in den Ablenker abfaellt.  Der Scheitel liegt bewusst ein Stueck
+	# links der gezeichneten Mitte, damit der obere Bereich nicht flach wird
+	# und dort keine Kugel liegen bleibt.
+	_wall(parent, [Vector2(101, 155), Vector2(112, 150), Vector2(120, 147),
+			Vector2(130, 144), Vector2(145, 146), Vector2(158, 150),
+			Vector2(170, 156), Vector2(183, 162), Vector2(196, 168),
+			Vector2(206, 172)], NEON_CYAN)
 	# Ablenker am linken Bogen-Abstieg: gleiche Lage und Enden wie zuvor,
 	# aber als fliessende Kurve ausgelegt - der Bogenteil ist ein sauberer
 	# Kreisbogen (r=27 um 207,140), an den sich der Auslauf tangential
