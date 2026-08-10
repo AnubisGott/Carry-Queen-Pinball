@@ -29,6 +29,10 @@ const NEON_VIOLET := Color(1.1, 0.4, 1.9)
 const CORE_DARK := Color(0.08, 0.13, 0.16)
 const SHADOW_OFF := Vector2(2, 3)
 
+## Feature-Schalter: G-G-E-Z-Rollover-Gassen oben rechts unter dem Bogen.
+## Auf false setzen, um die Bank samt Logik komplett abzuschalten.
+const FEATURE_GGEZ := true
+
 
 static func build(parent: Node2D) -> Dictionary:
 	_background(parent)
@@ -139,6 +143,26 @@ static func build(parent: Node2D) -> Dictionary:
 
 	parent.add_child(LaneGate.new(Vector2(495, 276)))
 
+	# G-G-E-Z-Rollover-Gassen oben rechts unter dem Bogen (FEATURE_GGEZ):
+	# vier parallele Stege bilden G-G-E, die Z-Gasse ist der offene Korridor
+	# rechts daneben, durch den auch die Klappen-Umlenkung fuehrt.
+	var ggez := []
+	if FEATURE_GGEZ:
+		var lane_dir := Vector2(-0.629, 0.777)
+		for w in [[Vector2(343.9, 127.0), Vector2(312.4, 165.9)],
+				[Vector2(376.4, 142.0), Vector2(344.9, 180.9)],
+				[Vector2(405.9, 162.1), Vector2(374.4, 201.0)],
+				[Vector2(431.8, 186.9), Vector2(400.3, 225.8)]]:
+			_wall(parent, w, NEON_VIOLET, false, false, true)
+		var ggez_letters := ["G", "G", "E", "Z"]
+		var centers := [Vector2(344.5, 154.0), Vector2(375.5, 171.6),
+				Vector2(403.2, 194.0), Vector2(444.0, 245.0)]
+		for i in 4:
+			var r := RolloverLane.new(centers[i], ggez_letters[i], lane_dir)
+			parent.add_child(r)
+			ggez.append(r)
+	refs["ggez"] = ggez
+
 	# Mulde in der Mitte (schwarzes Loch der Vorlage)
 	parent.add_child(Scoop.new(Vector2(270, 505)))
 
@@ -156,7 +180,7 @@ static func build(parent: Node2D) -> Dictionary:
 	parent.add_child(TableDeco.new("comet", Vector2(38, 540), NEON_GOLD, 1.0, 15.0))
 	parent.add_child(TableDeco.new("comet", Vector2(445, 500), NEON_GOLD, 1.0, -15.0))
 	parent.add_child(TableDeco.new("saturn", Vector2(82, 475), NEON_GOLD))
-	parent.add_child(TableDeco.new("bolt", Vector2(445, 185), NEON_GOLD))
+	parent.add_child(TableDeco.new("bolt", Vector2(205, 175), NEON_GOLD))
 	parent.add_child(TableDeco.new("arrow", Vector2(375, 520), NEON_CYAN, 1.0, -35.0))
 	for i in 5:
 		parent.add_child(TableDeco.new("chevron", Vector2(495, 540 + i * 60), NEON_GOLD))

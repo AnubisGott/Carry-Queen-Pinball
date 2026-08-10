@@ -16,6 +16,7 @@ var flipper_r: Flipper
 var throne: Throne
 var drops: Array = []
 var standups: Array = []
+var ggez: Array = []
 var locked_balls: Array = []
 var dim: CanvasModulate
 
@@ -56,6 +57,7 @@ func _ready() -> void:
 	flipper_r = refs["flipper_r"]
 	drops = refs["drops"]
 	standups = refs["standups"]
+	ggez = refs.get("ggez", [])
 	throne = refs["throne"]
 	throne.captured.connect(_on_throne_captured)
 	_make_drain()
@@ -262,7 +264,7 @@ func _cleanup_lost_balls() -> void:
 
 
 func _on_event(kind: String, data: Dictionary) -> void:
-	if autotest and kind in ["spinner", "scoop", "save", "pocket"]:
+	if autotest and kind in ["spinner", "scoop", "save", "pocket", "ggez"]:
 		print("AUTOTEST event ", kind)
 	match kind:
 		"bumper":
@@ -271,6 +273,8 @@ func _on_event(kind: String, data: Dictionary) -> void:
 			_check_bank()
 		"standup":
 			_check_ich()
+		"rollover":
+			_check_ggez()
 		"all_disciplines":
 			_start_wizard()
 		"scoop":
@@ -307,6 +311,22 @@ func _check_bank() -> void:
 	await get_tree().create_timer(1.2, false).timeout
 	for d in drops:
 		d.reset()
+
+
+func _check_ggez() -> void:
+	if ggez.is_empty():
+		return
+	for r in ggez:
+		if not r.lit:
+			return
+	Game.add_score(5000)
+	Game.add_ego(4)
+	Sfx.play("jackpot", -4.0)
+	hud.show_message("G-G-E-Z.", "Waren ja auch nur vier Gassen.", 2.2)
+	Game.emit("ggez")
+	await get_tree().create_timer(1.0, false).timeout
+	for r in ggez:
+		r.set_lit(false)
 
 
 func _check_ich() -> void:
@@ -574,6 +594,8 @@ func _restart() -> void:
 		d.reset()
 	for s in standups:
 		s.reset()
+	for r in ggez:
+		r.set_lit(false)
 	throne.release_ready()
 	streak_letters.clear()
 	hurry_active = false
