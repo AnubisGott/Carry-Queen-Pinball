@@ -20,7 +20,7 @@ const ARCH_R := 250.0
 const NEON_PINK := Color(1.7, 0.28, 1.0)
 const NEON_GREEN := Color(0.3, 1.35, 0.22)
 const NEON_CYAN := Color(0.15, 1.6, 1.8)
-const NEON_GOLD := Color(1.5, 1.08, 0.22)
+const NEON_GOLD := Color(1.22, 0.9, 0.2)
 const NEON_VIOLET := Color(1.1, 0.4, 1.9)
 
 ## Aufbau der Banden nach dem Vorbild von Flipper03 (_draw_rails):
@@ -31,7 +31,11 @@ const SHADOW_OFF := Vector2(2, 3)
 
 ## Feature-Schalter: G-G-E-Z-Rollover-Gassen oben rechts unter dem Bogen.
 ## Auf false setzen, um die Bank samt Logik komplett abzuschalten.
-const FEATURE_GGEZ := true
+const FEATURE_GGEZ := false
+
+## Feature-Schalter: E-G-O-Standup-Bank schraeg an der Trichterwand oben
+## links.  Alle drei getroffen -> Ego-Multiplikator steigt sofort.
+const FEATURE_EGO := true
 
 
 static func build(parent: Node2D) -> Dictionary:
@@ -40,8 +44,11 @@ static func build(parent: Node2D) -> Dictionary:
 	_wall(parent, [Vector2(LEFT, 760), Vector2(LEFT, 330)], NEON_PINK)
 	_wall(parent, _arch_points(), NEON_PINK)
 	_wall(parent, [Vector2(RIGHT, 330), Vector2(RIGHT, 960)], NEON_PINK)
-	# Abschussbahn (rechts) mit Abweiser oben
+	# Abschussbahn (rechts) mit Abweiser oben.  Die Trennwand bekommt einen
+	# unsichtbaren Zwilling 4px daneben: durch zwei dicht gestaffelte
+	# Segmente tunnelt auch ein sehr schneller Ball nicht mehr hindurch.
 	_wall(parent, [Vector2(DIVIDER, 960), Vector2(DIVIDER, 300)], NEON_VIOLET)
+	_wall(parent, [Vector2(466, 960), Vector2(466, 300)], NEON_VIOLET, false, true)
 	_wall(parent, [Vector2(DIVIDER, 305), Vector2(445, 335)], NEON_VIOLET)
 	_wall(parent, [Vector2(DIVIDER, 935), Vector2(RIGHT, 935)], NEON_VIOLET)
 	# Fang-Trichter oben links: leitet Baelle durch den Spinner nach unten
@@ -131,6 +138,18 @@ static func build(parent: Node2D) -> Dictionary:
 		parent.add_child(s)
 		standups.append(s)
 	refs["standups"] = standups
+
+	# E-G-O-Standup-Bank schraeg an der Unterseite der Trichterwand
+	# (FEATURE_EGO): alle drei -> Ego-Level rauf (Logik in main.gd)
+	var ego_bank := []
+	if FEATURE_EGO:
+		var ego_letters := ["E", "G", "O"]
+		var ego_pos := [Vector2(104, 230), Vector2(131, 201), Vector2(158, 172)]
+		for i in 3:
+			var e := Standup.new(ego_pos[i], ego_letters[i], 43.6)
+			parent.add_child(e)
+			ego_bank.append(e)
+	refs["ego_bank"] = ego_bank
 
 	# OP-Spinner in der Einfahrt oben links
 	var sp := Spinner.new(Vector2(55, 222))

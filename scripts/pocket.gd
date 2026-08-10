@@ -28,7 +28,7 @@ func _draw() -> void:
 	# Hell = Mulde faengt; dunkel = zu, die Kugel rollt durch.
 	draw_circle(Vector2(0, 6), 20.0, Color(0.08, 0.13, 0.16, 0.9))
 	var ring := Color(1.1, 0.4, 1.9) if not _busy else Color(0.4, 0.18, 0.65, 0.5)
-	var inner := Color(1.5, 1.08, 0.22, 0.6) if not _busy else Color(0.6, 0.42, 0.1, 0.3)
+	var inner := Color(1.22, 0.9, 0.2, 0.6) if not _busy else Color(0.6, 0.42, 0.1, 0.3)
 	draw_arc(Vector2(0, 2), 24.0, 0.1 * PI, 0.9 * PI, 22, ring, 3.0)
 	draw_arc(Vector2(0, 2), 16.0, 0.15 * PI, 0.85 * PI, 16, inner, 2.0)
 

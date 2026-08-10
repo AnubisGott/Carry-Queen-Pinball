@@ -1,7 +1,7 @@
 extends Node2D
 ## Spielsteuerung: Ballfluss, Disziplinen/Modi, Plunger, Blackout, Match-Report.
 
-const SPAWN := Vector2(495, 880)
+const SPAWN := Vector2(495, 848)
 
 const WIZARD_LINES := [
 	"WER MACHT DEN SCHADEN? ICH.",
@@ -18,6 +18,7 @@ var plunger: Plunger
 var drops: Array = []
 var standups: Array = []
 var ggez: Array = []
+var ego_bank: Array = []
 var locked_balls: Array = []
 var dim: CanvasModulate
 
@@ -59,6 +60,7 @@ func _ready() -> void:
 	drops = refs["drops"]
 	standups = refs["standups"]
 	ggez = refs.get("ggez", [])
+	ego_bank = refs.get("ego_bank", [])
 	throne = refs["throne"]
 	plunger = refs["plunger"]
 	throne.captured.connect(_on_throne_captured)
@@ -279,6 +281,7 @@ func _on_event(kind: String, data: Dictionary) -> void:
 			_check_bank()
 		"standup":
 			_check_ich()
+			_check_ego_bank()
 		"rollover":
 			_check_ggez()
 		"all_disciplines":
@@ -317,6 +320,22 @@ func _check_bank() -> void:
 	await get_tree().create_timer(1.2, false).timeout
 	for d in drops:
 		d.reset()
+
+
+func _check_ego_bank() -> void:
+	if ego_bank.is_empty():
+		return
+	for s in ego_bank:
+		if not s.lit:
+			return
+	# +12 Ego-Punkte heben den Multiplikator garantiert um eine Stufe
+	Game.add_ego(12)
+	Game.add_score(2500)
+	Sfx.play("mode", -4.0)
+	hud.show_message("E-G-O KOMPLETT.", "Skaliert. Natuerlich.", 2.0)
+	await get_tree().create_timer(1.0, false).timeout
+	for s in ego_bank:
+		s.reset()
 
 
 func _check_ggez() -> void:
@@ -545,7 +564,7 @@ func _save_return() -> void:
 		return
 	var lbl := Label.new()
 	lbl.add_theme_font_size_override("font_size", 26)
-	lbl.add_theme_color_override("font_color", Color(1.5, 1.08, 0.22))
+	lbl.add_theme_color_override("font_color", Color(1.22, 0.9, 0.2))
 	lbl.add_theme_constant_override("outline_size", 7)
 	lbl.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.85))
 	lbl.position = Vector2(207, 894)
@@ -602,6 +621,8 @@ func _restart() -> void:
 		s.reset()
 	for r in ggez:
 		r.set_lit(false)
+	for s in ego_bank:
+		s.reset()
 	throne.release_ready()
 	streak_letters.clear()
 	hurry_active = false

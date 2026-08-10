@@ -13,7 +13,9 @@ func _init(pos: Vector2) -> void:
 func _ready() -> void:
 	var cs := CollisionShape2D.new()
 	var sh := RectangleShape2D.new()
-	sh.size = Vector2(48, 56)
+	# Hoch genug, dass zwischen Zone und Bogendach kein kugelbreites
+	# Fenster mehr bleibt, durch das ein Ball unbemerkt einfaedeln kann.
+	sh.size = Vector2(48, 64)
 	cs.shape = sh
 	add_child(cs)
 	z_index = 4

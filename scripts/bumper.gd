@@ -51,7 +51,7 @@ func _process(delta: float) -> void:
 
 
 func _draw() -> void:
-	var glow := Color(0.4, 2.0, 0.25) if _flash > 0.0 else Color(0.25, 1.2, 0.15)
+	var glow := Color(0.35, 1.5, 0.22) if _flash > 0.0 else Color(0.2, 0.95, 0.14)
 	draw_circle(Vector2.ZERO, RADIUS + 5.0, Color(glow.r, glow.g, glow.b, 0.10 + 0.3 * _flash))
 	draw_circle(Vector2.ZERO, RADIUS, Color(0.05, 0.09, 0.05).lerp(Color(0.2, 0.5, 0.2), _flash))
 	draw_arc(Vector2.ZERO, RADIUS - 1.0, 0.0, TAU, 40, glow, 3.0)

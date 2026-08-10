@@ -71,9 +71,11 @@ func _draw_art(c: Node2D) -> void:
 		inner.append(Vector2(p.x * 0.88, p.y * 0.52))
 	c.draw_colored_polygon(inner, Color(0.080, 0.090, 0.120))
 
-	# pinke Aussenkante
+	# Neon-Schein um den ganzen Hebel, darauf die pinke Aussenkante
 	var closed := pts.duplicate()
 	closed.append(pts[0])
+	c.draw_polyline(closed, Color(Table.NEON_PINK.r, Table.NEON_PINK.g,
+			Table.NEON_PINK.b, 0.30), 10.0, true)
 	c.draw_polyline(closed, Table.NEON_PINK, 3.0, true)
 
 	# cyanfarbene Linie auf der Oberseite

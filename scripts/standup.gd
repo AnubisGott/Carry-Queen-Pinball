@@ -10,9 +10,10 @@ var lit := false
 var _cool := 0.0
 
 
-func _init(pos: Vector2, l: String) -> void:
+func _init(pos: Vector2, l: String, rot_deg: float = 0.0) -> void:
 	position = pos
 	letter = l
+	rotation = deg_to_rad(rot_deg)
 
 
 func _ready() -> void:
@@ -38,11 +39,14 @@ func _process(delta: float) -> void:
 
 func _draw() -> void:
 	var r := Rect2(-W / 2, -H / 2, W, H)
-	var col := Color(0.2, 2.0, 1.2) if lit else Color(0.1, 0.5, 0.4)
+	var col := Color(0.18, 1.5, 0.95) if lit else Color(0.1, 0.5, 0.4)
 	draw_rect(r, Color(0.03, 0.09, 0.08))
 	draw_rect(r, col, false, 2.0)
+	# Buchstabe bleibt aufrecht, auch wenn das Target gedreht montiert ist
 	var f := ThemeDB.fallback_font
-	draw_string(f, Vector2(12, 5), letter, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, col)
+	draw_set_transform(Vector2(12, 5), -rotation, Vector2.ONE)
+	draw_string(f, Vector2.ZERO, letter, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, col)
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 
 func _on_hit(body: Node2D) -> void:

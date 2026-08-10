@@ -4,8 +4,8 @@ extends AnimatableBody2D
 ## Leertaste gehalten wird, zieht sich die Feder zusammen und der Ball sinkt
 ## mit; beim Loslassen schnellen Teller und Ball nach vorne.
 
-const REST_Y := 903.0
-const TRAVEL := 26.0
+const REST_Y := 873.0
+const TRAVEL := 40.0
 const BASE_Y := 933.0
 const VIOLET := Color(1.1, 0.4, 1.9)
 
@@ -48,7 +48,7 @@ func _physics_process(delta: float) -> void:
 func _draw() -> void:
 	var h := BASE_Y - position.y
 	# Spiralfeder als Zickzack zwischen Teller und Sockel
-	var n := 7
+	var n := 10
 	var pts := PackedVector2Array()
 	pts.append(Vector2(0, 4))
 	for i in n:
