@@ -205,7 +205,8 @@ func _update_plunger(delta: float) -> void:
 		_at_launch_cool = maxf(0.0, _at_launch_cool - delta)
 		if lane_ball != null and _at_launch_cool <= 0.0:
 			_at_launch_cool = 1.5
-			lane_ball.apply_central_impulse(Vector2(0, -1900))
+			lane_ball.apply_central_impulse(
+					Vector2(randf_range(-30.0, 30.0), -randf_range(1750.0, 2050.0)))
 			Game.emit("launch")
 		hud.set_power(0.0, false)
 		return
@@ -223,7 +224,9 @@ func _update_plunger(delta: float) -> void:
 		elif charging:
 			_crank_step = 0
 			plunger.release()
-			lane_ball.apply_central_impulse(Vector2(0, -(750.0 + 1350.0 * charge)))
+			# Leichte Streuung: kein Einwurf gleicht dem anderen
+			var power := (750.0 + 1350.0 * charge) * randf_range(0.94, 1.06)
+			lane_ball.apply_central_impulse(Vector2(randf_range(-30.0, 30.0), -power))
 			Sfx.play("launch", -4.0)
 			Game.emit("launch")
 			charging = false
