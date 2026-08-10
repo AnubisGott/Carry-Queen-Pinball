@@ -62,9 +62,6 @@ static func build(parent: Node2D) -> Dictionary:
 	_bar(parent, Vector2(86, 702), Vector2(151, 833), Color(0.25, 0.95, 0.18), true)
 	# Rechte Inlane ("KEIN PLAN")
 	_bar(parent, Vector2(410, 700), Vector2(339, 834), Color(0.25, 0.95, 0.18), true)
-	# Thron-Pfosten
-	_wall(parent, [Vector2(250, 82), Vector2(250, 160)], NEON_GOLD)
-	_wall(parent, [Vector2(290, 82), Vector2(290, 160)], NEON_GOLD)
 	# Hoerner der Mulde (Trichter unter dem S-Bumper); blitzen bei Beruehrung
 	_wall(parent, [Vector2(240, 455), Vector2(252, 492)], NEON_GOLD, false, false, true)
 	_wall(parent, [Vector2(300, 455), Vector2(288, 492)], NEON_GOLD, false, false, true)
@@ -157,10 +154,7 @@ static func build(parent: Node2D) -> Dictionary:
 	parent.add_child(sp)
 	refs["spinner"] = sp
 
-	var throne := Throne.new(Vector2(270, 132))
-	parent.add_child(throne)
-	refs["throne"] = throne
-
+	# Thron auf Nutzerwunsch entfernt - die Mitte oben ist frei
 	parent.add_child(LaneGate.new(Vector2(495, 276)))
 
 	# G-G-E-Z-Rollover-Gassen oben rechts unter dem Bogen (FEATURE_GGEZ):

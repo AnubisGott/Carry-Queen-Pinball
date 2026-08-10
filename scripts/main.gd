@@ -62,9 +62,10 @@ func _ready() -> void:
 	standups = refs["standups"]
 	ggez = refs.get("ggez", [])
 	ego_bank = refs.get("ego_bank", [])
-	throne = refs["throne"]
+	throne = refs.get("throne", null)
 	plunger = refs["plunger"]
-	throne.captured.connect(_on_throne_captured)
+	if throne:
+		throne.captured.connect(_on_throne_captured)
 	_make_drain()
 	hud = Hud.new()
 	add_child(hud)
@@ -630,7 +631,8 @@ func _restart() -> void:
 		r.set_lit(false)
 	for s in ego_bank:
 		s.reset()
-	throne.release_ready()
+	if throne:
+		throne.release_ready()
 	streak_letters.clear()
 	hurry_active = false
 	frenzy_time = 0.0
