@@ -21,15 +21,22 @@ func _ready() -> void:
 
 
 func _draw() -> void:
-	# Mulde als leuchtende Schale
-	draw_arc(Vector2.ZERO, 22.0, 0.15 * PI, 0.85 * PI, 20, Color(0.15, 1.6, 1.8), 3.0)
-	draw_arc(Vector2.ZERO, 14.0, 0.2 * PI, 0.8 * PI, 16, Color(0.15, 1.6, 1.8, 0.5), 2.0)
+	# Hell = Mulde faengt; dunkel = zu, die Kugel rollt einfach durch.
+	var main := Color(0.15, 1.6, 1.8) if not _busy else Color(0.08, 0.4, 0.45, 0.55)
+	var sub := Color(0.15, 1.6, 1.8, 0.5) if not _busy else Color(0.08, 0.4, 0.45, 0.3)
+	draw_arc(Vector2.ZERO, 22.0, 0.15 * PI, 0.85 * PI, 20, main, 3.0)
+	draw_arc(Vector2.ZERO, 14.0, 0.2 * PI, 0.8 * PI, 16, sub, 2.0)
 
 
 func _on_enter(body: Node2D) -> void:
 	if _busy or not body is PinBall:
 		return
+	# Nur von oben faellt die Kugel hinein - von unten kommend fliegt sie
+	# durch (und wird erst gefangen, wenn sie von oben zurueckfaellt).
+	if body.linear_velocity.y < 30.0:
+		return
 	_busy = true
+	queue_redraw()
 	var ball := body as PinBall
 	ball.set_deferred("freeze", true)
 	ball.hide()
@@ -52,3 +59,4 @@ func _eject_later(ball: PinBall) -> void:
 		Sfx.play("eject", -4.0)
 	await get_tree().create_timer(1.0, false).timeout
 	_busy = false
+	queue_redraw()

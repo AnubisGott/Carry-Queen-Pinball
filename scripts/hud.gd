@@ -39,7 +39,7 @@ const CHAT := {
 	"launch": ["da fliegt er", "neuer Ball, gleiche Queen"],
 	"tilt": ["RAGEQUIT lmaooo", "er schuettelt den Tisch, peinlich", "tilt wie im Ranked"],
 	"scoop": ["die Mulde carried", "Taxi zurueck ins Spiel", "Heal? nein. Wurf? ja."],
-	"pocket": ["rechts geparkt lol", "3.. 2.. 1.. tschuess", "die Fang-Mulde zaehlt runter"],
+	"pocket": ["kurz geparkt lol", "rein und sofort wieder raus", "die Fang-Mulde carried"],
 	"ego_level": ["ihr EGO skaliert besser als wir", "x-fach?? okay"],
 }
 const CHAT_PROB := {"bumper": 0.06, "sling": 0.15, "spinner": 0.3, "drop_target": 0.25, "standup": 0.4, "ego_level": 0.5}
@@ -232,11 +232,13 @@ func _build_messages() -> void:
 	_sub_label.add_theme_constant_override("outline_size", 6)
 	_sub_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.85))
 	_sub_label.modulate.a = 0.0
-	_go_label = _label("GAME OVER", Vector2(0, 370), 56, PINK)
-	_go_label.size = Vector2(540, 90)
+	_go_label = _label("GAME OVER", Vector2(0, 360), 76, PINK)
+	_go_label.size = Vector2(540, 110)
 	_go_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_go_label.add_theme_constant_override("outline_size", 14)
+	_go_label.add_theme_constant_override("outline_size", 18)
 	_go_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
+	# Bleibt auch ueber dem abdunkelnden Overlay des Endstand-Popups hell
+	_go_label.z_index = 30
 	_go_label.visible = false
 
 
@@ -334,12 +336,14 @@ func show_big_gameover() -> void:
 
 
 func show_gameover(score: int, best: int) -> void:
-	_go_label.visible = false
+	# Das fette GAME OVER bleibt stehen und rueckt ueber das Endstand-Popup
+	_go_label.visible = true
+	_go_label.position = Vector2(0, 120)
 	popup_kind = "gameover"
 	var top: int = maxi(score, best)
 	_popup_title.text = "STREAM BEENDET."
 	_popup_body.text = "DEIN SCORE  " + fmt(score) + "\n\nHIGHSCORES\n1.  ICH  ...............  " + fmt(top + 1) + "\n2.  TEAM (DU)  ...  " + fmt(top) + "\n3.  TEAM (DU)  ...  " + fmt(mini(score, best)) + "\n\n\"Ihr wart auch dabei.\nDas war bestimmt schoen fuer euch.\nNichts zu danken.\nGERN GESCHEHEN.\""
-	_popup_hint.text = "LEERTASTE = NEUER RUN"
+	_popup_hint.text = "BELIEBIGE TASTE = NEUER RUN"
 	_overlay.visible = true
 	_popup.visible = true
 
@@ -355,6 +359,8 @@ func _input(event: InputEvent) -> void:
 		return
 	var ok := false
 	if event.is_action_pressed("launch"):
+		ok = true
+	elif event is InputEventKey and event.pressed and not event.echo:
 		ok = true
 	elif event is InputEventMouseButton and event.pressed:
 		ok = true
@@ -389,6 +395,7 @@ func _on_game_event(kind: String, _data: Dictionary) -> void:
 			_update_stats()
 			if kind == "reset":
 				_go_label.visible = false
+				_go_label.position = Vector2(0, 360)
 		"discipline", "disciplines_reset", "all_disciplines":
 			_update_disciplines()
 			_update_stats()

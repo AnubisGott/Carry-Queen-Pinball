@@ -42,23 +42,25 @@ static func build(parent: Node2D) -> Dictionary:
 	_wall(parent, [Vector2(DIVIDER, 935), Vector2(RIGHT, 935)], NEON_VIOLET)
 	# Fang-Trichter oben links: leitet Baelle durch den Spinner nach unten
 	_wall(parent, [Vector2(160, 150), Vector2(82, 232)], NEON_CYAN)
-	# Linke Seite: Ablenk-Leiste (wie die schraege Bande der Vorlage) + Inlane.
-	# Das untere Ende muss mindestens eine Kugelbreite (26) von der Bande bei
-	# x=20 wegbleiben - stand es dichter dran, verkeilte sich die Kugel im
-	# spitzen Winkel zwischen Bande und Leiste und das Spiel stand still.
-	_wall(parent, [Vector2(54, 598), Vector2(92, 508)], NEON_GREEN)
-	_bar(parent, Vector2(95, 690), Vector2(154, 830), NEON_GREEN)
+	# Linke Inlane ("KEIN HEAL").  Oberes Ende weit genug vom Slingshot weg,
+	# damit die Einfahrt in die Laufrinne mehr als eine Kugelbreite bietet.
+	# Untere Enden ueberlappen den Schwenkkreis der hinteren Flipper-Ecke -
+	# sonst bildet sich dort je nach Flipperstellung eine Kerbe, in der die
+	# Kugel liegen bleibt statt aufs Blatt zu rollen.
+	_bar(parent, Vector2(86, 702), Vector2(151, 833), NEON_GREEN)
 	# Rechte Inlane ("KEIN PLAN")
-	_bar(parent, Vector2(410, 700), Vector2(336, 830), NEON_GREEN)
+	_bar(parent, Vector2(410, 700), Vector2(339, 834), NEON_GREEN)
 	# Thron-Pfosten
 	_wall(parent, [Vector2(250, 82), Vector2(250, 160)], NEON_GOLD)
 	_wall(parent, [Vector2(290, 82), Vector2(290, 160)], NEON_GOLD)
 	# Hoerner der Mulde (Trichter unter dem S-Bumper)
 	_wall(parent, [Vector2(240, 455), Vector2(252, 492)], NEON_GOLD)
 	_wall(parent, [Vector2(300, 455), Vector2(288, 492)], NEON_GOLD)
-	# Hoerner der Fang-Mulde rechts: leiten den Lauf am Trenner in die Schale
+	# Hoerner der Fang-Mulden beidseitig: leiten die Seitenlaeufe in die Schalen
 	_wall(parent, [Vector2(408, 576), Vector2(421, 602)], NEON_GOLD)
 	_wall(parent, [Vector2(468, 572), Vector2(455, 598)], NEON_GOLD)
+	_wall(parent, [Vector2(82, 576), Vector2(69, 602)], NEON_GOLD)
+	_wall(parent, [Vector2(22, 572), Vector2(35, 598)], NEON_GOLD)
 	# Untere Banden: kantig gefast statt rund gebogen - wenige lange Geraden
 	# mit scharfen Knicken, wie die Ecken der Vorlage.  Die Drain-Oeffnung in
 	# der Mitte (210..285) bleibt unveraendert.
@@ -140,8 +142,9 @@ static func build(parent: Node2D) -> Dictionary:
 	# Mulde in der Mitte (schwarzes Loch der Vorlage)
 	parent.add_child(Scoop.new(Vector2(270, 505)))
 
-	# Fang-Mulde am rechten Lauf: Countdown 3-2-1, dann Schuss zurueck ins Feld
-	parent.add_child(SidePocket.new(Vector2(438, 612)))
+	# Fang-Mulden an beiden Seitenlaeufen: kurz fangen, sofort zurueck ins Feld
+	parent.add_child(SidePocket.new(Vector2(438, 612), -1.0))
+	parent.add_child(SidePocket.new(Vector2(52, 612), 1.0))
 
 	# Dekos im Stil der Vorlage
 	parent.add_child(TableDeco.new("pad", Vector2(270, 350), NEON_CYAN))
@@ -152,7 +155,7 @@ static func build(parent: Node2D) -> Dictionary:
 	parent.add_child(TableDeco.new("star", Vector2(322, 668), Color(1.6, 1.5, 1.2), 0.7))
 	parent.add_child(TableDeco.new("comet", Vector2(38, 540), NEON_GOLD, 1.0, 15.0))
 	parent.add_child(TableDeco.new("comet", Vector2(445, 500), NEON_GOLD, 1.0, -15.0))
-	parent.add_child(TableDeco.new("saturn", Vector2(60, 610), NEON_GOLD))
+	parent.add_child(TableDeco.new("saturn", Vector2(82, 475), NEON_GOLD))
 	parent.add_child(TableDeco.new("bolt", Vector2(445, 185), NEON_GOLD))
 	parent.add_child(TableDeco.new("arrow", Vector2(375, 520), NEON_CYAN, 1.0, -35.0))
 	for i in 5:
