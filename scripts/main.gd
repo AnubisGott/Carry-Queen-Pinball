@@ -24,6 +24,7 @@ var dim: CanvasModulate
 
 var charge := 0.0
 var charging := false
+var _crank_step := 0
 
 var streak_letters := {}
 var streak_time := 0.0
@@ -214,7 +215,13 @@ func _update_plunger(delta: float) -> void:
 			charging = true
 			charge = minf(1.0, charge + delta * 0.8)
 			plunger.compress(charge)
+			# Ratschen-Klicks, waehrend sich die Feder spannt
+			var step := int(charge * 12.0)
+			if step != _crank_step:
+				_crank_step = step
+				Sfx.play("crank", -9.0)
 		elif charging:
+			_crank_step = 0
 			plunger.release()
 			lane_ball.apply_central_impulse(Vector2(0, -(750.0 + 1350.0 * charge)))
 			Sfx.play("launch", -4.0)

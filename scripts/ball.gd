@@ -1,4 +1,4 @@
-class_name PinBall
+﻿class_name PinBall
 extends RigidBody2D
 ## Die Kugel. "is_carry" = die pinke Carry-Kugel (zaehlt im Multiball x10).
 
@@ -11,6 +11,9 @@ var is_carry := false
 func _ready() -> void:
 	add_to_group("balls")
 	mass = 1.0
+	# Nie einschlafen: eine schlafende Kugel bleibt in der Luft haengen,
+	# wenn sich der Feder-Teller unter ihr nach unten bewegt.
+	can_sleep = false
 	continuous_cd = RigidBody2D.CCD_MODE_CAST_SHAPE
 	linear_damp = 0.06
 	var pm := PhysicsMaterial.new()

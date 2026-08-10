@@ -58,9 +58,10 @@ static func build(parent: Node2D) -> Dictionary:
 	# Untere Enden ueberlappen den Schwenkkreis der hinteren Flipper-Ecke -
 	# sonst bildet sich dort je nach Flipperstellung eine Kerbe, in der die
 	# Kugel liegen bleibt statt aufs Blatt zu rollen.
-	_bar(parent, Vector2(86, 702), Vector2(151, 833), NEON_GREEN, true)
+	# Ruhe-Gruen wie die W/A/S/D-Ringe gedimmt, hell nur beim Blitz
+	_bar(parent, Vector2(86, 702), Vector2(151, 833), Color(0.25, 0.95, 0.18), true)
 	# Rechte Inlane ("KEIN PLAN")
-	_bar(parent, Vector2(410, 700), Vector2(339, 834), NEON_GREEN, true)
+	_bar(parent, Vector2(410, 700), Vector2(339, 834), Color(0.25, 0.95, 0.18), true)
 	# Thron-Pfosten
 	_wall(parent, [Vector2(250, 82), Vector2(250, 160)], NEON_GOLD)
 	_wall(parent, [Vector2(290, 82), Vector2(290, 160)], NEON_GOLD)
@@ -294,9 +295,10 @@ static func _wall(parent: Node2D, pts: Array, color: Color, sharp: bool = false,
 	line.end_cap_mode = cap
 	parent.add_child(line)
 	if flash:
+		# Dezenter Blitz wie bei den gruenen Leisten: nur eine Spur heller
 		var tf := TouchFlash.new(pts, 6.0)
-		tf.watch(under)
-		tf.watch(line)
+		tf.watch(under, Color(color.r + 0.1, color.g + 0.1, color.b + 0.1, 0.17))
+		tf.watch(line, Color(color.r + 0.1, color.g + 0.1, color.b + 0.1, color.a))
 		parent.add_child(tf)
 	# Knotenpunkte als kleine Quadrate betonen
 	if sharp:
@@ -387,7 +389,7 @@ static func _bar(parent: Node2D, a: Vector2, b: Vector2, color: Color,
 	var core := Line2D.new()
 	core.points = PackedVector2Array([a, b])
 	core.width = 4.0
-	core.default_color = Color(1.5, 1.5, 1.5, 0.55)
+	core.default_color = Color(1.1, 1.1, 1.1, 0.5)
 	core.begin_cap_mode = Line2D.LINE_CAP_ROUND
 	core.end_cap_mode = Line2D.LINE_CAP_ROUND
 	parent.add_child(core)

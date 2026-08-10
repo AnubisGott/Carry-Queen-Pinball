@@ -14,6 +14,8 @@ var is_left := true
 var rest_deg := 28.0
 var pressed_deg := -32.0
 var _target := 0.0
+var _flash := 0.0
+var _art: Node2D
 
 
 func _init(left: bool, pivot: Vector2) -> void:
@@ -39,7 +41,19 @@ func _ready() -> void:
 	var art := Node2D.new()
 	art.draw.connect(_draw_art.bind(art))
 	add_child(art)
+	_art = art
 	z_index = 5
+
+	# Beruehrungs-Sensor: laesst den Hebel nur bei Ballkontakt aufleuchten
+	var area := Area2D.new()
+	var acol := CollisionPolygon2D.new()
+	var grown := PackedVector2Array()
+	for p in _shape_points():
+		grown.append(p * 1.18)
+	acol.polygon = grown
+	area.add_child(acol)
+	add_child(area)
+	area.body_entered.connect(_on_touch)
 
 
 func _shape_points() -> PackedVector2Array:
@@ -71,11 +85,12 @@ func _draw_art(c: Node2D) -> void:
 		inner.append(Vector2(p.x * 0.88, p.y * 0.52))
 	c.draw_colored_polygon(inner, Color(0.080, 0.090, 0.120))
 
-	# Neon-Schein um den ganzen Hebel, darauf die pinke Aussenkante
+	# Neon-Schein nur bei Ballberuehrung, darauf die pinke Aussenkante
 	var closed := pts.duplicate()
 	closed.append(pts[0])
-	c.draw_polyline(closed, Color(Table.NEON_PINK.r, Table.NEON_PINK.g,
-			Table.NEON_PINK.b, 0.30), 10.0, true)
+	if _flash > 0.0:
+		c.draw_polyline(closed, Color(Table.NEON_PINK.r, Table.NEON_PINK.g,
+				Table.NEON_PINK.b, 0.30 * _flash), 10.0, true)
 	c.draw_polyline(closed, Table.NEON_PINK, 3.0, true)
 
 	# cyanfarbene Linie auf der Oberseite
@@ -99,5 +114,14 @@ func set_pressed(on: bool) -> void:
 	_target = new_target
 
 
+func _on_touch(body: Node2D) -> void:
+	if body is PinBall:
+		_flash = 1.0
+		_art.queue_redraw()
+
+
 func _physics_process(delta: float) -> void:
 	rotation = move_toward(rotation, _target, SPEED * delta)
+	if _flash > 0.0:
+		_flash = maxf(0.0, _flash - delta * 3.0)
+		_art.queue_redraw()
