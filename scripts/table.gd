@@ -53,6 +53,12 @@ static func build(parent: Node2D) -> Dictionary:
 	_wall(parent, [Vector2(DIVIDER, 935), Vector2(RIGHT, 935)], NEON_VIOLET)
 	# Fang-Trichter oben links: leitet Baelle durch den Spinner nach unten
 	_wall(parent, [Vector2(160, 150), Vector2(82, 232)], NEON_CYAN)
+	# Zweite Trichterwand (Symmetrie-Wunsch): fasst den Kanal zum OP-Spinner
+	# von unten ein - die E-G-O-Targets liegen mitten in der Gasse.  Beide
+	# Enden halten mehr als Kugelbreite Abstand zu Haken und Steg 1, damit
+	# dort keine Ruhe-Tasche entsteht.
+	_wall(parent, [Vector2(185, 195), Vector2(148, 237), Vector2(116, 267)],
+			NEON_CYAN, false, false, true)
 	# Sanfte Ablenkung am linken Bogen-Abstieg (Nutzer-Skizze, rotes Kreuz):
 	# ein Haken-Bogen faengt den ueber den Scheitel kommenden Ball ab und
 	# schickt ihn nach rechts unten in die G-G-E-Z-Gassen.  Der Trichter
