@@ -4,6 +4,13 @@ extends CanvasLayer
 
 signal continue_pressed
 
+## Spielfeldbreite, Chat-Spalte und Gesamtbreite - muessen zu
+## Table.FIELD_W / CHAT_W und der Viewport-Breite passen.
+const FIELD_W := 540
+const CHAT_W := 120
+const TOTAL_W := FIELD_W + CHAT_W
+const CHAT_LINES := 17
+
 const PINK := Color(1.0, 0.24, 0.62)
 const GREEN := Color(0.35, 0.95, 0.25)
 const CYAN := Color(0.2, 0.85, 0.95)
@@ -138,22 +145,37 @@ func _try_avatar(bar: Panel) -> void:
 	bar.add_child(tr)
 
 
+## Chat als eigene Spalte rechts neben dem Spielfeld - der Stream-Look.
 func _build_chat() -> void:
 	var panel := Panel.new()
 	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color(0.02, 0.01, 0.04, 0.42)
+	sb.bg_color = Color(0.028, 0.012, 0.050, 0.94)
+	sb.border_color = Color(0.72, 0.20, 0.95, 0.85)
+	sb.set_border_width_all(2)
 	sb.set_corner_radius_all(6)
 	panel.add_theme_stylebox_override("panel", sb)
-	panel.position = Vector2(24, 96)
-	panel.size = Vector2(214, 180)
+	panel.position = Vector2(FIELD_W + 6, 88)
+	panel.size = Vector2(CHAT_W - 12, 868)
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(panel)
+
+	var head := _label("LIVE CHAT", Vector2(0, 6), 12, GREEN, panel)
+	head.size = Vector2(CHAT_W - 12, 16)
+	head.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+
+	var rule := ColorRect.new()
+	rule.color = Color(0.72, 0.20, 0.95, 0.5)
+	rule.position = Vector2(8, 26)
+	rule.size = Vector2(CHAT_W - 28, 1)
+	rule.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.add_child(rule)
+
 	_chat_vbox = VBoxContainer.new()
-	_chat_vbox.position = Vector2(8, 6)
-	_chat_vbox.size = Vector2(198, 168)
-	_chat_vbox.add_theme_constant_override("separation", 1)
+	_chat_vbox.position = Vector2(7, 32)
+	_chat_vbox.size = Vector2(CHAT_W - 26, 826)
+	_chat_vbox.add_theme_constant_override("separation", 5)
 	panel.add_child(_chat_vbox)
-	chat("gleich geht's los!!")
+	chat("gleich geht's los!!", "mod_bot")
 
 
 func chat(msg: String, user: String = "") -> void:
@@ -162,12 +184,13 @@ func chat(msg: String, user: String = "") -> void:
 	var col: Color = USER_COLORS[user.hash() % USER_COLORS.size()]
 	var l := Label.new()
 	l.text = user + ": " + msg
-	l.add_theme_font_size_override("font_size", 11)
+	l.add_theme_font_size_override("font_size", 10)
 	l.add_theme_color_override("font_color", Color(col.r, col.g, col.b, 0.92))
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	l.custom_minimum_size = Vector2(198, 0)
+	l.custom_minimum_size = Vector2(CHAT_W - 26, 0)
 	_chat_vbox.add_child(l)
-	while _chat_vbox.get_child_count() > 9:
+	# Die Spalte laeuft von oben nach unten voll; oben faellt das Aelteste raus.
+	while _chat_vbox.get_child_count() > CHAT_LINES:
 		var first := _chat_vbox.get_child(0)
 		_chat_vbox.remove_child(first)
 		first.queue_free()
@@ -240,7 +263,7 @@ func set_power(p: float, show_bar: bool) -> void:
 func _build_popup() -> void:
 	_overlay = ColorRect.new()
 	_overlay.position = Vector2.ZERO
-	_overlay.size = Vector2(540, 960)
+	_overlay.size = Vector2(TOTAL_W, 960)
 	_overlay.color = Color(0, 0, 0, 0.55)
 	_overlay.visible = false
 	add_child(_overlay)

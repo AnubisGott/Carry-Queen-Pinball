@@ -105,6 +105,9 @@ func _make_drain() -> void:
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:
+		# Tippen in der Chat-Spalte rechts steuert nichts
+		if event.position.x >= Table.FIELD_W:
+			return
 		if event.pressed:
 			if event.position.x > 430 and event.position.y > 700:
 				_touch_launch[event.index] = true

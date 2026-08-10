@@ -4,6 +4,13 @@ extends RefCounted
 ## Draht-Hochbahn ueber dem Tisch (2. Ebene), Mulde mit Hoernern in der Mitte,
 ## Bumper-Pad, I-C-H-Bank links, In-/Outlanes beidseitig, Spiral-Scheibe unten.
 
+const BG_SHADER := preload("res://shaders/playfield_bg.gdshader")
+
+## Spielfeldbreite und Breite der Chat-Spalte rechts daneben.
+const FIELD_W := 540.0
+const CHAT_W := 120.0
+const TOTAL_W := FIELD_W + CHAT_W
+
 const LEFT := 20.0
 const RIGHT := 520.0
 const DIVIDER := 470.0
@@ -15,6 +22,12 @@ const NEON_GREEN := Color(0.35, 1.8, 0.25)
 const NEON_CYAN := Color(0.15, 1.6, 1.8)
 const NEON_GOLD := Color(1.9, 1.3, 0.2)
 const NEON_VIOLET := Color(1.1, 0.4, 1.9)
+
+## Aufbau der Banden nach dem Vorbild von Flipper03 (_draw_rails):
+## Schlagschatten, weiter Schein, dunkler Kern, helle Kante.  Erst der dunkle
+## Kern macht aus einer Leuchtlinie ein Profil mit Koerper.
+const CORE_DARK := Color(0.08, 0.13, 0.16)
+const SHADOW_OFF := Vector2(2, 3)
 
 
 static func build(parent: Node2D) -> Dictionary:
@@ -29,8 +42,11 @@ static func build(parent: Node2D) -> Dictionary:
 	_wall(parent, [Vector2(DIVIDER, 935), Vector2(RIGHT, 935)], NEON_VIOLET)
 	# Fang-Trichter oben links: leitet Baelle in die Hochbahn-Einfahrt
 	_wall(parent, [Vector2(160, 150), Vector2(82, 232)], NEON_CYAN)
-	# Linke Seite: Ablenk-Leiste (wie die schraege Bande der Vorlage) + Inlane
-	_wall(parent, [Vector2(24, 598), Vector2(92, 508)], NEON_GREEN)
+	# Linke Seite: Ablenk-Leiste (wie die schraege Bande der Vorlage) + Inlane.
+	# Das untere Ende muss mindestens eine Kugelbreite (26) von der Bande bei
+	# x=20 wegbleiben - stand es dichter dran, verkeilte sich die Kugel im
+	# spitzen Winkel zwischen Bande und Leiste und das Spiel stand still.
+	_wall(parent, [Vector2(54, 598), Vector2(92, 508)], NEON_GREEN)
 	_bar(parent, Vector2(95, 690), Vector2(154, 830), NEON_GREEN)
 	# Rechte Inlane ("KEIN PLAN")
 	_bar(parent, Vector2(410, 700), Vector2(336, 830), NEON_GREEN)
@@ -40,10 +56,38 @@ static func build(parent: Node2D) -> Dictionary:
 	# Hoerner der Mulde (Trichter unter dem S-Bumper)
 	_wall(parent, [Vector2(240, 455), Vector2(252, 492)], NEON_GOLD)
 	_wall(parent, [Vector2(300, 455), Vector2(288, 492)], NEON_GOLD)
-	# Untere Bogen-Banden: sanfte Kurven fuehren aussen herum zur
-	# Drain-Oeffnung in der Mitte (Skizze des Nutzers)
-	_wall(parent, [Vector2(LEFT, 760), Vector2(25, 820), Vector2(40, 875), Vector2(65, 915), Vector2(100, 940), Vector2(140, 952), Vector2(180, 956), Vector2(210, 956)], NEON_PINK)
-	_wall(parent, [Vector2(DIVIDER, 600), Vector2(462, 680), Vector2(445, 750), Vector2(420, 810), Vector2(385, 865), Vector2(340, 910), Vector2(300, 940), Vector2(285, 948)], NEON_PINK)
+	# Untere Banden: kantig gefast statt rund gebogen - wenige lange Geraden
+	# mit scharfen Knicken, wie die Ecken der Vorlage.  Die Drain-Oeffnung in
+	# der Mitte (210..285) bleibt unveraendert.
+	_wall(parent, [Vector2(LEFT, 760), Vector2(LEFT, 838), Vector2(58, 904),
+			Vector2(128, 946), Vector2(210, 958)], NEON_PINK, true)
+	# Rechte Auslauf-Bande ohne eigene Linie - nur Kollision.
+	_wall(parent, [Vector2(DIVIDER, 600), Vector2(456, 706), Vector2(424, 806),
+			Vector2(364, 886), Vector2(285, 950)], NEON_PINK, true, true)
+
+	# Randaufbau: Blechband mit Schellen, Rohr, Waben und Leiterbahnen entlang
+	# der Banden - die Struktur der Vorlagentextur als echte Elemente.
+	# Rohrfarbe immer anders als die Bande daneben - sonst liest sich das als
+	# verdoppelte Linie statt als Strangbuendel wie in der Vorlage.
+	parent.add_child(EdgeStructure.new(_arch_points(), -1.0, NEON_CYAN, 26.0, 60.0))
+	parent.add_child(EdgeStructure.new(
+			[Vector2(LEFT, 330), Vector2(LEFT, 760)], 1.0, NEON_CYAN, 24.0, 46.0))
+	# Rechts laeuft das Cyan-Band wie links ganz aussen herum und biegt in die
+	# Ecke ab - nicht diagonal durchs Feld.
+	parent.add_child(EdgeStructure.new(
+			[Vector2(LEFT, 760), Vector2(LEFT, 838), Vector2(58, 904),
+				Vector2(128, 946), Vector2(210, 958)], 1.0, NEON_CYAN, 22.0, 30.0))
+	parent.add_child(EdgeStructure.new(
+			[Vector2(RIGHT, 330), Vector2(RIGHT, 935), Vector2(DIVIDER, 935)],
+			-1.0, NEON_CYAN, 22.0, 54.0))
+	# Rechte Seite exakt spiegelbildlich zur linken.  Spiegelachse ist x=245,
+	# die Mitte zwischen linker Bande (20) und Trennwand (470):
+	#   20 -> 470 | 58 -> 432 | 128 -> 362 | 210 -> 280
+	parent.add_child(EdgeStructure.new(
+			[Vector2(DIVIDER, 330), Vector2(DIVIDER, 760)], -1.0, NEON_CYAN, 24.0, 46.0))
+	parent.add_child(EdgeStructure.new(
+			[Vector2(DIVIDER, 760), Vector2(DIVIDER, 838), Vector2(432, 904),
+				Vector2(362, 946), Vector2(280, 958)], -1.0, NEON_CYAN, 22.0, 30.0))
 
 	var refs := {}
 
@@ -132,7 +176,12 @@ static func _arch_points() -> Array:
 	return pts
 
 
-static func _wall(parent: Node2D, pts: Array, color: Color) -> void:
+## `sharp` zeichnet die Bande mit spitzen Knicken und geraden Enden statt
+## rund verschliffen - das gibt den kantigen Look der Vorlage.
+## `hidden` baut nur die Kollision, ohne Linie - fuer Banden, deren Optik ein
+## darueberliegendes Element traegt.
+static func _wall(parent: Node2D, pts: Array, color: Color, sharp: bool = false,
+		hidden: bool = false) -> void:
 	var body := StaticBody2D.new()
 	var pm := PhysicsMaterial.new()
 	pm.bounce = 0.28
@@ -146,23 +195,92 @@ static func _wall(parent: Node2D, pts: Array, color: Color) -> void:
 		cs.shape = seg
 		body.add_child(cs)
 	parent.add_child(body)
+	var joint := Line2D.LINE_JOINT_SHARP if sharp else Line2D.LINE_JOINT_ROUND
+	var cap := Line2D.LINE_CAP_BOX if sharp else Line2D.LINE_CAP_ROUND
 	var packed := PackedVector2Array(pts)
+
+	if hidden:
+		return
+
+	# Schlagschatten leicht versetzt - hebt die Bande vom Untergrund ab
+	var shadow := Line2D.new()
+	var shifted := PackedVector2Array()
+	for p in pts:
+		shifted.append(p + SHADOW_OFF)
+	shadow.points = shifted
+	shadow.width = 9.0
+	shadow.default_color = Color(0, 0, 0, 0.7)
+	shadow.joint_mode = joint
+	shadow.begin_cap_mode = cap
+	shadow.end_cap_mode = cap
+	parent.add_child(shadow)
+
 	var under := Line2D.new()
 	under.points = packed
-	under.width = 11.0
-	under.default_color = Color(color.r, color.g, color.b, 0.16)
-	under.joint_mode = Line2D.LINE_JOINT_ROUND
-	under.begin_cap_mode = Line2D.LINE_CAP_ROUND
-	under.end_cap_mode = Line2D.LINE_CAP_ROUND
+	under.width = 12.0
+	under.default_color = Color(color.r, color.g, color.b, 0.13)
+	under.joint_mode = joint
+	under.begin_cap_mode = cap
+	under.end_cap_mode = cap
 	parent.add_child(under)
+
+	# Dunkler Kern: macht aus der Leuchtlinie ein koerperhaftes Profil
+	var core := Line2D.new()
+	core.points = packed
+	core.width = 6.5
+	core.default_color = CORE_DARK
+	core.joint_mode = joint
+	core.begin_cap_mode = cap
+	core.end_cap_mode = cap
+	parent.add_child(core)
+
+	# Helle Kante obenauf
 	var line := Line2D.new()
 	line.points = packed
-	line.width = 4.0
+	line.width = 2.4
 	line.default_color = color
-	line.joint_mode = Line2D.LINE_JOINT_ROUND
-	line.begin_cap_mode = Line2D.LINE_CAP_ROUND
-	line.end_cap_mode = Line2D.LINE_CAP_ROUND
+	line.joint_mode = joint
+	line.begin_cap_mode = cap
+	line.end_cap_mode = cap
 	parent.add_child(line)
+	# Knotenpunkte als kleine Quadrate betonen
+	if sharp:
+		for i in range(1, pts.size() - 1):
+			var node := Polygon2D.new()
+			var s := 5.0
+			node.polygon = PackedVector2Array([
+				Vector2(-s, -s), Vector2(s, -s), Vector2(s, s), Vector2(-s, s)])
+			node.position = pts[i]
+			node.color = Color(color.r, color.g, color.b, 0.95)
+			parent.add_child(node)
+
+
+## Rein dekorativer Winkel in einer Ecke: zwei Schenkel im rechten Winkel und
+## ein kleines Quadrat.  `dir` gibt an, in welche Richtung die Schenkel zeigen.
+static func _corner_bracket(parent: Node2D, at: Vector2, dir: Vector2, color: Color) -> void:
+	var arm := 34.0
+	var line := Line2D.new()
+	line.points = PackedVector2Array([
+		at + Vector2(dir.x * arm, 0), at, at + Vector2(0, dir.y * arm)])
+	line.width = 3.0
+	line.default_color = Color(color.r, color.g, color.b, 0.85)
+	line.joint_mode = Line2D.LINE_JOINT_SHARP
+	line.begin_cap_mode = Line2D.LINE_CAP_BOX
+	line.end_cap_mode = Line2D.LINE_CAP_BOX
+	line.z_index = -3
+	parent.add_child(line)
+
+	var box := Line2D.new()
+	var s := 9.0
+	var c := at + Vector2(dir.x * 15.0, dir.y * 15.0)
+	box.points = PackedVector2Array([
+		c + Vector2(-s, -s), c + Vector2(s, -s), c + Vector2(s, s),
+		c + Vector2(-s, s), c + Vector2(-s, -s)])
+	box.width = 2.0
+	box.default_color = Color(color.r, color.g, color.b, 0.6)
+	box.joint_mode = Line2D.LINE_JOINT_SHARP
+	box.z_index = -3
+	parent.add_child(box)
 
 
 static func _bar(parent: Node2D, a: Vector2, b: Vector2, color: Color) -> void:
@@ -181,17 +299,32 @@ static func _bar(parent: Node2D, a: Vector2, b: Vector2, color: Color) -> void:
 	body.rotation = (b - a).angle() - PI / 2.0
 	body.add_child(cs)
 	parent.add_child(body)
+	var shadow := Line2D.new()
+	shadow.points = PackedVector2Array([a + SHADOW_OFF, b + SHADOW_OFF])
+	shadow.width = 18.0
+	shadow.default_color = Color(0, 0, 0, 0.7)
+	shadow.begin_cap_mode = Line2D.LINE_CAP_ROUND
+	shadow.end_cap_mode = Line2D.LINE_CAP_ROUND
+	parent.add_child(shadow)
 	var under := Line2D.new()
 	under.points = PackedVector2Array([a, b])
-	under.width = 24.0
-	under.default_color = Color(color.r, color.g, color.b, 0.16)
+	under.width = 26.0
+	under.default_color = Color(color.r, color.g, color.b, 0.13)
 	under.begin_cap_mode = Line2D.LINE_CAP_ROUND
 	under.end_cap_mode = Line2D.LINE_CAP_ROUND
 	parent.add_child(under)
+	# dunkler Koerper, darauf erst die Leuchtkante
+	var shell := Line2D.new()
+	shell.points = PackedVector2Array([a, b])
+	shell.width = 15.0
+	shell.default_color = CORE_DARK
+	shell.begin_cap_mode = Line2D.LINE_CAP_ROUND
+	shell.end_cap_mode = Line2D.LINE_CAP_ROUND
+	parent.add_child(shell)
 	var line := Line2D.new()
 	line.points = PackedVector2Array([a, b])
-	line.width = 14.0
-	line.default_color = Color(color.r, color.g, color.b, 0.9)
+	line.width = 11.0
+	line.default_color = Color(color.r, color.g, color.b, 0.55)
 	line.begin_cap_mode = Line2D.LINE_CAP_ROUND
 	line.end_cap_mode = Line2D.LINE_CAP_ROUND
 	parent.add_child(line)
@@ -205,18 +338,56 @@ static func _bar(parent: Node2D, a: Vector2, b: Vector2, color: Color) -> void:
 
 
 static func _background(parent: Node2D) -> void:
+	# Platinen-Hintergrund als Shader: Wabenraster, Magenta-Kern hinter der
+	# Scheibe, kalter Schein hinter dem Bumper-Pad, Vignette.
 	var bg := Polygon2D.new()
-	bg.polygon = PackedVector2Array([Vector2(0, 0), Vector2(540, 0), Vector2(540, 960), Vector2(0, 960)])
-	bg.color = Color(0.035, 0.018, 0.055)
+	bg.polygon = PackedVector2Array([
+		Vector2(0, 0), Vector2(TOTAL_W, 0), Vector2(TOTAL_W, 960), Vector2(0, 960)])
+	bg.color = Color.WHITE
 	bg.z_index = -10
+	var mat := ShaderMaterial.new()
+	mat.shader = BG_SHADER
+	mat.set_shader_parameter("rect_size", Vector2(TOTAL_W, 960))
+	bg.material = mat
 	parent.add_child(bg)
-	for i in 12:
-		var scan := Line2D.new()
-		scan.points = PackedVector2Array([Vector2(0, 80 * i), Vector2(540, 80 * i)])
-		scan.width = 1.0
-		scan.default_color = Color(0.15, 1.6, 1.8, 0.035)
-		scan.z_index = -9
-		parent.add_child(scan)
+
+	# schwache Leiterbahnen als Struktur
+	for i in 7:
+		var x := 46.0 + i * 74.0
+		var trace := Line2D.new()
+		trace.points = PackedVector2Array([
+			Vector2(x, 90), Vector2(x, 300 + i * 40), Vector2(x + 30, 340 + i * 40),
+			Vector2(x + 30, 950)])
+		trace.width = 1.0
+		trace.default_color = Color(0.55, 0.16, 0.70, 0.22)
+		trace.z_index = -9
+		parent.add_child(trace)
+
+	# Rahmen um das Spielfeld - der Stream-Look der Vorlage
+	var frame := Line2D.new()
+	frame.points = PackedVector2Array([
+		Vector2(4, 88), Vector2(FIELD_W - 4, 88), Vector2(FIELD_W - 4, 956),
+		Vector2(4, 956), Vector2(4, 88)])
+	frame.width = 2.5
+	frame.default_color = Color(0.15, 1.4, 1.6, 0.85)
+	frame.joint_mode = Line2D.LINE_JOINT_SHARP
+	frame.z_index = -8
+	parent.add_child(frame)
+
+	# Eckstrukturen: Metallplatten mit Schrauben, Wabenfeld und Neonrohr -
+	# so wie die Textur der Vorlage ihre Struktur in die Ecken legt und die
+	# Mitte frei laesst.
+	# Letzter Wert je Ecke ist die Wabenfarbe (unabhaengig vom Akzent).
+	for spec in [
+		[Vector2(4, 88), Vector2(1, 1), Vector2(122, 152), NEON_CYAN, NEON_CYAN],
+		[Vector2(FIELD_W - 4, 88), Vector2(-1, 1), Vector2(122, 152), NEON_PINK, NEON_PINK],
+		# Unten rechts sitzt die Platte an der Spielfeldecke, nicht an der
+		# Rahmenecke - sonst liegt sie hinter der Schussbahn und steht nicht
+		# spiegelbildlich zur linken (Achse x=245: 4..116 -> 374..486).
+		[Vector2(486, 956), Vector2(-1, -1), Vector2(112, 126), NEON_CYAN, NEON_VIOLET],
+		[Vector2(4, 956), Vector2(1, -1), Vector2(112, 126), NEON_CYAN, NEON_GREEN],
+	]:
+		parent.add_child(CornerPlate.new(spec[0], spec[1], spec[2], spec[3], spec[4]))
 
 
 static func _deco(parent: Node2D, text: String, pos: Vector2, col: Color, size: int, rot: float) -> void:
