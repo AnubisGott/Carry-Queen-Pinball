@@ -6,6 +6,7 @@
 - In manchen Fällen die Leuchtkraft verstärken, wenn man einem Ziel näher kommt.
 - Die Bumper spitzer machen. Sie stören, wenn man hoch schießen möchte.
 - Den Bogen oben hinzufügen
+- Sonderfunktionen justieren
 
 To continue this session, run codex resume 019fe73f-ff94-72e2-862a-f500a5904c5e
 d:\daten\development\gaming\Flipper02Codex>
@@ -18,9 +19,18 @@ e:\multimed\Musikideen\work\SunoAI\Der Beste\game
 Resume this session with:
 claude --resume 94101305-1426-4398-8d2f-8ad07fde1b03
 
-1. E-G-O-Standup-Bank (links oben) – drei Standup-Targets schräg am Bogen entlang (wie die I-C-H-Bank, die Klasse existiert schon). Alle drei getroffen → Ego-Multiplikator sofort +1, Chat: „ihr EGO skaliert besser als wir". Geringster Aufwand, füllt die linke Zone sinnvoll.
-2. Skill-Shot-Schale (rechts oben) – kleine Leucht-Schale bei ~(430, 200): Wer den Abschuss mit dem Power-Balken so dosiert, dass die Kugel direkt hineinfällt, bekommt „PERFEKTER START. NATÜRLICH." (+5000). Gibt dem Federkraft-Balken endlich einen Sinn und belebt genau die rechte Zone, durch die die Kugel bisher nur durchfällt.
-3. Captive Ball „Der Teammate" (links oben) – eine kurze, geschlossene Gasse mit einer zweiten, dauerhaft gefangenen Kugel. Man schießt sie an, sie knallt ans Gassenende (Punkte je nach Wucht), kommt aber nie frei. Bester Song-Gag: das Team ist da, kann aber nichts tun.
-4. G-G-E-Z-Rollover-Gassen (rechts oben) – 3–4 kurze parallele Gassen mit Leuchtbuchstaben, durch die die Kugel von oben durchrollt. G-G-E-Z vollständig → Bonus + Ego-Level, Chat spammt „gg ez". Der Pinball-Klassiker für Top-Lanes.
-5. Speedrun-Loop (links, ohne neues Bauteil) – die bestehende Bahn links um das Pad als Orbit werten: Lichtschranke oben, jede volle Passage zählt „RUNDE ×" mit steigenden Punkten, drei in Folge zünden Frenzy. Nur Logik + zwei Leucht-Pfeile.
+Hier alle Sondermechaniken im aktuellen Stand:
 
+Der Multiplikator-Stapel (alles multipliziert sich): EGO ×1…×10 · Frenzy ×2 · Wizard ×5 · pinke Carry-Kugel im Multiball ×10. Blackout überschreibt alles auf ×1.
+
+EGO – Der einzelne Knopf oben links ist die einzige Quelle: ein Treffer = genau eine Stufe rauf (Fanfare, +1.000 Punkte), maximal ×10. Bei Ballverlust fällt er auf ×1 zurück – jeder Ball beginnt also von vorn.
+
+Carry-Save – Einmal pro Ball scharf (grüner Punkt „CARRY-SAVE ●" oben links). Geht der Ball verloren, liegt er sichtbar in der Drain-Öffnung, zittert mit Grollen, zählt 3-2-1 herunter und wird zwischen den Flippern wieder hochgeschossen.
+
+Die vier Disziplinen – jede einmal geschafft, dann zündet der Wizard:
+- DMG: Alle sechs D-A-M-A-G-E-Targets (je 500) abräumen → +3.000 und Damage-Frenzy: 20 Sekunden alles doppelt. Die Bank bleibt bis zum Ballverlust leuchten.
+- KILLS: Alle vier Bumper W-A-S-D treffen (je 150). Getroffene bleiben golden markiert bis zum Ballverlust → +3.000, „KILL BESTÄTIGT".
+- ICH: I-C-H-Bank links komplett (je 300) → +2.000 und ein Hurry-Up: 25.000 Punkte, 12 Sekunden, der Wert tickt rapide runter (Minimum 5.000). Abgeholt wird er an der Mittel-Mulde – „ICH. WER SONST."
+- CARRY: Alle vier G-G-E-Z-Gassen durchrollen (je 500) → +5.000 und Ko-op-Multiball: Deine Kugel wird zur pinken Carry-Kugel (alles ×10), zwei Team-Kugeln kommen oben dazu. Der Multiball endet, wenn nur noch eine Kugel lebt.
+
+Wizard „Der Bericht" – Sind alle vier Lam dazu die vier Sprüche („Wer macht denSchaden? Ich."), und die Mulde zahlt pro Treffer einen Mega-Jackpot von 20.000. Danach werden die Disziplinen zurückgesetzt.

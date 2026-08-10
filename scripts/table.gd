@@ -51,14 +51,14 @@ static func build(parent: Node2D) -> Dictionary:
 	_wall(parent, [Vector2(466, 960), Vector2(466, 300)], NEON_VIOLET, false, true)
 	_wall(parent, [Vector2(DIVIDER, 305), Vector2(445, 335)], NEON_VIOLET)
 	_wall(parent, [Vector2(DIVIDER, 935), Vector2(RIGHT, 935)], NEON_VIOLET)
-	# Der Bereich oben links bleibt offen - Trichterwaende, Leit-Band und
-	# Innen-Bogen wurden alle wieder verworfen.
-	# Sanfte Ablenkung am linken Bogen-Abstieg (Nutzer-Skizze, rotes Kreuz):
-	# ein Haken-Bogen faengt den ueber den Scheitel kommenden Ball ab und
-	# schickt ihn nach rechts unten in die G-G-E-Z-Gassen.  Der Trichter
-	# zum OP-Spinner bleibt von unten her erreichbar.
-	_wall(parent, [Vector2(230, 96), Vector2(203, 104), Vector2(185, 122),
-			Vector2(183, 144), Vector2(192, 162), Vector2(207, 172)], NEON_CYAN)
+	# Leitplanke oben links nach den drei Punkten der Nutzer-Skizze:
+	# rot (119,152) - gruen (161,153) - blau (195,162).  Sie faengt Baelle,
+	# die ueber den Bogenscheitel kommen, und leitet sie nach rechts unten.
+	_wall(parent, [Vector2(119, 152), Vector2(161, 153), Vector2(195, 162)], NEON_CYAN)
+	# Ablenker am linken Bogen-Abstieg, auf sein oberes Stueck gekuerzt:
+	# sein absteigender Arm stand sonst quer auf der neuen Leitplanke.  So
+	# rutscht der Ball ueber den Ablenker und faellt auf die Planke.
+	_wall(parent, [Vector2(230, 96), Vector2(203, 104), Vector2(185, 122)], NEON_CYAN)
 	# (Leit-Band wieder entfernt - hat optisch nicht gepasst)
 	# Linke Inlane ("KEIN HEAL").  Oberes Ende weit genug vom Slingshot weg,
 	# damit die Einfahrt in die Laufrinne mehr als eine Kugelbreite bietet.
