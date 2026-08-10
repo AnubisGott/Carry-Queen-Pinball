@@ -59,6 +59,12 @@ static func build(parent: Node2D) -> Dictionary:
 	# zum OP-Spinner bleibt von unten her erreichbar.
 	_wall(parent, [Vector2(230, 96), Vector2(203, 104), Vector2(185, 122),
 			Vector2(183, 144), Vector2(192, 162), Vector2(207, 172)], NEON_CYAN)
+	# Leit-Bogen oben links (Nutzer-Skizze): schliesst links buendig an die
+	# Aussenbande an und muendet versiegelt am Haken - Kugeln, die den linken
+	# Orbit hochlaufen, werden so ebenfalls in die Gassen gefuehrt.  Beide
+	# Enden unter Kugelbreite Abstand, damit keine Keil-Tasche entsteht.
+	_wall(parent, [Vector2(222, 110), Vector2(196, 120), Vector2(170, 132),
+			Vector2(145, 143), Vector2(116, 154)], NEON_CYAN)
 	# Linke Inlane ("KEIN HEAL").  Oberes Ende weit genug vom Slingshot weg,
 	# damit die Einfahrt in die Laufrinne mehr als eine Kugelbreite bietet.
 	# Untere Enden ueberlappen den Schwenkkreis der hinteren Flipper-Ecke -
