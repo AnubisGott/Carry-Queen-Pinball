@@ -13,7 +13,10 @@ func _init(pos: Vector2) -> void:
 func _ready() -> void:
 	var cs := CollisionShape2D.new()
 	var sh := RectangleShape2D.new()
-	sh.size = Vector2(60, 30)
+	# Schmaler als die Oeffnung zwischen den Horn-Spitzen (252..288): nur wer
+	# durch den Trichter faellt, wird gefangen - wer seitlich ans Horn prallt,
+	# fliegt aussen vorbei, ohne die Zone zu streifen.
+	sh.size = Vector2(16, 26)
 	cs.shape = sh
 	add_child(cs)
 	body_entered.connect(_on_enter)
