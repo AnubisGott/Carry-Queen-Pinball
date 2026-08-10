@@ -175,15 +175,15 @@ static func build(parent: Node2D) -> Dictionary:
 		# Stege enden bei y=248: die Gassen-Ausgaenge links und rechts des
 		# Plug-Stegs haben so gut 34px Abstand zur Bumper-Kuppe (Kugel: 26).
 		var lane_dir := Vector2(0.483, -0.877)
-		for w in [[Vector2(231, 248), Vector2(216, 220)],
-				[Vector2(269, 248), Vector2(254, 220)],
-				[Vector2(307, 248), Vector2(292, 220)],
-				[Vector2(345, 248), Vector2(330, 220)],
-				[Vector2(383, 248), Vector2(368, 220)]]:
+		for w in [[Vector2(231, 226), Vector2(216, 198)],
+				[Vector2(269, 226), Vector2(254, 198)],
+				[Vector2(307, 226), Vector2(292, 198)],
+				[Vector2(345, 226), Vector2(330, 198)],
+				[Vector2(383, 226), Vector2(368, 198)]]:
 			_wall(parent, w, NEON_VIOLET, false, false, true)
 		var ggez_letters := ["G", "G", "E", "Z"]
-		var centers := [Vector2(243, 234), Vector2(281, 234),
-				Vector2(319, 234), Vector2(357, 234)]
+		var centers := [Vector2(243, 212), Vector2(281, 212),
+				Vector2(319, 212), Vector2(357, 212)]
 		for i in 4:
 			var r := RolloverLane.new(centers[i], ggez_letters[i], lane_dir)
 			parent.add_child(r)
