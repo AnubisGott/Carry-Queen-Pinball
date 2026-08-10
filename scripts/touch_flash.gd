@@ -23,8 +23,10 @@ func _init(pts: Array, radius: float = 6.0) -> void:
 
 
 ## Registriert eine Leuchtschicht, die beim Blitz mit hochgezogen wird.
-func watch(line: Line2D) -> void:
-	_layers.append({"line": line, "color": line.default_color, "width": line.width})
+## Ohne `flash_color` gilt die Standard-Formel (_boost), sonst exakt der Wert.
+func watch(line: Line2D, flash_color = null) -> void:
+	_layers.append({"line": line, "color": line.default_color,
+			"width": line.width, "flash": flash_color})
 
 
 func _ready() -> void:
@@ -38,7 +40,7 @@ func _on_touch(body: Node2D) -> void:
 		_tw.kill()
 	for l in _layers:
 		var line: Line2D = l["line"]
-		line.default_color = _boost(l["color"])
+		line.default_color = l["flash"] if l["flash"] != null else _boost(l["color"])
 		line.width = l["width"] * 1.6
 	_tw = create_tween().set_parallel(true)
 	for l in _layers:

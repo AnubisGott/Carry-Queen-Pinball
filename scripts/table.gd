@@ -392,10 +392,11 @@ static func _bar(parent: Node2D, a: Vector2, b: Vector2, color: Color,
 	core.end_cap_mode = Line2D.LINE_CAP_ROUND
 	parent.add_child(core)
 	if flash:
+		# Dezenter Blitz nach Nutzer-Vorgabe: nur eine Spur heller, nicht grell
 		var tf := TouchFlash.new([a, b], 8.0)
-		tf.watch(under)
-		tf.watch(line)
-		tf.watch(core)
+		tf.watch(under, Color(0.4, 1.5, 0.33, 0.17))
+		tf.watch(line, Color(0.4, 1.5, 0.33, 0.66))
+		tf.watch(core, Color(1.6, 1.6, 1.6, 0.66))
 		parent.add_child(tf)
 
 
