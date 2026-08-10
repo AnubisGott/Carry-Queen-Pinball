@@ -200,8 +200,13 @@ static func build(parent: Node2D) -> Dictionary:
 	parent.add_child(TableDeco.new("saturn", Vector2(82, 475), NEON_GOLD))
 	parent.add_child(TableDeco.new("bolt", Vector2(205, 175), NEON_GOLD))
 	parent.add_child(TableDeco.new("arrow", Vector2(375, 520), NEON_CYAN, 1.0, -35.0))
+	# Lane-Pfeile: blinken, solange ein Ball abschussbereit ist (main.gd)
+	var lane_chevrons := []
 	for i in 5:
-		parent.add_child(TableDeco.new("chevron", Vector2(495, 540 + i * 60), NEON_GOLD))
+		var ch := TableDeco.new("chevron", Vector2(495, 540 + i * 60), NEON_GOLD)
+		parent.add_child(ch)
+		lane_chevrons.append(ch)
+	refs["lane_chevrons"] = lane_chevrons
 	parent.add_child(TableDeco.new("chevron", Vector2(105, 170), NEON_PINK, 1.0, 225.0))
 	parent.add_child(TableDeco.new("chevron", Vector2(85, 200), NEON_PINK, 1.0, 225.0))
 

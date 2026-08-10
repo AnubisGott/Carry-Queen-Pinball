@@ -19,6 +19,7 @@ var drops: Array = []
 var standups: Array = []
 var ggez: Array = []
 var ego_bank: Array = []
+var lane_chevrons: Array = []
 var locked_balls: Array = []
 var dim: CanvasModulate
 
@@ -62,6 +63,7 @@ func _ready() -> void:
 	standups = refs["standups"]
 	ggez = refs.get("ggez", [])
 	ego_bank = refs.get("ego_bank", [])
+	lane_chevrons = refs.get("lane_chevrons", [])
 	throne = refs.get("throne", null)
 	plunger = refs["plunger"]
 	if throne:
@@ -202,6 +204,9 @@ func _update_plunger(delta: float) -> void:
 			if b.global_position.x > Table.DIVIDER and b.global_position.y > 780:
 				lane_ball = b
 				break
+	# Lane-Pfeile blinken, solange ein Ball abschussbereit liegt
+	for c in lane_chevrons:
+		c.set_blink(lane_ball != null)
 	if autotest:
 		_at_launch_cool = maxf(0.0, _at_launch_cool - delta)
 		if lane_ball != null and _at_launch_cool <= 0.0:

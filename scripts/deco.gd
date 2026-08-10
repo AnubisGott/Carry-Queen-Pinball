@@ -6,6 +6,18 @@ extends Node2D
 var kind := "comet"
 var deco_size := 1.0
 var col := Color(1.22, 0.9, 0.2)
+var _blink := false
+var _blink_t := 0.0
+
+
+## Blinken ein-/ausschalten (z.B. Lane-Pfeile bei abschussbereitem Ball)
+func set_blink(on: bool) -> void:
+	if _blink == on:
+		return
+	_blink = on
+	_blink_t = 0.0
+	if not on:
+		modulate.a = 1.0
 
 
 func _init(k: String, pos: Vector2, c: Color = Color(1.22, 0.9, 0.2), s: float = 1.0, rot_deg: float = 0.0) -> void:
@@ -20,6 +32,9 @@ func _init(k: String, pos: Vector2, c: Color = Color(1.22, 0.9, 0.2), s: float =
 func _process(delta: float) -> void:
 	if kind == "spiral":
 		rotation += delta * 0.35
+	if _blink:
+		_blink_t += delta
+		modulate.a = 0.2 + 0.8 * (0.5 + 0.5 * sin(_blink_t * 9.0))
 
 
 func _draw() -> void:
