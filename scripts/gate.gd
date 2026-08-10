@@ -13,7 +13,7 @@ func _init(pos: Vector2) -> void:
 func _ready() -> void:
 	var cs := CollisionShape2D.new()
 	var sh := RectangleShape2D.new()
-	sh.size = Vector2(48, 44)
+	sh.size = Vector2(48, 56)
 	cs.shape = sh
 	add_child(cs)
 	z_index = 4
@@ -25,7 +25,11 @@ func _physics_process(delta: float) -> void:
 		queue_redraw()
 	for body in get_overlapping_bodies():
 		if body is PinBall and not body.freeze and body.linear_velocity.y > 30.0:
-			body.linear_velocity = Vector2(minf(-240.0, -absf(body.linear_velocity.y) * 0.8), -90.0)
+			# Kraeftig genug nach oben, dass der Ball die Trennwand-Oberkante
+			# (470,300) sicher ueberfliegt - mit dem alten flachen Bogen
+			# streifte er aus dem unteren Zonenteil die Kante und fiel
+			# zurueck in die Abschussbahn.
+			body.linear_velocity = Vector2(minf(-260.0, -absf(body.linear_velocity.y) * 0.8), -230.0)
 			Sfx.play("tick", -6.0)
 			_flash = 1.0
 			queue_redraw()
