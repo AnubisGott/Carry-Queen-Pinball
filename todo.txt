@@ -7,6 +7,7 @@
 - Die Bumper spitzer machen. Sie stören, wenn man hoch schießen möchte.
 - Den Bogen oben hinzufügen
 - Sonderfunktionen justieren
+- in der Mitte soll nichts mehr eingesaugt werden.
 
 To continue this session, run codex resume 019fe73f-ff94-72e2-862a-f500a5904c5e
 d:\daten\development\gaming\Flipper02Codex>
@@ -34,3 +35,13 @@ Die vier Disziplinen – jede einmal geschafft, dann zündet der Wizard:
 - CARRY: Alle vier G-G-E-Z-Gassen durchrollen (je 500) → +5.000 und Ko-op-Multiball: Deine Kugel wird zur pinken Carry-Kugel (alles ×10), zwei Team-Kugeln kommen oben dazu. Der Multiball endet, wenn nur noch eine Kugel lebt.
 
 Wizard „Der Bericht" – Sind alle vier Lam dazu die vier Sprüche („Wer macht denSchaden? Ich."), und die Mulde zahlt pro Treffer einen Mega-Jackpot von 20.000. Danach werden die Disziplinen zurückgesetzt.
+
+
+
+Drei Beobachtungen
+
+Der Hurry-Up ist der Flaschenhals für den Wizard. Die ICH-Belohnung muss an der Mittel-Mulde abgeholt werden, und deren Fangfenster ist seit der Seitentreffer-Korrektur nur noch 16 px breit und nimmt Kugeln ausschließlich von oben. Im Test kam die Mulde auf 6 Treffer in 15 Bällen – die Chance, einen davon in die 12-Sekunden-Frist zu legen, ist gering. Damit ist der Wizard-Modus praktisch schwer erreichbar. Falls du das ändern willst: Frist verlängern, Fangfenster etwas verbreitern oder das Abholen zusätzlich an einer Seiten-Mulde erlauben.
+
+Der linke Orbit wird kaum befahren – nur 2 Spinner-Durchgänge in 5 Minuten. Der Spinner ist damit fast Deko. Die Seiten-Mulden dominieren das Geschehen deutlich (32 Treffer).
+
+Karteileichen im Code (stören nichts, laufen nur ins Leere): Seit dem Thron-Abriss sind rund 60 Zeilen Thron-Logik in main.gd unerreichbar (_resolve_throne, _start_multiball, _eject_after, locked_balls, Game.locks) samt der Klasse Throne in kicker.gd. Außerdem füllt table.gd das Array ego_bank nicht mehr, weshalb die Reset-Schleife darüber leer läuft – der EGO-Knopf braucht sie ohnehin nicht. Aufräumen kann ich das jederzeit, wenn du willst.
