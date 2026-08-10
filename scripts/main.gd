@@ -301,7 +301,14 @@ func _on_event(kind: String, data: Dictionary) -> void:
 		"all_disciplines":
 			_start_wizard()
 		"scoop":
-			if hurry_active:
+			if Game.wizard:
+				# Mega-Jackpot des Wizard-Modus - fruener am Thron, seit
+				# dessen Abriss zahlt ihn die Mulde aus.
+				var mega := Game.add_score(20000)
+				hud.show_message("MEGA-JACKPOT!", "+" + Hud.fmt(mega), 2.0)
+				Sfx.play("jackpot")
+				Game.emit("jackpot")
+			elif hurry_active:
 				# Hurry-Up wird seit dem Thron-Abriss an der Mulde abgeholt
 				var pts := Game.add_score(hurry_value)
 				_end_hurry()
@@ -493,7 +500,7 @@ func _start_wizard() -> void:
 	wizard_line_time = 0.5
 	Sfx.play("mode")
 	Sfx.say("bericht")
-	hud.show_message("DER BERICHT.", "Alles x5. Der Thron zahlt Mega-Jackpots.", 3.0)
+	hud.show_message("DER BERICHT.", "Alles x5. Die Mulde zahlt Mega-Jackpots.", 3.0)
 	Game.emit("wizard")
 
 
