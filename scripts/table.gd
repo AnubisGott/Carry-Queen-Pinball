@@ -1,8 +1,8 @@
 class_name Table
 extends RefCounted
 ## Tisch-Geometrie nach der Weltraum-Vorlage, im Carry-Queen-Neon-Schema:
-## Draht-Hochbahn ueber dem Tisch (2. Ebene), Mulde mit Hoernern in der Mitte,
-## Bumper-Pad, I-C-H-Bank links, In-/Outlanes beidseitig, Spiral-Scheibe unten.
+## Mulde mit Hoernern in der Mitte, Bumper-Pad, I-C-H-Bank links,
+## In-/Outlanes beidseitig, Spiral-Scheibe unten.
 
 const BG_SHADER := preload("res://shaders/playfield_bg.gdshader")
 
@@ -40,7 +40,7 @@ static func build(parent: Node2D) -> Dictionary:
 	_wall(parent, [Vector2(DIVIDER, 960), Vector2(DIVIDER, 300)], NEON_VIOLET)
 	_wall(parent, [Vector2(DIVIDER, 305), Vector2(445, 335)], NEON_VIOLET)
 	_wall(parent, [Vector2(DIVIDER, 935), Vector2(RIGHT, 935)], NEON_VIOLET)
-	# Fang-Trichter oben links: leitet Baelle in die Hochbahn-Einfahrt
+	# Fang-Trichter oben links: leitet Baelle durch den Spinner nach unten
 	_wall(parent, [Vector2(160, 150), Vector2(82, 232)], NEON_CYAN)
 	# Linke Seite: Ablenk-Leiste (wie die schraege Bande der Vorlage) + Inlane.
 	# Das untere Ende muss mindestens eine Kugelbreite (26) von der Bande bei
@@ -123,7 +123,7 @@ static func build(parent: Node2D) -> Dictionary:
 		standups.append(s)
 	refs["standups"] = standups
 
-	# OP-Spinner in der Hochbahn-Einfahrt oben links
+	# OP-Spinner in der Einfahrt oben links
 	var sp := Spinner.new(Vector2(55, 222))
 	parent.add_child(sp)
 	refs["spinner"] = sp
@@ -136,11 +136,6 @@ static func build(parent: Node2D) -> Dictionary:
 
 	# Mulde in der Mitte (schwarzes Loch der Vorlage)
 	parent.add_child(Scoop.new(Vector2(270, 505)))
-
-	# Draht-Hochbahn (2. Ebene) ueber den Tisch
-	var ramp := WireRamp.new()
-	parent.add_child(ramp)
-	refs["ramp"] = ramp
 
 	# Dekos im Stil der Vorlage
 	parent.add_child(TableDeco.new("pad", Vector2(270, 350), NEON_CYAN))

@@ -39,7 +39,6 @@ const CHAT := {
 	"launch": ["da fliegt er", "neuer Ball, gleiche Queen"],
 	"tilt": ["RAGEQUIT lmaooo", "er schuettelt den Tisch, peinlich", "tilt wie im Ranked"],
 	"scoop": ["die Mulde carried", "Taxi zurueck ins Spiel", "Heal? nein. Wurf? ja."],
-	"ramp": ["UEBERFLUG lol", "sie nimmt die Abkuerzung oben", "zwei Ebenen, ein Ego"],
 	"ego_level": ["ihr EGO skaliert besser als wir", "x-fach?? okay"],
 }
 const CHAT_PROB := {"bumper": 0.06, "sling": 0.15, "spinner": 0.3, "drop_target": 0.25, "standup": 0.4, "ego_level": 0.5}
@@ -70,6 +69,7 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	layer = 10
 	_build_bar()
+	_build_controls()
 	_build_chat()
 	_build_messages()
 	_build_power()
@@ -143,6 +143,28 @@ func _try_avatar(bar: Panel) -> void:
 	tr.position = Vector2(464, 6)
 	tr.size = Vector2(72, 72)
 	bar.add_child(tr)
+
+
+## Tasten-Legende in der Ecke oben rechts, ueber der Chat-Spalte.
+func _build_controls() -> void:
+	var panel := Panel.new()
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.028, 0.012, 0.050, 0.94)
+	sb.border_color = Color(0.72, 0.20, 0.95, 0.85)
+	sb.set_border_width_all(2)
+	sb.set_corner_radius_all(6)
+	panel.add_theme_stylebox_override("panel", sb)
+	panel.position = Vector2(FIELD_W + 6, 4)
+	panel.size = Vector2(CHAT_W - 12, 80)
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(panel)
+	var head := _label("TASTEN", Vector2(0, 4), 11, GREEN, panel)
+	head.size = Vector2(CHAT_W - 12, 14)
+	head.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	var rows := [["A/D", "Flipper"], ["Q/E", "Stupsen"], ["LEER", "Abschuss"]]
+	for i in rows.size():
+		_label(rows[i][0], Vector2(8, 24 + i * 18), 10, GOLD, panel)
+		_label(rows[i][1], Vector2(44, 24 + i * 18), 10, Color(0.8, 0.78, 0.9), panel)
 
 
 ## Chat als eigene Spalte rechts neben dem Spielfeld - der Stream-Look.
