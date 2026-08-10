@@ -51,8 +51,11 @@ static func build(parent: Node2D) -> Dictionary:
 	_wall(parent, [Vector2(466, 960), Vector2(466, 300)], NEON_VIOLET, false, true)
 	_wall(parent, [Vector2(DIVIDER, 305), Vector2(445, 335)], NEON_VIOLET)
 	_wall(parent, [Vector2(DIVIDER, 935), Vector2(RIGHT, 935)], NEON_VIOLET)
-	# Fang-Trichter oben links: leitet Baelle durch den Spinner nach unten
-	_wall(parent, [Vector2(160, 150), Vector2(82, 232)], NEON_CYAN)
+	# Fang-Trichter oben links: leitet Baelle durch den Spinner nach unten.
+	# Als Bogen konzentrisch zum Aussenbogen (r~211 um die Bogenmitte) statt
+	# als gerader Stab - der Kanal hat so ueberall gleiche Breite.
+	_wall(parent, [Vector2(160, 150), Vector2(140, 164), Vector2(123, 178),
+			Vector2(108, 194), Vector2(95, 212), Vector2(83, 232)], NEON_CYAN)
 	# Zweite Trichterwand (Symmetrie-Wunsch): fasst den Kanal zum OP-Spinner
 	# von unten ein - die E-G-O-Targets liegen mitten in der Gasse.  Beide
 	# Enden halten mehr als Kugelbreite Abstand zu Haken und Steg 1, damit
@@ -227,8 +230,9 @@ static func build(parent: Node2D) -> Dictionary:
 	parent.add_child(TableDeco.new("chevron", Vector2(105, 170), NEON_PINK, 1.0, 225.0))
 	parent.add_child(TableDeco.new("chevron", Vector2(85, 200), NEON_PINK, 1.0, 225.0))
 
-	_deco(parent, "KEIN HEAL", Vector2(30, 745), Color(0.3, 1.35, 0.22, 0.5), 11, 72.0)
-	_deco(parent, "KEIN PLAN", Vector2(412, 698), Color(0.3, 1.35, 0.22, 0.5), 11, 62.0)
+	# Beide Texte frei lesbar in den Auslauf-Rinnen neben den Inlane-Leisten
+	_deco(parent, "KEIN HEAL", Vector2(58, 712), Color(0.3, 1.35, 0.22, 0.6), 11, 64.0)
+	_deco(parent, "KEIN PLAN", Vector2(427, 723), Color(0.3, 1.35, 0.22, 0.6), 11, 63.0)
 	_deco(parent, "KEIN SKILL.", Vector2(208, 900), Color(1.0, 0.3, 0.6, 0.55), 12, 0.0)
 	_deco(parent, "CARRY QUEEN", Vector2(225, 655), Color(1.0, 0.24, 0.62, 0.75), 12, 0.0)
 	_deco(parent, "SPACE HALTEN", Vector2(505, 740), Color(1.1, 0.4, 1.9, 0.5), 10, 90.0)
