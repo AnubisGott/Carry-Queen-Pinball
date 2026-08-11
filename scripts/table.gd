@@ -97,7 +97,10 @@ static func build(parent: Node2D) -> Dictionary:
 	# der Banden - die Struktur der Vorlagentextur als echte Elemente.
 	# Rohrfarbe immer anders als die Bande daneben - sonst liest sich das als
 	# verdoppelte Linie statt als Strangbuendel wie in der Vorlage.
-	parent.add_child(EdgeStructure.new(_arch_points(), -1.0, NEON_CYAN, 26.0, 60.0))
+	# Startversatz 6 statt 60: die Schelle, die vorher mitten im Kanal ueber
+	# der Leitplanke sass, sitzt damit am Fusspunkt der Planke und wirkt wie
+	# deren Halterung.  Der Rest des Randaufbaus wandert entsprechend mit.
+	parent.add_child(EdgeStructure.new(_arch_points(), -1.0, NEON_CYAN, 26.0, 6.0))
 	parent.add_child(EdgeStructure.new(
 			[Vector2(LEFT, 330), Vector2(LEFT, 760)], 1.0, NEON_CYAN, 24.0, 46.0))
 	# Rechts laeuft das Cyan-Band wie links ganz aussen herum und biegt in die
