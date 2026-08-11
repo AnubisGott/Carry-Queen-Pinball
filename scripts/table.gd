@@ -1,4 +1,4 @@
-class_name Table
+﻿class_name Table
 extends RefCounted
 ## Tisch-Geometrie nach der Weltraum-Vorlage, im Carry-Queen-Neon-Schema:
 ## Mulde mit Hoernern in der Mitte, Bumper-Pad, I-C-H-Bank links,
@@ -36,6 +36,10 @@ const FEATURE_GGEZ := true
 ## Feature-Schalter: E-G-O-Standup-Bank schraeg an der Trichterwand oben
 ## links.  Alle drei getroffen -> Ego-Multiplikator steigt sofort.
 const FEATURE_EGO := true
+
+## Mitte der G-G-E-Z-Gassen-Bank.  245 = Spielfeld-Mittelachse, 300 war die
+## urspruengliche Lage rechts davon.
+const GGEZ_CENTER := 245.0
 
 
 static func build(parent: Node2D) -> Dictionary:
@@ -215,18 +219,17 @@ static func build(parent: Node2D) -> Dictionary:
 		# und pingpongt die Kugel endlos senkrecht zwischen Bumper und Bogen).
 		# Stege enden bei y=248: die Gassen-Ausgaenge links und rechts des
 		# Plug-Stegs haben so gut 34px Abstand zur Bumper-Kuppe (Kugel: 26).
+		# Fuenf schraege Stege, symmetrisch um GGEZ_CENTER
 		var lane_dir := Vector2(0.483, -0.877)
-		for w in [[Vector2(231, 226), Vector2(216, 198)],
-				[Vector2(269, 226), Vector2(254, 198)],
-				[Vector2(307, 226), Vector2(292, 198)],
-				[Vector2(345, 226), Vector2(330, 198)],
-				[Vector2(383, 226), Vector2(368, 198)]]:
-			_wall(parent, w, NEON_VIOLET, false, false, true)
+		for i in 5:
+			_wall(parent, [Vector2(GGEZ_CENTER - 69.0 + i * 38.0, 226),
+					Vector2(GGEZ_CENTER - 84.0 + i * 38.0, 198)],
+					NEON_VIOLET, false, false, true)
 		var ggez_letters := ["G", "G", "E", "Z"]
-		var centers := [Vector2(243, 212), Vector2(281, 212),
-				Vector2(319, 212), Vector2(357, 212)]
 		for i in 4:
-			var r := RolloverLane.new(centers[i], ggez_letters[i], lane_dir)
+			var r := RolloverLane.new(
+					Vector2(GGEZ_CENTER - 57.0 + i * 38.0, 212),
+					ggez_letters[i], lane_dir)
 			parent.add_child(r)
 			ggez.append(r)
 	refs["ggez"] = ggez

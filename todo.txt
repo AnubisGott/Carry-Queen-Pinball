@@ -12,6 +12,7 @@
 - Wenn ein Bumper getroffen wird soll das Spielfeld um ein Pixel in die entsprechende Richtung verschoben werden und wieder zurück in kurzer Zeit.
 - Kugelsave nur in den ersten 20 Sekunden
 - Spinner mit Sound hinzufügen
+- wozu ist der cyan farbene Pfeil
 
 To continue this session, run codex resume 019fe73f-ff94-72e2-862a-f500a5904c5e
 d:\daten\development\gaming\Flipper02Codex>

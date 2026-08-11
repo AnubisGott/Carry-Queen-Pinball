@@ -104,6 +104,9 @@ func _ready() -> void:
 		_take_shot()
 	if "--autotest" in OS.get_cmdline_user_args():
 		autotest = true
+		# Ohne randomize() wuerfelt Godot in jedem Lauf gleich - fuer
+		# Messreihen brauchen wir unterschiedliche Spielverlaeufe.
+		randomize()
 		var t := Timer.new()
 		t.wait_time = 0.4
 		t.process_mode = Node.PROCESS_MODE_ALWAYS
@@ -324,7 +327,9 @@ func _cleanup_lost_balls() -> void:
 
 func _on_event(kind: String, data: Dictionary) -> void:
 	if autotest and kind in ["spinner", "scoop", "save", "pocket", "ggez", "rollover"]:
-		print("AUTOTEST event ", kind)
+		print("AUTOTEST event %s%s t=%.1f ball=%d" % [kind,
+				(" " + str(data["letter"])) if data.has("letter") else "",
+				_at_pulses * 0.4, Game.ball_number])
 	match kind:
 		"launch":
 			# Erst ab dem Abschuss laeuft das Zeitfenster des Carry-Save
