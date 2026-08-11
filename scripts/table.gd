@@ -67,15 +67,18 @@ static func build(parent: Node2D) -> Dictionary:
 			Vector2(180, 145), Vector2(184, 154), Vector2(190, 161),
 			Vector2(196, 165), Vector2(202, 169), Vector2(207, 172)], NEON_CYAN)
 	# (Leit-Band wieder entfernt - hat optisch nicht gepasst)
-	# Linke Inlane ("KEIN HEAL").  Oberes Ende weit genug vom Slingshot weg,
-	# damit die Einfahrt in die Laufrinne mehr als eine Kugelbreite bietet.
-	# Untere Enden ueberlappen den Schwenkkreis der hinteren Flipper-Ecke -
-	# sonst bildet sich dort je nach Flipperstellung eine Kerbe, in der die
-	# Kugel liegen bleibt statt aufs Blatt zu rollen.
-	# Ruhe-Gruen wie die W/A/S/D-Ringe gedimmt, hell nur beim Blitz
-	_bar(parent, Vector2(86, 702), Vector2(151, 833), Color(0.25, 0.95, 0.18), true)
-	# Rechte Inlane ("KEIN PLAN")
-	_bar(parent, Vector2(410, 700), Vector2(339, 834), Color(0.25, 0.95, 0.18), true)
+	# Inlanes als Winkel (Nutzer-Redesign): ein senkrechtes Stueck laengs der
+	# Aussenbahn, das unten in ein kurzes Schraegstueck uebergeht und die
+	# Kugel auf das Flipperblatt legt.  Die unteren Enden ueberlappen den
+	# Schwenkkreis der hinteren Flipper-Ecke - sonst bildet sich dort je nach
+	# Flipperstellung eine Kerbe, in der die Kugel liegen bleibt.
+	# Ruhe-Gruen wie die W/A/S/D-Ringe gedimmt, hell nur beim Blitz.
+	var inlane_col := Color(0.25, 0.95, 0.18)
+	_bar(parent, Vector2(86, 679), Vector2(86, 820), inlane_col, true)
+	_bar(parent, Vector2(86, 820), Vector2(141, 837), inlane_col, true)
+	# Rechte Inlane spiegelbildlich zur linken (Achse x=245)
+	_bar(parent, Vector2(404, 679), Vector2(404, 820), inlane_col, true)
+	_bar(parent, Vector2(404, 820), Vector2(349, 837), inlane_col, true)
 	# Hoerner der Mulde (Trichter unter dem S-Bumper); blitzen bei Beruehrung
 	_wall(parent, [Vector2(240, 455), Vector2(252, 492)], NEON_GOLD, false, false, true)
 	_wall(parent, [Vector2(300, 455), Vector2(288, 492)], NEON_GOLD, false, false, true)
