@@ -37,9 +37,9 @@ const FEATURE_GGEZ := true
 ## links.  Alle drei getroffen -> Ego-Multiplikator steigt sofort.
 const FEATURE_EGO := true
 
-## Mitte der G-G-E-Z-Gassen-Bank.  245 = Spielfeld-Mittelachse, 300 war die
-## urspruengliche Lage rechts davon.
-const GGEZ_CENTER := 245.0
+## Mitte der G-G-E-Z-Gassen-Bank.  300 = urspruengliche Lage rechts der
+## Spielfeld-Mittelachse; mittig (245) getestet und wieder verworfen.
+const GGEZ_CENTER := 300.0
 
 
 static func build(parent: Node2D) -> Dictionary:
