@@ -23,6 +23,9 @@ var band_w := 26.0
 var accent := Color(1.7, 0.28, 1.0)
 var clamp_step := 96.0
 var start_offset := 40.0
+## Bogenlaengen, an denen kein Beschlag gesetzt wird - dort sitzen einzeln
+## platzierte Schellen (EdgeClamp).
+var skip_at: Array = []
 
 var _len := PackedFloat32Array()
 
@@ -130,6 +133,10 @@ func _draw_fittings() -> void:
 	var d := start_offset
 	var n := 0
 	while d < total - 12.0:
+		if _skipped(d):
+			d += clamp_step
+			n += 1
+			continue
 		var s := _sample(d)
 		var pos: Vector2 = s[0]
 		var dir: Vector2 = s[1]
@@ -145,6 +152,13 @@ func _draw_fittings() -> void:
 			_draw_trace(pos, dir, nrm)
 		d += clamp_step
 		n += 1
+
+
+func _skipped(d: float) -> bool:
+	for s in skip_at:
+		if absf(d - float(s)) < 12.0:
+			return true
+	return false
 
 
 ## Schelle quer ueber das Band, mit zwei Schrauben - haelt das Rohr.

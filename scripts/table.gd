@@ -97,10 +97,13 @@ static func build(parent: Node2D) -> Dictionary:
 	# der Banden - die Struktur der Vorlagentextur als echte Elemente.
 	# Rohrfarbe immer anders als die Bande daneben - sonst liest sich das als
 	# verdoppelte Linie statt als Strangbuendel wie in der Vorlage.
-	# Startversatz 6 statt 60: die Schelle, die vorher mitten im Kanal ueber
-	# der Leitplanke sass, sitzt damit am Fusspunkt der Planke und wirkt wie
-	# deren Halterung.  Der Rest des Randaufbaus wandert entsprechend mit.
-	parent.add_child(EdgeStructure.new(_arch_points(), -1.0, NEON_CYAN, 26.0, 6.0))
+	# Der Randaufbau am Bogen sitzt wieder im urspruenglichen Raster.  Zwei
+	# Stellen sind ausgespart: bei Bogenlaenge 252 (die Schelle, die im
+	# Kanal ueber der Leitplanke sass) und bei 344 - dort stehen einzeln
+	# gesetzte Schellen, die ueber allem gezeichnet werden.
+	var arch_edge := EdgeStructure.new(_arch_points(), -1.0, NEON_CYAN, 26.0, 60.0)
+	arch_edge.skip_at = [252.0, 348.0]
+	parent.add_child(arch_edge)
 	parent.add_child(EdgeStructure.new(
 			[Vector2(LEFT, 330), Vector2(LEFT, 760)], 1.0, NEON_CYAN, 24.0, 46.0))
 	# Rechts laeuft das Cyan-Band wie links ganz aussen herum und biegt in die
@@ -119,6 +122,12 @@ static func build(parent: Node2D) -> Dictionary:
 	parent.add_child(EdgeStructure.new(
 			[Vector2(DIVIDER, 760), Vector2(DIVIDER, 838), Vector2(432, 904),
 				Vector2(362, 946), Vector2(280, 958)], -1.0, NEON_CYAN, 22.0, 30.0))
+
+	# Einzeln gesetzte Schellen (voll sichtbar, ueber Banden und Eckplatten):
+	# eine am Fusspunkt der Leitplanke, eine oben am Bogen.
+	for d in [198.0, 344.0]:
+		var at := _arch_at(d)
+		parent.add_child(EdgeClamp.new(at[0], at[1], -1.0))
 
 	var refs := {}
 
@@ -237,6 +246,13 @@ static func build(parent: Node2D) -> Dictionary:
 	_deco(parent, "SPACE HALTEN", Vector2(505, 740), Color(1.1, 0.4, 1.9, 0.5), 10, 90.0)
 
 	return refs
+
+
+## Punkt und Laufrichtung auf dem Aussenbogen bei Bogenlaenge d (0 = linkes
+## Ende bei (20,330), Gesamtlaenge PI * ARCH_R).
+static func _arch_at(d: float) -> Array:
+	var a := PI + PI * d / (PI * ARCH_R)
+	return [ARCH_C + Vector2(cos(a), sin(a)) * ARCH_R, Vector2(-sin(a), cos(a))]
 
 
 static func _arch_points() -> Array:
