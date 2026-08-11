@@ -4,6 +4,21 @@ extends Node2D
 
 const SPAWN := Vector2(495, 854)
 
+## Der Carry-Save gilt nur die ersten Sekunden eines Balls - danach spottet
+## die Queen.
+const SAVE_WINDOW := 20.0
+
+const QUEEN_SPOTT := [
+	"Warst du nicht gut genug?",
+	"Einfach mal besser sein.",
+	"Skill-Issue. Nicht meins.",
+	"Ich haette den gehalten. Locker.",
+	"Reflexe wie ein Ladebildschirm.",
+	"Soll ich das auch noch fuer dich machen?",
+	"Uebung. Ganz viel Uebung.",
+	"War bestimmt der Ping, ne?",
+]
+
 const WIZARD_LINES := [
 	"WER MACHT DEN SCHADEN? ICH.",
 	"WER HOLT DIE KILLS? ICH.",
@@ -35,6 +50,8 @@ var _streak_done := false
 var hurry_active := false
 var hurry_value := 0
 var hurry_time := 0.0
+
+var save_time := 0.0
 
 var frenzy_time := 0.0
 var wizard_time := 0.0
@@ -258,6 +275,14 @@ func _update_plunger(delta: float) -> void:
 
 
 func _update_timers(delta: float) -> void:
+	# Carry-Save laeuft nach SAVE_WINDOW Sekunden ab - danach haelt sie nichts
+	# mehr, kommentiert es aber gerne.
+	if Game.ball_save_armed and save_time > 0.0:
+		save_time -= delta
+		if save_time <= 0.0:
+			Game.ball_save_armed = false
+			Game.emit("save_armed")
+			hud.show_sub("Carry-Save vorbei. " + spott(), 2.2)
 	if hurry_active:
 		hurry_time -= delta
 		hurry_value = maxi(5000, hurry_value - int(1600.0 * delta))
@@ -301,6 +326,10 @@ func _on_event(kind: String, data: Dictionary) -> void:
 	if autotest and kind in ["spinner", "scoop", "save", "pocket", "ggez", "rollover"]:
 		print("AUTOTEST event ", kind)
 	match kind:
+		"launch":
+			# Erst ab dem Abschuss laeuft das Zeitfenster des Carry-Save
+			if Game.ball_save_armed:
+				save_time = SAVE_WINDOW
 		"bumper":
 			_on_bumper(data.get("letter", ""))
 		"drop_target":
@@ -525,6 +554,11 @@ func _end_wizard() -> void:
 	hud.show_message("AM ENDE STEHT MEIN NAME.", "Eure Namen stehen nicht.", 3.0)
 
 
+## Ein zufaelliger Spott-Spruch der Queen.
+func spott() -> String:
+	return QUEEN_SPOTT[randi() % QUEEN_SPOTT.size()]
+
+
 ## Tisch dunkel bzw. wieder hell schalten (Ruhe-Modus).
 func _set_dimmed(on: bool) -> void:
 	if dimmed == on:
@@ -691,6 +725,8 @@ func _restart() -> void:
 
 func _start_ball(first: bool = false) -> void:
 	Game.ball_save_armed = true
+	# Der Save-Countdown startet erst mit dem Abschuss (siehe _on_event)
+	save_time = SAVE_WINDOW
 	Game.damage_points = 0
 	Game.tilted = false
 	nudge_heat = 0.0
@@ -709,7 +745,7 @@ func _start_ball(first: bool = false) -> void:
 		hud.show_message("KO-OP MODUS.", "Vier Spieler. Ein Carry. Ich.", 3.0)
 		Sfx.say("koop")
 	else:
-		hud.show_message("BALL %d" % Game.ball_number, "Liegt rechts unten bereit. Dein Anteil bisher: 2 %.", 2.5)
+		hud.show_message("BALL %d" % Game.ball_number, spott(), 2.5)
 
 
 func _spawn_ball(pos: Vector2, carry: bool = false, impulse: Vector2 = Vector2.ZERO) -> PinBall:

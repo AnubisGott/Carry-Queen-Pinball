@@ -141,8 +141,11 @@ static func build(parent: Node2D) -> Dictionary:
 
 	var refs := {}
 
-	var fl := Flipper.new(true, Vector2(160, 850))
-	var fr := Flipper.new(false, Vector2(330, 850))
+	# Drehpunkte 16 Einheiten tiefer als die Inlane-Fuehrung endet: so faellt
+	# die Kugel vom Schraegstueck auf das Blatt, statt in der Kerbe zwischen
+	# Fuehrungsende und hinterer Flipper-Ecke liegen zu bleiben.
+	var fl := Flipper.new(true, Vector2(160, 866))
+	var fr := Flipper.new(false, Vector2(330, 866))
 	parent.add_child(fl)
 	parent.add_child(fr)
 	refs["flipper_l"] = fl
