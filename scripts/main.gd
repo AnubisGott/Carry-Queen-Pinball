@@ -1,5 +1,6 @@
 extends Node2D
-## Spielsteuerung: Ballfluss, Disziplinen/Modi, Plunger, Blackout, Match-Report.
+## Spielsteuerung: Ballfluss, Disziplinen/Modi, Plunger, Ruhe-Modus,
+## Match-Report.
 
 const SPAWN := Vector2(495, 854)
 
@@ -39,8 +40,13 @@ var frenzy_time := 0.0
 var wizard_time := 0.0
 var wizard_line_time := 0.0
 var wizard_line_idx := 0
-var blackout_time := 0.0
-var next_blackout := 90.0
+## Ruhe-Modus: der Tisch dimmt nach dem Spielende und nach 120 Sekunden
+## ohne Eingabe; die naechste Eingabe bzw. das naechste Spiel weckt ihn.
+const IDLE_DIM_AFTER := 120.0
+const DIM_COLOR := Color(0.38, 0.33, 0.48)
+
+var idle_time := 0.0
+var dimmed := false
 
 var _touch_flip := {}
 var _touch_launch := {}
@@ -116,6 +122,9 @@ func _make_drain() -> void:
 
 
 func _input(event: InputEvent) -> void:
+	if event.is_pressed() and (event is InputEventKey
+			or event is InputEventMouseButton or event is InputEventScreenTouch):
+		_wake()
 	if event is InputEventScreenTouch:
 		# Tippen in der Chat-Spalte rechts steuert nichts
 		if event.position.x >= Table.FIELD_W:
@@ -269,14 +278,16 @@ func _update_timers(delta: float) -> void:
 			wizard_line_time = 4.0
 		if wizard_time <= 0.0:
 			_end_wizard()
-	if Game.blackout:
-		blackout_time -= delta
-		if blackout_time <= 0.0:
-			_end_blackout()
-	elif not (Game.frenzy or Game.wizard or Game.multiball or hurry_active):
-		next_blackout -= delta
-		if next_blackout <= 0.0:
-			_start_blackout()
+	# Ruhe-Modus: lange keine Eingabe -> Tisch dimmt.  Gedrueckt gehaltene
+	# Tasten zaehlen mit (die liefern kein neues Eingabe-Ereignis), ebenso
+	# der Autotest.
+	if autotest or Input.is_action_pressed("flip_left") \
+			or Input.is_action_pressed("flip_right") \
+			or Input.is_action_pressed("launch"):
+		_wake()
+	idle_time += delta
+	if idle_time >= IDLE_DIM_AFTER:
+		_set_dimmed(true)
 
 
 func _cleanup_lost_balls() -> void:
@@ -514,22 +525,20 @@ func _end_wizard() -> void:
 	hud.show_message("AM ENDE STEHT MEIN NAME.", "Eure Namen stehen nicht.", 3.0)
 
 
-func _start_blackout() -> void:
-	Game.blackout = true
-	blackout_time = 15.0
-	Sfx.play("over", -8.0)
+## Tisch dunkel bzw. wieder hell schalten (Ruhe-Modus).
+func _set_dimmed(on: bool) -> void:
+	if dimmed == on:
+		return
+	dimmed = on
 	var tw := create_tween()
-	tw.tween_property(dim, "color", Color(0.38, 0.33, 0.48), 0.6)
-	hud.show_message("KEIN HEAL. KEIN PLAN.", "KEIN SKILL. KEIN SIEG.", 3.0)
-	Game.emit("blackout")
+	tw.tween_property(dim, "color", DIM_COLOR if on else Color.WHITE, 0.8)
 
 
-func _end_blackout() -> void:
-	Game.blackout = false
-	next_blackout = randf_range(75.0, 115.0)
-	var tw := create_tween()
-	tw.tween_property(dim, "color", Color.WHITE, 0.8)
-	hud.show_sub("Licht an. Gern geschehen.", 2.0)
+## Jede Eingabe weckt den Tisch und setzt die Ruhe-Uhr zurueck.
+func _wake() -> void:
+	idle_time = 0.0
+	if dimmed and not Game.game_over:
+		_set_dimmed(false)
 
 
 func _on_drain(body: Node2D) -> void:
@@ -563,7 +572,7 @@ func _after_drain() -> void:
 		_end_multiball()
 	if hurry_active:
 		_end_hurry()
-	if Game.ball_save_armed and not Game.blackout:
+	if Game.ball_save_armed:
 		Game.ball_save_armed = false
 		Sfx.play("save", -2.0)
 		Sfx.say("carry_rettet")
@@ -572,12 +581,7 @@ func _after_drain() -> void:
 		_save_return()
 		return
 	Sfx.play("drain", -2.0)
-	if Game.blackout:
-		Sfx.say("ohne_mich")
-		hud.show_message("OHNE MICH.", "", 2.0)
-		_end_blackout()
-	else:
-		Sfx.say("kein_skill")
+	Sfx.say("kein_skill")
 	Game.emit("drain")
 	if Game.ball_number >= Game.balls_per_game:
 		_game_over()
@@ -645,6 +649,8 @@ func _on_continue() -> void:
 
 func _game_over() -> void:
 	Game.game_over = true
+	# Nach dem Spielende bleibt der Tisch gedimmt, bis das naechste losgeht
+	_set_dimmed(true)
 	Game.save_best()
 	Sfx.play("over")
 	Sfx.say("outro")
@@ -675,8 +681,10 @@ func _restart() -> void:
 	hurry_active = false
 	frenzy_time = 0.0
 	wizard_time = 0.0
-	next_blackout = 90.0
-	dim.color = Color.WHITE
+	# Das neue Spiel weckt den Tisch wieder auf
+	dimmed = true
+	_set_dimmed(false)
+	idle_time = 0.0
 	Game.reset_game()
 	_start_ball(true)
 

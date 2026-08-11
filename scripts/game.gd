@@ -14,7 +14,6 @@ var ball_save_armed: bool = true
 var multiball: bool = false
 var frenzy: bool = false
 var wizard: bool = false
-var blackout: bool = false
 var locks: int = 0
 var kills: int = 0
 var damage_points: int = 0
@@ -39,7 +38,6 @@ func reset_game() -> void:
 	multiball = false
 	frenzy = false
 	wizard = false
-	blackout = false
 	locks = 0
 	kills = 0
 	damage_points = 0
@@ -62,8 +60,6 @@ func add_score(base: int, source_ball: Node = null) -> int:
 		mult *= 2
 	if wizard:
 		mult *= 5
-	if blackout:
-		mult = 1
 	if multiball and source_ball != null and source_ball.get("is_carry") == true:
 		mult *= 10
 	var pts := base * mult
@@ -74,7 +70,7 @@ func add_score(base: int, source_ball: Node = null) -> int:
 
 ## Nur der EGO-Knopf hebt den Multiplikator - genau eine Stufe pro Treffer.
 func ego_level_up() -> void:
-	if blackout or game_over or tilted:
+	if game_over or tilted:
 		return
 	if ego_mult < 10:
 		ego_mult += 1

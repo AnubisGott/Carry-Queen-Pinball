@@ -34,7 +34,6 @@ const CHAT := {
 	"save": ["CARRY RETTET LOL", "nichts zu danken ;)", "sie hat schon wieder recht"],
 	"frenzy": ["FRENZY!! alles x2", "DAMAGE MODUS AN"],
 	"wizard": ["DER BERICHT. Gaensehaut.", "ihr Name steht schon drauf"],
-	"blackout": ["licht aus lol", "kein heal? kein plan?", "wer zahlt die Stromrechnung"],
 	"gameover": ["war bestimmt schoen fuer euch", "gern geschehen und tschuess", "98% waren ihre, wie immer"],
 	"launch": ["da fliegt er", "neuer Ball, gleiche Queen"],
 	"tilt": ["RAGEQUIT lmaooo", "er schuettelt den Tisch, peinlich", "tilt wie im Ranked"],
