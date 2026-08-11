@@ -1,4 +1,4 @@
-class_name Flipper
+﻿class_name Flipper
 extends AnimatableBody2D
 ## Flipperfinger, kinematisch rotiert (sync_to_physics schiebt die Kugel).
 ##
@@ -7,6 +7,10 @@ extends AnimatableBody2D
 ## Lagerring am Drehpunkt.  Die Kollisionsform bleibt davon unberuehrt.
 
 const SPEED := 22.0
+## Zurueck in die Ruhelage geht es deutlich langsamer - wie bei einer echten
+## Rueckstellfeder.  Ein schnell wegfallendes Blatt laesst die aufliegende
+## Kugel sonst kurz in der Luft stehen und sie kommt als Huepfer wieder auf.
+const RETURN_SPEED := 4.0
 const METAL := Color(0.78, 0.83, 0.92)
 const TIP_X := 78.0
 
@@ -14,6 +18,7 @@ var is_left := true
 var rest_deg := 28.0
 var pressed_deg := -32.0
 var _target := 0.0
+var _held := false
 var _flash := 0.0
 var _art: Node2D
 
@@ -119,6 +124,7 @@ func set_pressed(on: bool) -> void:
 	if on and new_target != _target:
 		Sfx.play("flip", -8.0)
 	_target = new_target
+	_held = on
 
 
 func _on_touch(body: Node2D) -> void:
@@ -128,7 +134,7 @@ func _on_touch(body: Node2D) -> void:
 
 
 func _physics_process(delta: float) -> void:
-	rotation = move_toward(rotation, _target, SPEED * delta)
+	rotation = move_toward(rotation, _target, (SPEED if _held else RETURN_SPEED) * delta)
 	if _flash > 0.0:
 		_flash = maxf(0.0, _flash - delta * 3.0)
 		_art.queue_redraw()
