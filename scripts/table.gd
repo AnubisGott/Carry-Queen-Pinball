@@ -76,8 +76,9 @@ static func build(parent: Node2D) -> Dictionary:
 	# Flipperstellung eine Kerbe, in der die Kugel liegen bleibt.
 	var inlane_l := [Vector2(86, 679), Vector2(86, 811), Vector2(141, 840)]
 	var inlane_r := [Vector2(404, 679), Vector2(404, 811), Vector2(349, 840)]
-	_wall(parent, inlane_l, NEON_CYAN, false, false, true)
-	_wall(parent, inlane_r, NEON_CYAN, false, false, true)
+	# Rein passive Banden: kein Abstoss, kein Aufleuchten bei Beruehrung.
+	_wall(parent, inlane_l, NEON_CYAN)
+	_wall(parent, inlane_r, NEON_CYAN)
 	parent.add_child(EdgeStructure.new(inlane_l, -1.0, NEON_CYAN, 18.0, 40.0))
 	parent.add_child(EdgeStructure.new(inlane_r, 1.0, NEON_CYAN, 18.0, 40.0))
 	# Hoerner der Mulde (Trichter unter dem S-Bumper); blitzen bei Beruehrung
