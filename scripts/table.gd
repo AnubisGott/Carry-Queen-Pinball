@@ -144,8 +144,12 @@ static func build(parent: Node2D) -> Dictionary:
 	# Drehpunkte 16 Einheiten tiefer als die Inlane-Fuehrung endet: so faellt
 	# die Kugel vom Schraegstueck auf das Blatt, statt in der Kerbe zwischen
 	# Fuehrungsende und hinterer Flipper-Ecke liegen zu bleiben.
-	var fl := Flipper.new(true, Vector2(160, 866))
-	var fr := Flipper.new(false, Vector2(330, 866))
+	# Drehpunkte 8 Einheiten enger zusammen als frueher: zwischen den
+	# Blattspitzen bleiben 24 Einheiten - schmaler als die Kugel (26), sie
+	# faellt also nicht mehr mittig durch, sondern nur noch durch die
+	# Auslaufbahnen aussen.
+	var fl := Flipper.new(true, Vector2(166, 866))
+	var fr := Flipper.new(false, Vector2(324, 866))
 	parent.add_child(fl)
 	parent.add_child(fr)
 	refs["flipper_l"] = fl
