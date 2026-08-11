@@ -82,8 +82,8 @@ static func build(parent: Node2D) -> Dictionary:
 	parent.add_child(EdgeStructure.new(inlane_l, -1.0, NEON_CYAN, 18.0, 40.0))
 	parent.add_child(EdgeStructure.new(inlane_r, 1.0, NEON_CYAN, 18.0, 40.0))
 	# Hoerner der Mulde (Trichter unter dem S-Bumper); blitzen bei Beruehrung
-	_wall(parent, [Vector2(240, 455), Vector2(252, 492)], NEON_GOLD, false, false, true)
-	_wall(parent, [Vector2(300, 455), Vector2(288, 492)], NEON_GOLD, false, false, true)
+	_wall(parent, [Vector2(215, 455), Vector2(227, 492)], NEON_GOLD, false, false, true)
+	_wall(parent, [Vector2(275, 455), Vector2(263, 492)], NEON_GOLD, false, false, true)
 	# Hoerner der Fang-Mulden beidseitig: leiten die Seitenlaeufe in die Schalen
 	_wall(parent, [Vector2(408, 576), Vector2(421, 602)], NEON_GOLD, false, false, true)
 	_wall(parent, [Vector2(468, 572), Vector2(455, 598)], NEON_GOLD, false, false, true)
@@ -164,9 +164,11 @@ static func build(parent: Node2D) -> Dictionary:
 	parent.add_child(Slingshot.new([Vector2(368, 703), Vector2(338, 798),
 			Vector2(368, 770)], Vector2(-89, -63)))
 
-	# WASD-Bumper auf dem Pad, S liegt tiefer und fuettert die Mulde
+	# WASD-Bumper auf dem Pad, S liegt tiefer und fuettert die Mulde.
+	# Die ganze Mittelgruppe steht auf der Spielfeld-Mittelachse x=245
+	# (Mitte zwischen linker Bande und Trennwand), nicht auf der Bogenmitte.
 	var bumpers := {}
-	for b in [["W", Vector2(270, 300)], ["A", Vector2(175, 350)], ["D", Vector2(365, 350)], ["S", Vector2(270, 395)]]:
+	for b in [["W", Vector2(245, 300)], ["A", Vector2(150, 350)], ["D", Vector2(340, 350)], ["S", Vector2(245, 395)]]:
 		var bu := Bumper.new(b[1], b[0])
 		parent.add_child(bu)
 		bumpers[b[0]] = bu
@@ -230,15 +232,15 @@ static func build(parent: Node2D) -> Dictionary:
 	refs["ggez"] = ggez
 
 	# Mulde in der Mitte (schwarzes Loch der Vorlage)
-	parent.add_child(Scoop.new(Vector2(270, 505)))
+	parent.add_child(Scoop.new(Vector2(245, 505)))
 
 	# Fang-Mulden an beiden Seitenlaeufen: kurz fangen, sofort zurueck ins Feld
 	parent.add_child(SidePocket.new(Vector2(438, 612), -1.0))
 	parent.add_child(SidePocket.new(Vector2(52, 612), 1.0))
 
 	# Dekos im Stil der Vorlage
-	parent.add_child(TableDeco.new("pad", Vector2(270, 350), NEON_CYAN))
-	parent.add_child(TableDeco.new("spiral", Vector2(270, 640)))
+	parent.add_child(TableDeco.new("pad", Vector2(245, 350), NEON_CYAN))
+	parent.add_child(TableDeco.new("spiral", Vector2(245, 640)))
 	parent.add_child(TableDeco.new("rays", Vector2(245, 944), NEON_PINK))
 	# Echte Abschuss-Feder statt Deko: Ball sitzt sichtbar auf dem Teller
 	var plunger := Plunger.new()
@@ -264,7 +266,7 @@ static func build(parent: Node2D) -> Dictionary:
 	_deco(parent, "KEIN HEAL", Vector2(58, 712), Color(0.3, 1.35, 0.22, 0.6), 11, 64.0)
 	_deco(parent, "KEIN PLAN", Vector2(427, 723), Color(0.3, 1.35, 0.22, 0.6), 11, 63.0)
 	_deco(parent, "KEIN SKILL.", Vector2(208, 900), Color(1.0, 0.3, 0.6, 0.55), 12, 0.0)
-	_deco(parent, "CARRY QUEEN", Vector2(225, 655), Color(1.0, 0.24, 0.62, 0.75), 12, 0.0)
+	_deco(parent, "CARRY QUEEN", Vector2(200, 655), Color(1.0, 0.24, 0.62, 0.75), 12, 0.0)
 	_deco(parent, "SPACE HALTEN", Vector2(505, 740), Color(1.1, 0.4, 1.9, 0.5), 10, 90.0)
 
 	return refs
