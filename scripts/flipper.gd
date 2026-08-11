@@ -33,6 +33,13 @@ func _init(left: bool, pivot: Vector2) -> void:
 
 func _ready() -> void:
 	sync_to_physics = true
+	# Absorbierendes Material: die Kugel dopst nicht auf dem Blatt, sondern
+	# bleibt liegen und rollt.  Der Schlag kommt allein aus der Drehung.
+	var pm := PhysicsMaterial.new()
+	pm.bounce = 0.32
+	pm.absorbent = true
+	pm.friction = 0.7
+	physics_material_override = pm
 	var col := CollisionPolygon2D.new()
 	col.polygon = _shape_points()
 	add_child(col)
