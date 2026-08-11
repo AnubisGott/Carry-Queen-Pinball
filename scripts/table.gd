@@ -124,10 +124,11 @@ static func build(parent: Node2D) -> Dictionary:
 				Vector2(362, 946), Vector2(280, 958)], -1.0, NEON_CYAN, 22.0, 30.0))
 
 	# Einzeln gesetzte Schellen (voll sichtbar, ueber Banden und Eckplatten):
-	# eine am Fusspunkt der Leitplanke, eine oben am Bogen.
-	for d in [198.0, 344.0]:
-		var at := _arch_at(d)
-		parent.add_child(EdgeClamp.new(at[0], at[1], -1.0))
+	# eine am Fusspunkt der Leitplanke, eine oben am Bogen.  Die obere sitzt
+	# 3px weiter rechts, damit das Ende des Ablenkers unter ihr verschwindet.
+	for spec in [[198.0, Vector2.ZERO], [344.0, Vector2(3, 0)]]:
+		var at := _arch_at(spec[0])
+		parent.add_child(EdgeClamp.new(at[0] + spec[1], at[1], -1.0))
 
 	var refs := {}
 
