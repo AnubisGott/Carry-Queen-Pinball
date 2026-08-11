@@ -52,13 +52,12 @@ static func build(parent: Node2D) -> Dictionary:
 	_wall(parent, [Vector2(DIVIDER, 305), Vector2(445, 335)], NEON_VIOLET)
 	_wall(parent, [Vector2(DIVIDER, 935), Vector2(RIGHT, 935)], NEON_VIOLET)
 	# Leitplanke oben links nach der roten Linie des Nutzers: Kuppe mit
-	# Scheitel bei x=140, durch die Mitte flach gefuehrt und erst spaet in
-	# die Ablenker-Spitze abfallend - die letzten Punkte liegen auf dem
-	# Ablenker-Auslauf, damit beide als eine durchgehende Welle lesen.
+	# Scheitel bei x=140, flacher Mittelteil.  Sie endet exakt im
+	# Ablenker-Stuetzpunkt (184,154) - ab dort uebernimmt dessen schwarze
+	# Kante die Fuehrung, keine doppelte Linie mehr davor.
 	_wall(parent, [Vector2(100, 160), Vector2(110, 153), Vector2(120, 149),
 			Vector2(130, 147), Vector2(140, 146), Vector2(152, 147),
-			Vector2(164, 149), Vector2(176, 152), Vector2(187, 156),
-			Vector2(196, 161), Vector2(203, 166), Vector2(208, 171)], NEON_CYAN)
+			Vector2(164, 149), Vector2(176, 152), Vector2(184, 154)], NEON_CYAN)
 	# Ablenker am linken Bogen-Abstieg: gleiche Lage und Enden wie zuvor,
 	# aber als fliessende Kurve ausgelegt - der Bogenteil ist ein sauberer
 	# Kreisbogen (r=27 um 207,140), an den sich der Auslauf tangential
