@@ -6,6 +6,11 @@ var pts: PackedVector2Array
 var kick_normal: Vector2
 var _cool := 0.0
 var _flash := 0.0
+## Schlagflaeche: Stuetzpunkt und Aussen-Normale.  Nur davor wird
+## abgestossen - an Rueckseite und Unterkante ist der Slingshot eine
+## normale Bande (dort laeuft die Kugel die Inlane hinunter).
+var _face_at := Vector2.ZERO
+var _face_n := Vector2.RIGHT
 
 
 func _init(points: Array, normal: Vector2) -> void:
@@ -14,6 +19,7 @@ func _init(points: Array, normal: Vector2) -> void:
 
 
 func _ready() -> void:
+	_find_face()
 	var col := CollisionPolygon2D.new()
 	col.polygon = pts
 	add_child(col)
@@ -28,6 +34,24 @@ func _ready() -> void:
 	add_child(area)
 	area.body_entered.connect(_on_hit)
 	z_index = 4
+
+
+## Sucht die Kante, deren Aussen-Normale am besten zur Abstossrichtung
+## passt - das ist die Schlagflaeche.
+func _find_face() -> void:
+	var c := _centroid()
+	var best := -INF
+	for i in pts.size():
+		var a: Vector2 = pts[i]
+		var b: Vector2 = pts[(i + 1) % pts.size()]
+		var n := (b - a).orthogonal().normalized()
+		if n.dot((a + b) * 0.5 - c) < 0.0:
+			n = -n
+		var d := n.dot(kick_normal)
+		if d > best:
+			best = d
+			_face_at = a
+			_face_n = n
 
 
 func _centroid() -> Vector2:
@@ -57,6 +81,9 @@ func _draw() -> void:
 
 func _on_hit(body: Node2D) -> void:
 	if not body is PinBall or _cool > 0.0:
+		return
+	# Nur Treffer vor der Schlagflaeche zaehlen
+	if _face_n.dot(body.global_position - _face_at) <= 0.0:
 		return
 	_cool = 0.12
 	_flash = 1.0
