@@ -139,9 +139,11 @@ static func build(parent: Node2D) -> Dictionary:
 	refs["flipper_l"] = fl
 	refs["flipper_r"] = fr
 
-	# Schlanke Viereck-Slingshots mit Laufrinne hinter den breiten Baendern
-	parent.add_child(Slingshot.new([Vector2(133, 674), Vector2(196, 763), Vector2(174, 775), Vector2(145, 720)], Vector2(89, -63)))
-	parent.add_child(Slingshot.new([Vector2(356, 689), Vector2(291, 769), Vector2(309, 781), Vector2(340, 729)], Vector2(-80, -65)))
+	# Schlanke Viereck-Slingshots mit Laufrinne hinter den breiten Baendern.
+	# Innenkanten 7 Einheiten Richtung Aussenkante gezogen - dadurch bleibt
+	# neben den Slings mehr Platz, wo sich die Kugel verhakt hat.
+	parent.add_child(Slingshot.new([Vector2(133, 674), Vector2(196, 763), Vector2(180, 771), Vector2(151, 716)], Vector2(89, -63)))
+	parent.add_child(Slingshot.new([Vector2(356, 689), Vector2(291, 769), Vector2(304, 777), Vector2(335, 725)], Vector2(-80, -65)))
 
 	# WASD-Bumper auf dem Pad, S liegt tiefer und fuettert die Mulde
 	var bumpers := {}
