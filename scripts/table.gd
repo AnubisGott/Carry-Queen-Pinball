@@ -67,18 +67,19 @@ static func build(parent: Node2D) -> Dictionary:
 			Vector2(180, 145), Vector2(184, 154), Vector2(190, 161),
 			Vector2(196, 165), Vector2(202, 169), Vector2(207, 172)], NEON_CYAN)
 	# (Leit-Band wieder entfernt - hat optisch nicht gepasst)
-	# Inlanes als Winkel (Nutzer-Redesign): ein senkrechtes Stueck laengs der
-	# Aussenbahn, das unten in ein kurzes Schraegstueck uebergeht und die
-	# Kugel auf das Flipperblatt legt.  Die unteren Enden ueberlappen den
+	# Inlane-Fuehrungen als Winkel, gebaut wie die Aussenbanden: Leuchtkante
+	# als Lauflaeche, dahinter das Blechband mit Schellen (Rand-Material).
+	# Das Schraegstueck liegt auf der Achse des ruhenden Flippers
+	# (y = 850 - (160-x) * tan 28 Grad), damit Fuehrung und Flipperblatt eine
+	# durchgehende Linie bilden.  Die unteren Enden ueberlappen den
 	# Schwenkkreis der hinteren Flipper-Ecke - sonst bildet sich dort je nach
 	# Flipperstellung eine Kerbe, in der die Kugel liegen bleibt.
-	# Ruhe-Gruen wie die W/A/S/D-Ringe gedimmt, hell nur beim Blitz.
-	var inlane_col := Color(0.25, 0.95, 0.18)
-	_bar(parent, Vector2(86, 679), Vector2(86, 820), inlane_col, true)
-	_bar(parent, Vector2(86, 820), Vector2(141, 837), inlane_col, true)
-	# Rechte Inlane spiegelbildlich zur linken (Achse x=245)
-	_bar(parent, Vector2(404, 679), Vector2(404, 820), inlane_col, true)
-	_bar(parent, Vector2(404, 820), Vector2(349, 837), inlane_col, true)
+	var inlane_l := [Vector2(86, 679), Vector2(86, 811), Vector2(141, 840)]
+	var inlane_r := [Vector2(404, 679), Vector2(404, 811), Vector2(349, 840)]
+	_wall(parent, inlane_l, NEON_CYAN, false, false, true)
+	_wall(parent, inlane_r, NEON_CYAN, false, false, true)
+	parent.add_child(EdgeStructure.new(inlane_l, -1.0, NEON_CYAN, 18.0, 40.0))
+	parent.add_child(EdgeStructure.new(inlane_r, 1.0, NEON_CYAN, 18.0, 40.0))
 	# Hoerner der Mulde (Trichter unter dem S-Bumper); blitzen bei Beruehrung
 	_wall(parent, [Vector2(240, 455), Vector2(252, 492)], NEON_GOLD, false, false, true)
 	_wall(parent, [Vector2(300, 455), Vector2(288, 492)], NEON_GOLD, false, false, true)
@@ -142,11 +143,14 @@ static func build(parent: Node2D) -> Dictionary:
 	refs["flipper_l"] = fl
 	refs["flipper_r"] = fr
 
-	# Schlanke Viereck-Slingshots mit Laufrinne hinter den breiten Baendern.
-	# Innenkanten 7 Einheiten Richtung Aussenkante gezogen - dadurch bleibt
-	# neben den Slings mehr Platz, wo sich die Kugel verhakt hat.
-	parent.add_child(Slingshot.new([Vector2(133, 674), Vector2(196, 763), Vector2(180, 771), Vector2(151, 716)], Vector2(89, -63)))
-	parent.add_child(Slingshot.new([Vector2(356, 689), Vector2(291, 769), Vector2(304, 777), Vector2(335, 725)], Vector2(-80, -65)))
+	# Schlanke Viereck-Slingshots, nach unten links gerueckt: zusammen mit
+	# der Inlane-Fuehrung bilden sie jetzt einen gleichmaessigen Kanal
+	# (rund 37 Einheiten Durchlass), der unten auf das Flipperblatt fuehrt.
+	# Beide Seiten sind exakt an der Achse x=245 gespiegelt.
+	parent.add_child(Slingshot.new([Vector2(123, 700), Vector2(186, 789),
+			Vector2(170, 797), Vector2(141, 742)], Vector2(89, -63)))
+	parent.add_child(Slingshot.new([Vector2(367, 700), Vector2(304, 789),
+			Vector2(320, 797), Vector2(349, 742)], Vector2(-89, -63)))
 
 	# WASD-Bumper auf dem Pad, S liegt tiefer und fuettert die Mulde
 	var bumpers := {}
