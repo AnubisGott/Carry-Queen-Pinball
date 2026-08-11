@@ -112,9 +112,13 @@ static func build(parent: Node2D) -> Dictionary:
 			[Vector2(LEFT, 330), Vector2(LEFT, 760)], 1.0, NEON_CYAN, 24.0, 46.0))
 	# Rechts laeuft das Cyan-Band wie links ganz aussen herum und biegt in die
 	# Ecke ab - nicht diagonal durchs Feld.
-	parent.add_child(EdgeStructure.new(
+	# Die Kamm-Schraffur bei Bogenlaenge 126 ist ausgespart (Nutzerwunsch) -
+	# sie sass mitten in der unteren Auslaufbahn.
+	var bl_edge := EdgeStructure.new(
 			[Vector2(LEFT, 760), Vector2(LEFT, 838), Vector2(58, 904),
-				Vector2(128, 946), Vector2(210, 958)], 1.0, NEON_CYAN, 22.0, 30.0))
+				Vector2(128, 946), Vector2(210, 958)], 1.0, NEON_CYAN, 22.0, 30.0)
+	bl_edge.skip_at = [126.0]
+	parent.add_child(bl_edge)
 	parent.add_child(EdgeStructure.new(
 			[Vector2(RIGHT, 330), Vector2(RIGHT, 935), Vector2(DIVIDER, 935)],
 			-1.0, NEON_CYAN, 22.0, 54.0))
@@ -123,9 +127,11 @@ static func build(parent: Node2D) -> Dictionary:
 	#   20 -> 470 | 58 -> 432 | 128 -> 362 | 210 -> 280
 	parent.add_child(EdgeStructure.new(
 			[Vector2(DIVIDER, 330), Vector2(DIVIDER, 760)], -1.0, NEON_CYAN, 24.0, 46.0))
-	parent.add_child(EdgeStructure.new(
+	var br_edge := EdgeStructure.new(
 			[Vector2(DIVIDER, 760), Vector2(DIVIDER, 838), Vector2(432, 904),
-				Vector2(362, 946), Vector2(280, 958)], -1.0, NEON_CYAN, 22.0, 30.0))
+				Vector2(362, 946), Vector2(280, 958)], -1.0, NEON_CYAN, 22.0, 30.0)
+	br_edge.skip_at = [126.0]
+	parent.add_child(br_edge)
 
 	# Einzeln gesetzte Schellen (voll sichtbar, ueber Banden und Eckplatten):
 	# eine am Fusspunkt der Leitplanke, eine oben am Bogen.  Die obere sitzt
@@ -143,14 +149,14 @@ static func build(parent: Node2D) -> Dictionary:
 	refs["flipper_l"] = fl
 	refs["flipper_r"] = fr
 
-	# Schlanke Viereck-Slingshots, nach unten links gerueckt: zusammen mit
-	# der Inlane-Fuehrung bilden sie jetzt einen gleichmaessigen Kanal
-	# (rund 37 Einheiten Durchlass), der unten auf das Flipperblatt fuehrt.
-	# Beide Seiten sind exakt an der Achse x=245 gespiegelt.
-	parent.add_child(Slingshot.new([Vector2(123, 700), Vector2(186, 789),
-			Vector2(170, 797), Vector2(141, 742)], Vector2(89, -63)))
-	parent.add_child(Slingshot.new([Vector2(367, 700), Vector2(304, 789),
-			Vector2(320, 797), Vector2(349, 742)], Vector2(-89, -63)))
+	# Slingshots als Dreieck durch die drei vom Nutzer gesetzten Punkte:
+	# senkrechte Innenkante parallel zur Inlane-Fuehrung, kurze Unterkante
+	# und die Hypotenuse als Schlagflaeche zur Spielfeldmitte.
+	# Rechts exakt an der Achse x=245 gespiegelt.
+	parent.add_child(Slingshot.new([Vector2(122, 703), Vector2(122, 770),
+			Vector2(152, 798)], Vector2(89, -63)))
+	parent.add_child(Slingshot.new([Vector2(368, 703), Vector2(338, 798),
+			Vector2(368, 770)], Vector2(-89, -63)))
 
 	# WASD-Bumper auf dem Pad, S liegt tiefer und fuettert die Mulde
 	var bumpers := {}
