@@ -19,6 +19,9 @@ var accent := Color(1.7, 0.28, 1.0)
 ## Wabenfeld kann eine eigene Farbe haben - ohne Angabe die des Akzents.
 var hex_col := Color(0, 0, 0, 0)
 var cut := 36.0
+## Das Neonrohr an der Fase kann abgeschaltet werden - in den unteren Ecken
+## schnitt es quer durch die Auslaufbahn.
+var show_pipe := true
 
 
 func _init(pos: Vector2, d: Vector2, size: Vector2, col: Color,
@@ -64,10 +67,11 @@ func _draw() -> void:
 	draw_polyline(PackedVector2Array([pts[5], pts[0], pts[1]]), PLATE_LIT, 2.4, true)
 
 	# Neonrohr entlang der abgeschraegten Innenkante
-	var pipe := PackedVector2Array([pts[2], pts[3], pts[4]])
-	draw_polyline(pipe, Color(accent.r, accent.g, accent.b, 0.16), 9.0, true)
-	draw_polyline(pipe, Color(0.08, 0.13, 0.16), 5.0, true)
-	draw_polyline(pipe, accent, 2.0, true)
+	if show_pipe:
+		var pipe := PackedVector2Array([pts[2], pts[3], pts[4]])
+		draw_polyline(pipe, Color(accent.r, accent.g, accent.b, 0.16), 9.0, true)
+		draw_polyline(pipe, Color(0.08, 0.13, 0.16), 5.0, true)
+		draw_polyline(pipe, accent, 2.0, true)
 
 	_draw_hex_patch(Vector2(plate_size.x * 0.30 * dir.x, plate_size.y * 0.30 * dir.y))
 	_draw_traces(pts)

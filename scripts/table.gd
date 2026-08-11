@@ -93,9 +93,13 @@ static func build(parent: Node2D) -> Dictionary:
 	# der Mitte (210..285) bleibt unveraendert.
 	_wall(parent, [Vector2(LEFT, 760), Vector2(LEFT, 838), Vector2(58, 904),
 			Vector2(128, 946), Vector2(210, 958)], NEON_PINK, true)
-	# Rechte Auslauf-Bande ohne eigene Linie - nur Kollision.
-	_wall(parent, [Vector2(DIVIDER, 600), Vector2(456, 706), Vector2(424, 806),
-			Vector2(364, 886), Vector2(285, 950)], NEON_PINK, true, true)
+	# Rechte Auslauf-Bande ohne eigene Linie - nur Kollision.  Sie folgt exakt
+	# dem gespiegelten Verlauf der linken (und damit ihrem eigenen sichtbaren
+	# Blechband): der alte, weiter oben abknickende Verlauf verengte die
+	# rechte Auslaufbahn auf Kugelbreite - dort blieb die Kugel an einer
+	# unsichtbaren Kante haengen.
+	_wall(parent, [Vector2(DIVIDER, 760), Vector2(DIVIDER, 838), Vector2(432, 904),
+			Vector2(362, 946), Vector2(280, 958)], NEON_PINK, true, true)
 
 	# Randaufbau: Blechband mit Schellen, Rohr, Waben und Leiterbahnen entlang
 	# der Banden - die Struktur der Vorlagentextur als echte Elemente.
@@ -112,13 +116,9 @@ static func build(parent: Node2D) -> Dictionary:
 			[Vector2(LEFT, 330), Vector2(LEFT, 760)], 1.0, NEON_CYAN, 24.0, 46.0))
 	# Rechts laeuft das Cyan-Band wie links ganz aussen herum und biegt in die
 	# Ecke ab - nicht diagonal durchs Feld.
-	# Die Kamm-Schraffur bei Bogenlaenge 126 ist ausgespart (Nutzerwunsch) -
-	# sie sass mitten in der unteren Auslaufbahn.
-	var bl_edge := EdgeStructure.new(
+	parent.add_child(EdgeStructure.new(
 			[Vector2(LEFT, 760), Vector2(LEFT, 838), Vector2(58, 904),
-				Vector2(128, 946), Vector2(210, 958)], 1.0, NEON_CYAN, 22.0, 30.0)
-	bl_edge.skip_at = [126.0]
-	parent.add_child(bl_edge)
+				Vector2(128, 946), Vector2(210, 958)], 1.0, NEON_CYAN, 22.0, 30.0))
 	parent.add_child(EdgeStructure.new(
 			[Vector2(RIGHT, 330), Vector2(RIGHT, 935), Vector2(DIVIDER, 935)],
 			-1.0, NEON_CYAN, 22.0, 54.0))
@@ -127,11 +127,9 @@ static func build(parent: Node2D) -> Dictionary:
 	#   20 -> 470 | 58 -> 432 | 128 -> 362 | 210 -> 280
 	parent.add_child(EdgeStructure.new(
 			[Vector2(DIVIDER, 330), Vector2(DIVIDER, 760)], -1.0, NEON_CYAN, 24.0, 46.0))
-	var br_edge := EdgeStructure.new(
+	parent.add_child(EdgeStructure.new(
 			[Vector2(DIVIDER, 760), Vector2(DIVIDER, 838), Vector2(432, 904),
-				Vector2(362, 946), Vector2(280, 958)], -1.0, NEON_CYAN, 22.0, 30.0)
-	br_edge.skip_at = [126.0]
-	parent.add_child(br_edge)
+				Vector2(362, 946), Vector2(280, 958)], -1.0, NEON_CYAN, 22.0, 30.0))
 
 	# Einzeln gesetzte Schellen (voll sichtbar, ueber Banden und Eckplatten):
 	# eine am Fusspunkt der Leitplanke, eine oben am Bogen.  Die obere sitzt
@@ -529,7 +527,12 @@ static func _background(parent: Node2D) -> void:
 		[Vector2(486, 956), Vector2(-1, -1), Vector2(112, 126), NEON_CYAN, NEON_VIOLET],
 		[Vector2(4, 956), Vector2(1, -1), Vector2(112, 126), NEON_CYAN, NEON_GREEN],
 	]:
-		parent.add_child(CornerPlate.new(spec[0], spec[1], spec[2], spec[3], spec[4]))
+		var plate := CornerPlate.new(spec[0], spec[1], spec[2], spec[3], spec[4])
+		# In den unteren Ecken ohne Neonrohr: es schnitt diagonal durch die
+		# Auslaufbahn (Nutzerwunsch).
+		if spec[0].y > 500.0:
+			plate.show_pipe = false
+		parent.add_child(plate)
 
 
 static func _deco(parent: Node2D, text: String, pos: Vector2, col: Color, size: int, rot: float) -> void:
