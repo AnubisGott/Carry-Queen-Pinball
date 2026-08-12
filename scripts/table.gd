@@ -117,8 +117,13 @@ static func build(parent: Node2D) -> Dictionary:
 	var arch_edge := EdgeStructure.new(_arch_points(), -1.0, NEON_CYAN, 26.0, 60.0)
 	arch_edge.skip_at = [252.0, 348.0]
 	parent.add_child(arch_edge)
-	parent.add_child(EdgeStructure.new(
-			[Vector2(LEFT, 330), Vector2(LEFT, 760)], 1.0, NEON_CYAN, 24.0, 46.0))
+	# Beschlaege eine Buchstabenlaenge (60) tiefer als frueher, damit die
+	# Schraffur nicht auf dem dritten Target liegt.  Der erste Beschlag
+	# entfaellt - der saesse sonst quer auf dem mittleren Target.
+	var left_edge := EdgeStructure.new(
+			[Vector2(LEFT, 330), Vector2(LEFT, 760)], 1.0, NEON_CYAN, 24.0, 106.0)
+	left_edge.skip_at = [106.0]
+	parent.add_child(left_edge)
 	# Rechts laeuft das Cyan-Band wie links ganz aussen herum und biegt in die
 	# Ecke ab - nicht diagonal durchs Feld.
 	parent.add_child(EdgeStructure.new(
@@ -130,8 +135,10 @@ static func build(parent: Node2D) -> Dictionary:
 	# Rechte Seite exakt spiegelbildlich zur linken.  Spiegelachse ist x=245,
 	# die Mitte zwischen linker Bande (20) und Trennwand (470):
 	#   20 -> 470 | 58 -> 432 | 128 -> 362 | 210 -> 280
-	parent.add_child(EdgeStructure.new(
-			[Vector2(DIVIDER, 330), Vector2(DIVIDER, 760)], -1.0, NEON_CYAN, 24.0, 46.0))
+	var div_edge := EdgeStructure.new(
+			[Vector2(DIVIDER, 330), Vector2(DIVIDER, 760)], -1.0, NEON_CYAN, 24.0, 106.0)
+	div_edge.skip_at = [106.0]
+	parent.add_child(div_edge)
 	parent.add_child(EdgeStructure.new(
 			[Vector2(DIVIDER, 760), Vector2(DIVIDER, 838), Vector2(432, 904),
 				Vector2(362, 946), Vector2(280, 958)], -1.0, NEON_CYAN, 22.0, 30.0))
