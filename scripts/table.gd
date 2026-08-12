@@ -260,8 +260,10 @@ static func build(parent: Node2D) -> Dictionary:
 	refs["plunger"] = plunger
 	parent.add_child(TableDeco.new("star", Vector2(218, 705), Color(1.6, 1.5, 1.2)))
 	parent.add_child(TableDeco.new("star", Vector2(322, 668), Color(1.6, 1.5, 1.2), 0.7))
-	parent.add_child(TableDeco.new("comet", Vector2(38, 540), NEON_GOLD, 1.0, 15.0))
-	parent.add_child(TableDeco.new("comet", Vector2(445, 500), NEON_GOLD, 1.0, -15.0))
+	# Kometen tiefer gesetzt: sie sassen den nach unten gerueckten Standup-
+	# Baenken im Weg.
+	parent.add_child(TableDeco.new("comet", Vector2(38, 590), NEON_GOLD, 1.0, 15.0))
+	parent.add_child(TableDeco.new("comet", Vector2(452, 550), NEON_GOLD, 1.0, -15.0))
 	parent.add_child(TableDeco.new("saturn", Vector2(82, 475), NEON_GOLD))
 	parent.add_child(TableDeco.new("arrow", Vector2(375, 520), NEON_CYAN, 1.0, -35.0))
 	# Lane-Pfeile: blinken, solange ein Ball abschussbereit ist (main.gd)
