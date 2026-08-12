@@ -326,7 +326,8 @@ func _cleanup_lost_balls() -> void:
 
 
 func _on_event(kind: String, data: Dictionary) -> void:
-	if autotest and kind in ["spinner", "scoop", "save", "pocket", "ggez", "rollover"]:
+	if autotest and kind in ["spinner", "scoop", "save", "pocket", "ggez",
+			"rollover", "standup"]:
 		print("AUTOTEST event %s%s t=%.1f ball=%d" % [kind,
 				(" " + str(data["letter"])) if data.has("letter") else "",
 				_at_pulses * 0.4, Game.ball_number])
@@ -341,6 +342,7 @@ func _on_event(kind: String, data: Dictionary) -> void:
 			_check_bank()
 		"standup":
 			_check_ich()
+			_check_ego_bank()
 		"rollover":
 			_check_ggez()
 		"all_disciplines":
@@ -404,6 +406,23 @@ func _check_bank() -> void:
 	hud.show_message("DAMAGE-FRENZY!", "Alles zaehlt doppelt. +" + Hud.fmt(pts), 2.5)
 	Game.emit("frenzy")
 	# Die volle Bank bleibt bis zum Ballverlust an (Reset in _start_ball)
+
+
+## E-G-O komplett: der Multiplikator steigt um eine Stufe, die Bank stellt
+## sich danach wieder auf.
+func _check_ego_bank() -> void:
+	if ego_bank.is_empty():
+		return
+	for s in ego_bank:
+		if not s.lit:
+			return
+	Game.ego_level_up()
+	Game.add_score(2500)
+	Sfx.play("ego_up", -2.0)
+	hud.show_message("E-G-O KOMPLETT.", "EGO x%d. Skaliert. Natuerlich." % Game.ego_mult, 2.2)
+	await get_tree().create_timer(1.0, false).timeout
+	for s in ego_bank:
+		s.reset()
 
 
 func _check_ggez() -> void:
@@ -735,14 +754,13 @@ func _start_ball(first: bool = false) -> void:
 	Game.damage_points = 0
 	Game.tilted = false
 	nudge_heat = 0.0
-	# Kill-Serie, volle DAMAGE-Bank und EGO-Multiplikator erloeschen erst
-	# beim Ballwechsel
+	# Kill-Serie und volle DAMAGE-Bank erloeschen beim Ballwechsel.  Der
+	# EGO-Multiplikator bleibt dagegen ueber das ganze Spiel stehen.
 	streak_letters.clear()
 	_streak_done = false
 	_update_bumper_marks()
 	for d in drops:
 		d.reset()
-	Game.reset_ego()
 	plunger.release()
 	Game.emit("save_armed")
 	_spawn_ball(SPAWN)

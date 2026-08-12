@@ -196,9 +196,16 @@ static func build(parent: Node2D) -> Dictionary:
 	refs["standups"] = standups
 
 	# Einzelner EGO-Knopf (FEATURE_EGO): jeder Treffer = Ego-Stufe rauf
+	# E-G-O-Bank an der Trennwand rechts, spiegelbildlich zur I-C-H-Bank
+	# links (Achse x=245).  Um 180 Grad gedreht, damit der Buchstabe zum
+	# Spielfeld hin steht statt in die Abschussbahn.
 	var ego_bank := []
 	if FEATURE_EGO:
-		parent.add_child(EgoButton.new(Vector2(131, 201), "EGO", 43.6))
+		var ego_letters := ["E", "G", "O"]
+		for i in 3:
+			var e := Standup.new(Vector2(459, 310 + i * 60), ego_letters[i], 180.0)
+			parent.add_child(e)
+			ego_bank.append(e)
 	refs["ego_bank"] = ego_bank
 
 	# OP-Spinner quer im Ausgang der Abschussbahn: jede abgeschossene Kugel

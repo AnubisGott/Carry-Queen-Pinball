@@ -78,13 +78,6 @@ func ego_level_up() -> void:
 	emit("ego")
 
 
-## Ballverlust setzt den Multiplikator auf x1 zurueck.
-func reset_ego() -> void:
-	ego = 0
-	ego_mult = 1
-	emit("ego")
-
-
 func discipline_done(disc: String) -> void:
 	if disciplines.get(disc, true):
 		return
