@@ -7,6 +7,8 @@ const SPAWN := Vector2(495, 854)
 ## Der Carry-Save gilt nur die ersten Sekunden eines Balls - danach spottet
 ## die Queen.
 const SAVE_WINDOW := 20.0
+## Laufzeit des Wizard-Modus "Der Bericht"
+const WIZARD_TIME := 40.0
 
 const QUEEN_SPOTT := [
 	"Warst du nicht gut genug?",
@@ -304,6 +306,7 @@ func _update_timers(delta: float) -> void:
 			hud.show_sub("Frenzy vorbei.", 1.5)
 	if Game.wizard:
 		wizard_time -= delta
+		hud.set_wizard(true, wizard_time / WIZARD_TIME)
 		wizard_line_time -= delta
 		if wizard_line_time <= 0.0 and wizard_line_idx < WIZARD_LINES.size():
 			hud.show_message(WIZARD_LINES[wizard_line_idx], "", 3.0)
@@ -564,7 +567,7 @@ func _end_multiball() -> void:
 
 func _start_wizard() -> void:
 	Game.wizard = true
-	wizard_time = 40.0
+	wizard_time = WIZARD_TIME
 	wizard_line_idx = 0
 	wizard_line_time = 0.5
 	Sfx.play("mode")
@@ -575,6 +578,7 @@ func _start_wizard() -> void:
 
 func _end_wizard() -> void:
 	Game.wizard = false
+	hud.set_wizard(false)
 	Game.reset_disciplines()
 	for d in drops:
 		d.reset()
@@ -712,6 +716,7 @@ func _on_continue() -> void:
 
 func _game_over() -> void:
 	Game.game_over = true
+	hud.set_wizard(false)
 	# Nach dem Spielende bleibt der Tisch gedimmt, bis das naechste losgeht
 	_set_dimmed(true)
 	Game.save_best()
@@ -744,6 +749,7 @@ func _restart() -> void:
 	hurry_active = false
 	frenzy_time = 0.0
 	wizard_time = 0.0
+	hud.set_wizard(false)
 	# Das neue Spiel weckt den Tisch wieder auf
 	dimmed = true
 	_set_dimmed(false)

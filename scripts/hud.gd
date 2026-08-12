@@ -46,6 +46,12 @@ const CHAT_PROB := {"bumper": 0.06, "sling": 0.15, "spinner": 0.3, "drop_target"
 
 var popup_kind := ""
 
+## Wizard-Anzeige: die vier Disziplinen pulsieren, darunter laeuft ein
+## Zeitbalken ab.
+var _wizard := false
+var _wizard_t := 0.0
+var _wizard_bar: ColorRect
+
 var _score_label: Label
 var _ego_label: Label
 var _ball_label: Label
@@ -123,7 +129,35 @@ func _build_bar() -> void:
 	var xs := {"DAMAGE": 285, "KILLS": 325, "CARRY": 378, "ICH": 432}
 	for k in disc_names:
 		_disc_labels[k] = _label(disc_names[k], Vector2(xs[k], 62), 11, DIM, bar)
+	# Zeitbalken des Wizard-Modus, direkt unter der Disziplinen-Reihe
+	_wizard_bar = ColorRect.new()
+	_wizard_bar.position = Vector2(285, 78)
+	_wizard_bar.size = Vector2(167, 3)
+	_wizard_bar.color = GOLD
+	_wizard_bar.visible = false
+	bar.add_child(_wizard_bar)
 	_try_avatar(bar)
+
+
+## Wizard-Modus anzeigen: `frac` ist die verbleibende Zeit (1 = voll).
+func set_wizard(on: bool, frac: float = 0.0) -> void:
+	if _wizard != on:
+		_wizard = on
+		_wizard_t = 0.0
+		if not on:
+			_update_disciplines()
+	_wizard_bar.visible = on
+	if on:
+		_wizard_bar.size = Vector2(167.0 * clampf(frac, 0.0, 1.0), 3)
+
+
+func _process(delta: float) -> void:
+	if not _wizard:
+		return
+	_wizard_t += delta * 5.0
+	var col := GOLD.lerp(Color(1.0, 1.0, 1.0), 0.5 + 0.5 * sin(_wizard_t))
+	for k in _disc_labels:
+		_disc_labels[k].add_theme_color_override("font_color", col)
 
 
 func _try_avatar(bar: Panel) -> void:

@@ -1,0 +1,34 @@
+extends Node
+## Entwicklerwerkzeug: startet das Spiel, zwingt den Wizard-Modus an und legt
+## zwei Aufnahmen ab - damit laesst sich das Pulsieren der Disziplinen und der
+## Zeitbalken pruefen.
+##   godot --path . res://tools/shot_wizard.tscn -- <ausgabeordner>
+
+const MAIN := preload("res://scenes/main.tscn")
+
+var out_dir := "user://shots"
+
+
+func _ready() -> void:
+	var w := get_window()
+	w.set_flag(Window.FLAG_NO_FOCUS, true)
+	DisplayServer.window_set_position(Vector2i(-4000, -4000))
+	for a in OS.get_cmdline_user_args():
+		if not a.begins_with("--"):
+			out_dir = a
+	DirAccess.make_dir_recursive_absolute(out_dir)
+	var main := MAIN.instantiate()
+	add_child(main)
+	await get_tree().create_timer(1.0).timeout
+	main._start_wizard()
+	await get_tree().create_timer(0.6).timeout
+	await _shot("wizard_a")
+	await get_tree().create_timer(0.35).timeout
+	await _shot("wizard_b")
+	print("screenshots -> ", out_dir)
+	get_tree().quit()
+
+
+func _shot(name: String) -> void:
+	await RenderingServer.frame_post_draw
+	get_viewport().get_texture().get_image().save_png("%s/%s.png" % [out_dir, name])
