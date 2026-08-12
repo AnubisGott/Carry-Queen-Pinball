@@ -280,9 +280,9 @@ func _update_plunger(delta: float) -> void:
 
 
 func _update_timers(delta: float) -> void:
-	# Der Durchlauf blinkt nur, wenn er gerade gebraucht wird
+	# Der Durchlauf blinkt nur waehrend eines laufenden Hurry-Up
 	if gate:
-		gate.set_armed(hurry_active or Game.wizard)
+		gate.set_armed(hurry_active)
 	# Carry-Save laeuft nach SAVE_WINDOW Sekunden ab - danach haelt sie nichts
 	# mehr, kommentiert es aber gerne.
 	if Game.ball_save_armed and save_time > 0.0:
@@ -296,7 +296,7 @@ func _update_timers(delta: float) -> void:
 		hurry_value = maxi(5000, hurry_value - int(1600.0 * delta))
 		if hurry_time <= 0.0:
 			_end_hurry()
-			hud.show_sub("Hurry-Up vorbei. Zu langsam.", 1.5)
+			hud.show_sub("Hurry-Up vorbei. " + spott(), 1.8)
 	if frenzy_time > 0.0:
 		frenzy_time -= delta
 		if frenzy_time <= 0.0:
@@ -353,18 +353,13 @@ func _on_event(kind: String, data: Dictionary) -> void:
 		"all_disciplines":
 			_start_wizard()
 		"gate":
-			if Game.wizard:
-				# Mega-Jackpot des Wizard-Modus - dafuer blinkt der Durchlauf
-				var mega := Game.add_score(20000)
-				hud.show_message("MEGA-JACKPOT!", "+" + Hud.fmt(mega), 2.0)
-				Sfx.play("jackpot")
-				Game.emit("jackpot")
-			elif hurry_active:
-				# Hurry-Up wird am blinkenden Durchlauf abgeholt
+			# Der Durchlauf hat genau eine Sonderfunktion: das Hurry-Up der
+			# Kill-Serie abholen.  Dafuer blinken die Hoerner.
+			if hurry_active:
 				var pts := Game.add_score(hurry_value)
 				_end_hurry()
-				Game.discipline_done("ICH")
-				hud.show_message("ICH. WER SONST.", "+" + Hud.fmt(pts), 2.2)
+				Game.discipline_done("KILLS")
+				hud.show_message("KILL KASSIERT.", "+" + Hud.fmt(pts), 2.2)
 				Sfx.play("jackpot")
 				Sfx.say("beste")
 				Game.emit("jackpot")
@@ -376,16 +371,19 @@ func _on_bumper(letter: String) -> void:
 	streak_letters[letter] = true
 	# Keine 6-Sekunden-Regel: die Markierungen bleiben bis zum Ballverlust.
 	# Der Kill zuendet beim vierten Bumper genau einmal pro Ball.
-	if streak_letters.size() >= 4 and not _streak_done:
+	if streak_letters.size() >= 4 and not _streak_done and not hurry_active:
 		_streak_done = true
 		Game.kills += 1
 		var pts := Game.add_score(3000)
-		Sfx.play("jackpot", -6.0)
-		hud.show_message("KILL BESTAETIGT (%d)" % Game.kills, "+" + Hud.fmt(pts), 1.6)
+		Sfx.play("mode", -3.0)
 		Game.emit("kill")
-		# Eine komplette W-A-S-D-Serie genuegt - seit die Markierungen bis
-		# zum Ballverlust stehen, gibt es nur noch einen Kill pro Ball.
-		Game.discipline_done("KILLS")
+		# Die volle W-A-S-D-Serie startet das Hurry-Up; kassiert wird es am
+		# blinkenden Durchlauf in der Mitte (siehe _on_event "gate").
+		hurry_active = true
+		hurry_value = 25000
+		hurry_time = 12.0
+		hud.show_message("KILL BESTAETIGT (%d)" % Game.kills,
+				"Hurry-Up: ab durch die MITTE! +" + Hud.fmt(pts), 2.5)
 	_update_bumper_marks()
 
 
@@ -464,24 +462,29 @@ func _start_ggez_multiball() -> void:
 		_spawn_ball(Vector2(270, 185), false, Vector2(randf_range(-60, 60), 300))
 
 
+## I-C-H komplett: zaehlt sofort als Disziplin, die Bank stellt sich danach
+## wieder auf.
 func _check_ich() -> void:
 	for s in standups:
 		if not s.lit:
 			return
-	if hurry_active:
-		return
-	Game.add_score(2000)
-	hurry_active = true
-	hurry_value = 25000
-	hurry_time = 12.0
-	Sfx.play("mode", -3.0)
-	hud.show_message("I-C-H KOMPLETT!", "Hurry-Up: Triff die MULDE in der Mitte!", 2.5)
-
-
-func _end_hurry() -> void:
-	hurry_active = false
+	var pts := Game.add_score(5000)
+	Game.discipline_done("ICH")
+	Sfx.play("jackpot", -4.0)
+	Sfx.say("beste")
+	hud.show_message("ICH. WER SONST.", "+" + Hud.fmt(pts), 2.2)
+	await get_tree().create_timer(1.0, false).timeout
 	for s in standups:
 		s.reset()
+
+
+## Hurry-Up beendet - ob kassiert oder abgelaufen.  Die Bumper-Serie wird
+## freigegeben, damit man es erneut starten kann.
+func _end_hurry() -> void:
+	hurry_active = false
+	streak_letters.clear()
+	_streak_done = false
+	_update_bumper_marks()
 
 
 func _on_throne_captured(ball: PinBall) -> void:
@@ -566,7 +569,7 @@ func _start_wizard() -> void:
 	wizard_line_time = 0.5
 	Sfx.play("mode")
 	Sfx.say("bericht")
-	hud.show_message("DER BERICHT.", "Alles x5. Die Mulde zahlt Mega-Jackpots.", 3.0)
+	hud.show_message("DER BERICHT.", "40 Sekunden lang zaehlt alles fuenffach.", 3.0)
 	Game.emit("wizard")
 
 
