@@ -262,7 +262,7 @@ func _update_plunger(delta: float) -> void:
 		_at_launch_cool = maxf(0.0, _at_launch_cool - delta)
 		if lane_ball != null and _at_launch_cool <= 0.0:
 			_at_launch_cool = 1.5
-			lane_ball.apply_central_impulse(Vector2(0, -randf_range(1450.0, 1750.0)))
+			lane_ball.apply_central_impulse(Vector2(0, -randf_range(1500.0, 1830.0)))
 			Game.emit("launch")
 		hud.set_power(0.0, false)
 		return
@@ -283,7 +283,10 @@ func _update_plunger(delta: float) -> void:
 			# Volle Ladung landet im Streu-Fenster des Bogens: mal haelt der
 			# Ball den Scheitel bis zum Trichter links, mal reisst er ab und
 			# faellt in eine der G-G-E-Z-Gassen, mal kommt er rechts zurueck.
-			var power := (700.0 + 950.0 * charge) * randf_range(0.95, 1.05)
+			# Maximalkraft um 5 Prozent angehoben (voll: 1732 statt 1650),
+			# der Antipp-Wert bleibt bei 700.  Der Zufallsfaktor von plus
+			# minus 5 Prozent sorgt weiter fuer wechselnde Einwurfwege.
+			var power := (700.0 + 1032.0 * charge) * randf_range(0.95, 1.05)
 			lane_ball.apply_central_impulse(Vector2(0, -power))
 			Sfx.play("launch", -4.0)
 			Game.emit("launch")
