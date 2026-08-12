@@ -13,6 +13,14 @@ const SPEED := 22.0
 const RETURN_SPEED := 4.0
 const METAL := Color(0.78, 0.83, 0.92)
 const TIP_X := 78.0
+## Schub des "Solenoids": eine aufliegende Kugel bekommt beim Schlag diesen
+## Stoss quer zum Blatt mit.  Ohne ihn haette eine am Blattansatz liegende
+## Kugel kaum Umfangsgeschwindigkeit und kaeme nicht bis nach oben - aus dem
+## Stand muss der Schlag aber bis zu den G-G-E-Z-Gassen (y = 212) reichen.
+const FLIP_POWER := 2150.0
+## Anteil, den die Kugel am Blattansatz mindestens abbekommt (an der Spitze
+## wirkt der volle Schub - so bleibt die Stelle des Treffers spuerbar).
+const FLIP_BASE := 0.62
 
 var is_left := true
 var rest_deg := 28.0
@@ -21,6 +29,8 @@ var _target := 0.0
 var _held := false
 var _flash := 0.0
 var _art: Node2D
+var _area: Area2D
+var _boost_pending := false
 
 
 func _init(left: bool, pivot: Vector2) -> void:
@@ -66,6 +76,7 @@ func _ready() -> void:
 	area.add_child(acol)
 	add_child(area)
 	area.body_entered.connect(_on_touch)
+	_area = area
 
 
 func _shape_points() -> PackedVector2Array:
@@ -123,6 +134,7 @@ func set_pressed(on: bool) -> void:
 	var new_target := deg_to_rad(pressed_deg if on else rest_deg)
 	if on and new_target != _target:
 		Sfx.play("flip", -8.0)
+		_boost_pending = true
 	_target = new_target
 	_held = on
 
@@ -133,7 +145,41 @@ func _on_touch(body: Node2D) -> void:
 		_art.queue_redraw()
 
 
+## Schlag aus dem Stand: alles, was im Moment des Druecken auf dem Blatt
+## liegt, bekommt einen Stoss quer zum Blatt.  Die reine Drehung reicht
+## dafuer nicht - eine am Ansatz liegende Kugel wuerde kaum wegkommen.
+func _kick_resting_balls() -> void:
+	if _area == null:
+		return
+	if _target == rotation:
+		return
+	# Die Kugel geht quer zum Blatt weg, und zwar so, wie das Blatt in der
+	# Ruhelage steht: schraeg nach oben zur Tischmitte (links nach rechts
+	# oben, rechts nach links oben).  Waere die aktuelle Blattstellung
+	# massgeblich, ginge ein Schlag aus dem gehaltenen Hebel seitwaerts
+	# in den Slingshot statt nach oben.
+	var axis := (Vector2.RIGHT if is_left else Vector2.LEFT).rotated(deg_to_rad(rest_deg))
+	var push := Vector2(axis.y, -axis.x) if is_left else Vector2(-axis.y, axis.x)
+	for b in _area.get_overlapping_bodies():
+		var ball := b as PinBall
+		if ball == null or ball.freeze:
+			continue
+		var arm := ball.global_position - global_position
+		var reach := clampf(arm.length() / TIP_X, 0.0, 1.0)
+		var power := FLIP_POWER * lerpf(FLIP_BASE, 1.0, reach)
+		# Nur so viel zugeben, dass die Kugel auf Solltempo kommt - eine
+		# schon schnell anfliegende Kugel wird dadurch nicht doppelt beschleunigt
+		var have := ball.linear_velocity.dot(push)
+		if have < power:
+			ball.apply_central_impulse(push * (power - have))
+		_flash = 1.0
+		_art.queue_redraw()
+
+
 func _physics_process(delta: float) -> void:
+	if _boost_pending:
+		_boost_pending = false
+		_kick_resting_balls()
 	rotation = move_toward(rotation, _target, (SPEED if _held else RETURN_SPEED) * delta)
 	if _flash > 0.0:
 		_flash = maxf(0.0, _flash - delta * 3.0)
