@@ -37,7 +37,7 @@ const CHAT := {
 	"gameover": ["war bestimmt schoen fuer euch", "gern geschehen und tschuess", "98% waren ihre, wie immer"],
 	"launch": ["da fliegt er", "neuer Ball, gleiche Queen"],
 	"tilt": ["RAGEQUIT lmaooo", "er schuettelt den Tisch, peinlich", "tilt wie im Ranked"],
-	"scoop": ["die Mulde carried", "Taxi zurueck ins Spiel", "Heal? nein. Wurf? ja."],
+	"gate": ["mitten durch lol", "einfach durchgerollt", "Durchlauf. Wie immer sie."],
 	"pocket": ["kurz geparkt lol", "rein und sofort wieder raus", "die Fang-Mulde carried"],
 	"ggez": ["gg ez", "EZ Clap", "vier Gassen, null Gegenwehr"],
 	"ego_level": ["ihr EGO skaliert besser als wir", "x-fach?? okay"],

@@ -85,9 +85,10 @@ static func build(parent: Node2D) -> Dictionary:
 	_wall(parent, inlane_r, NEON_CYAN)
 	parent.add_child(EdgeStructure.new(inlane_l, -1.0, NEON_CYAN, 18.0, 40.0))
 	parent.add_child(EdgeStructure.new(inlane_r, 1.0, NEON_CYAN, 18.0, 40.0))
-	# Hoerner der Mulde (Trichter unter dem S-Bumper); blitzen bei Beruehrung
-	_wall(parent, [Vector2(215, 455), Vector2(227, 492)], NEON_GOLD, false, false, true)
-	_wall(parent, [Vector2(275, 455), Vector2(263, 492)], NEON_GOLD, false, false, true)
+	# Hoerner des Durchlaufs unter dem S-Bumper.  Sie blinken, wenn der
+	# Durchlauf fuer eine Sonderfunktion gebraucht wird (siehe PassGate).
+	var horn_l := _wall(parent, [Vector2(215, 455), Vector2(227, 492)], NEON_GOLD)
+	var horn_r := _wall(parent, [Vector2(275, 455), Vector2(263, 492)], NEON_GOLD)
 	# Hoerner der Fang-Mulden beidseitig: leiten die Seitenlaeufe in die Schalen
 	_wall(parent, [Vector2(408, 576), Vector2(421, 602)], NEON_GOLD, false, false, true)
 	_wall(parent, [Vector2(468, 572), Vector2(455, 598)], NEON_GOLD, false, false, true)
@@ -250,8 +251,13 @@ static func build(parent: Node2D) -> Dictionary:
 			ggez.append(r)
 	refs["ggez"] = ggez
 
-	# Mulde in der Mitte (schwarzes Loch der Vorlage)
-	parent.add_child(Scoop.new(Vector2(245, 505)))
+	# Durchlauf in der Mitte statt der frueheren Mulde: die Kugel rollt
+	# zwischen den Hoernern hindurch, gefangen wird sie nicht mehr.
+	var gate := PassGate.new(Vector2(245, 500))
+	gate.watch_horn(horn_l)
+	gate.watch_horn(horn_r)
+	parent.add_child(gate)
+	refs["gate"] = gate
 
 	# Fang-Mulden an beiden Seitenlaeufen: kurz fangen, sofort zurueck ins Feld
 	parent.add_child(SidePocket.new(Vector2(438, 612), -1.0))
@@ -310,8 +316,10 @@ static func _arch_points() -> Array:
 ## rund verschliffen - das gibt den kantigen Look der Vorlage.
 ## `hidden` baut nur die Kollision, ohne Linie - fuer Banden, deren Optik ein
 ## darueberliegendes Element traegt.
+## Gibt die helle Kantenlinie zurueck (null bei `hidden`) - daran koennen
+## Elemente wie das Muldentor ihre Blink-Animation haengen.
 static func _wall(parent: Node2D, pts: Array, color: Color, sharp: bool = false,
-		hidden: bool = false, flash: bool = false) -> void:
+		hidden: bool = false, flash: bool = false) -> Line2D:
 	var body := StaticBody2D.new()
 	var pm := PhysicsMaterial.new()
 	pm.bounce = 0.28
@@ -330,7 +338,7 @@ static func _wall(parent: Node2D, pts: Array, color: Color, sharp: bool = false,
 	var packed := PackedVector2Array(pts)
 
 	if hidden:
-		return
+		return null
 
 	# Schlagschatten leicht versetzt - hebt die Bande vom Untergrund ab
 	var shadow := Line2D.new()
@@ -389,6 +397,7 @@ static func _wall(parent: Node2D, pts: Array, color: Color, sharp: bool = false,
 			node.position = pts[i]
 			node.color = Color(color.r, color.g, color.b, 0.95)
 			parent.add_child(node)
+	return line
 
 
 ## Dickes Kapsel-Band entlang einer Polylinie - die Optik der Inlane-

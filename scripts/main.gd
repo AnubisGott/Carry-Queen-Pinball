@@ -31,6 +31,7 @@ var flipper_l: Flipper
 var flipper_r: Flipper
 var throne: Throne
 var plunger: Plunger
+var gate: PassGate
 var drops: Array = []
 var standups: Array = []
 var ggez: Array = []
@@ -91,6 +92,7 @@ func _ready() -> void:
 	bumpers = refs.get("bumpers", {})
 	throne = refs.get("throne", null)
 	plunger = refs["plunger"]
+	gate = refs.get("gate", null)
 	if throne:
 		throne.captured.connect(_on_throne_captured)
 	_make_drain()
@@ -278,6 +280,9 @@ func _update_plunger(delta: float) -> void:
 
 
 func _update_timers(delta: float) -> void:
+	# Der Durchlauf blinkt nur, wenn er gerade gebraucht wird
+	if gate:
+		gate.set_armed(hurry_active or Game.wizard)
 	# Carry-Save laeuft nach SAVE_WINDOW Sekunden ab - danach haelt sie nichts
 	# mehr, kommentiert es aber gerne.
 	if Game.ball_save_armed and save_time > 0.0:
@@ -326,7 +331,7 @@ func _cleanup_lost_balls() -> void:
 
 
 func _on_event(kind: String, data: Dictionary) -> void:
-	if autotest and kind in ["spinner", "scoop", "save", "pocket", "ggez",
+	if autotest and kind in ["spinner", "gate", "save", "pocket", "ggez",
 			"rollover", "standup"]:
 		print("AUTOTEST event %s%s t=%.1f ball=%d" % [kind,
 				(" " + str(data["letter"])) if data.has("letter") else "",
@@ -347,16 +352,15 @@ func _on_event(kind: String, data: Dictionary) -> void:
 			_check_ggez()
 		"all_disciplines":
 			_start_wizard()
-		"scoop":
+		"gate":
 			if Game.wizard:
-				# Mega-Jackpot des Wizard-Modus - fruener am Thron, seit
-				# dessen Abriss zahlt ihn die Mulde aus.
+				# Mega-Jackpot des Wizard-Modus - dafuer blinkt der Durchlauf
 				var mega := Game.add_score(20000)
 				hud.show_message("MEGA-JACKPOT!", "+" + Hud.fmt(mega), 2.0)
 				Sfx.play("jackpot")
 				Game.emit("jackpot")
 			elif hurry_active:
-				# Hurry-Up wird seit dem Thron-Abriss an der Mulde abgeholt
+				# Hurry-Up wird am blinkenden Durchlauf abgeholt
 				var pts := Game.add_score(hurry_value)
 				_end_hurry()
 				Game.discipline_done("ICH")
@@ -364,8 +368,6 @@ func _on_event(kind: String, data: Dictionary) -> void:
 				Sfx.play("jackpot")
 				Sfx.say("beste")
 				Game.emit("jackpot")
-			else:
-				hud.show_message("ZURUECK INS SPIEL.", "Gern geschehen.", 1.8)
 
 
 func _on_bumper(letter: String) -> void:
