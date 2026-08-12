@@ -327,6 +327,9 @@ func _update_timers(delta: float) -> void:
 			d.set_pulsing(frenzy_time > 0.0, hektik)
 		if frenzy_time <= 0.0:
 			Game.frenzy = false
+			# Bank wieder aufstellen: dunkel und damit erneut abraeumbar
+			for d in drops:
+				d.reset()
 			hud.show_sub("Frenzy vorbei. " + spott(), 1.8)
 	if Game.wizard:
 		wizard_time -= delta
