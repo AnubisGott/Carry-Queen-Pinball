@@ -60,6 +60,9 @@ var save_time := 0.0
 var _ich_done := false
 var _ego_done := false
 
+## Test-Hilfe: Strg+Umschalt+G schaltet unendlich viele Baelle ein.
+var god_mode := false
+
 var frenzy_time := 0.0
 var wizard_time := 0.0
 var wizard_line_time := 0.0
@@ -153,6 +156,15 @@ func _input(event: InputEvent) -> void:
 	if event.is_pressed() and (event is InputEventKey
 			or event is InputEventMouseButton or event is InputEventScreenTouch):
 		_wake()
+	# God-Modus zum Testen: Strg + Umschalt + G
+	if event is InputEventKey and event.pressed and not event.echo \
+			and event.keycode == KEY_G and event.ctrl_pressed and event.shift_pressed:
+		god_mode = not god_mode
+		hud.set_god(god_mode)
+		hud.show_message("GOD-MODUS " + ("AN" if god_mode else "AUS"),
+				"Unendlich Baelle." if god_mode else "Wieder drei Baelle.", 2.0)
+		get_viewport().set_input_as_handled()
+		return
 	if event is InputEventScreenTouch:
 		# Tippen in der Chat-Spalte rechts steuert nichts
 		if event.position.x >= Table.FIELD_W:
@@ -344,9 +356,16 @@ func _cleanup_lost_balls() -> void:
 
 func _on_event(kind: String, data: Dictionary) -> void:
 	if autotest and kind in ["spinner", "gate", "save", "pocket", "ggez",
-			"rollover", "standup"]:
-		print("AUTOTEST event %s%s t=%.1f ball=%d" % [kind,
-				(" " + str(data["letter"])) if data.has("letter") else "",
+			"rollover", "standup", "kill", "frenzy", "wizard", "multiball",
+			"jackpot", "discipline", "all_disciplines", "ego_level", "tilt"]:
+		var extra := ""
+		if data.has("letter"):
+			extra = " " + str(data["letter"])
+		elif data.has("name"):
+			extra = " " + str(data["name"])
+		elif data.has("mult"):
+			extra = " x" + str(data["mult"])
+		print("AUTOTEST event %s%s t=%.1f ball=%d" % [kind, extra,
 				_at_pulses * 0.4, Game.ball_number])
 	match kind:
 		"launch":
@@ -665,7 +684,10 @@ func _after_drain() -> void:
 	Sfx.play("drain", -2.0)
 	Sfx.say("kein_skill")
 	Game.emit("drain")
-	if Game.ball_number >= Game.balls_per_game:
+	if god_mode:
+		# Ball kostenlos nachlegen, die Ballnummer bleibt stehen
+		_start_ball()
+	elif Game.ball_number >= Game.balls_per_game:
 		_game_over()
 	else:
 		# Naechster Ball wird automatisch rechts unten eingelegt

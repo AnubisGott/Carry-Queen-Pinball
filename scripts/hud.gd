@@ -56,6 +56,7 @@ var _score_label: Label
 var _ego_label: Label
 var _ball_label: Label
 var _save_label: Label
+var _god_label: Label
 var _disc_labels := {}
 var _chat_vbox: VBoxContainer
 var _msg_label: Label
@@ -125,6 +126,8 @@ func _build_bar() -> void:
 	_ego_label = _label("EGO x1", Vector2(10, 28), 16, GREEN, bar)
 	_ball_label = _label("BALL 1/3", Vector2(10, 52), 12, Color(0.8, 0.8, 0.9), bar)
 	_save_label = _label("CARRY-SAVE ●", Vector2(10, 68), 10, GREEN, bar)
+	_god_label = _label("GOD", Vector2(78, 50), 13, GOLD, bar)
+	_god_label.visible = false
 	var disc_names := {"DAMAGE": "DMG", "EGO": "EGO", "CARRY": "CARRY", "ICH": "ICH"}
 	var xs := {"DAMAGE": 285, "EGO": 330, "CARRY": 375, "ICH": 432}
 	for k in disc_names:
@@ -137,6 +140,11 @@ func _build_bar() -> void:
 	_wizard_bar.visible = false
 	bar.add_child(_wizard_bar)
 	_try_avatar(bar)
+
+
+## Kennzeichnung fuer den God-Modus (unendlich Baelle).
+func set_god(on: bool) -> void:
+	_god_label.visible = on
 
 
 ## Wizard-Modus anzeigen: `frac` ist die verbleibende Zeit (1 = voll).

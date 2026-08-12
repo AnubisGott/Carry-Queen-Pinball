@@ -53,7 +53,9 @@ static func build(parent: Node2D) -> Dictionary:
 	# Segmente tunnelt auch ein sehr schneller Ball nicht mehr hindurch.
 	_wall(parent, [Vector2(DIVIDER, 960), Vector2(DIVIDER, 300)], NEON_VIOLET)
 	_wall(parent, [Vector2(466, 960), Vector2(466, 300)], NEON_VIOLET, false, true)
-	_wall(parent, [Vector2(DIVIDER, 305), Vector2(445, 335)], NEON_VIOLET)
+	# (Der schraege Abweiser am Bahnkopf ist entfallen: mit dem obersten
+	# EGO-Target darunter bildete er eine Tasche, in der die Kugel haengen
+	# blieb.  Den Abschuss lenkt ohnehin der Aussenbogen nach links.)
 	_wall(parent, [Vector2(DIVIDER, 935), Vector2(RIGHT, 935)], NEON_VIOLET)
 	# Leitplanke oben links nach der roten Linie des Nutzers: Kuppe mit
 	# Scheitel bei x=140, flacher Mittelteil.  Sie endet exakt im
