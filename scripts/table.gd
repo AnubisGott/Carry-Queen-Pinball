@@ -117,10 +117,8 @@ static func build(parent: Node2D) -> Dictionary:
 	var arch_edge := EdgeStructure.new(_arch_points(), -1.0, NEON_CYAN, 26.0, 60.0)
 	arch_edge.skip_at = [252.0, 348.0]
 	parent.add_child(arch_edge)
-	# Startversatz 190 statt 46: die Beschlaege sitzen damit unterhalb der
-	# Standup-Bank in der freien Wandstrecke statt quer auf den Targets.
 	parent.add_child(EdgeStructure.new(
-			[Vector2(LEFT, 330), Vector2(LEFT, 760)], 1.0, NEON_CYAN, 24.0, 190.0))
+			[Vector2(LEFT, 330), Vector2(LEFT, 760)], 1.0, NEON_CYAN, 24.0, 46.0))
 	# Rechts laeuft das Cyan-Band wie links ganz aussen herum und biegt in die
 	# Ecke ab - nicht diagonal durchs Feld.
 	parent.add_child(EdgeStructure.new(
@@ -132,12 +130,8 @@ static func build(parent: Node2D) -> Dictionary:
 	# Rechte Seite exakt spiegelbildlich zur linken.  Spiegelachse ist x=245,
 	# die Mitte zwischen linker Bande (20) und Trennwand (470):
 	#   20 -> 470 | 58 -> 432 | 128 -> 362 | 210 -> 280
-	# Rechts genauso; der Beschlag bei Bogenlaenge 286 entfaellt, dort sitzt
-	# die Fang-Mulde.
-	var div_edge := EdgeStructure.new(
-			[Vector2(DIVIDER, 330), Vector2(DIVIDER, 760)], -1.0, NEON_CYAN, 24.0, 190.0)
-	div_edge.skip_at = [286.0]
-	parent.add_child(div_edge)
+	parent.add_child(EdgeStructure.new(
+			[Vector2(DIVIDER, 330), Vector2(DIVIDER, 760)], -1.0, NEON_CYAN, 24.0, 46.0))
 	parent.add_child(EdgeStructure.new(
 			[Vector2(DIVIDER, 760), Vector2(DIVIDER, 838), Vector2(432, 904),
 				Vector2(362, 946), Vector2(280, 958)], -1.0, NEON_CYAN, 22.0, 30.0))
@@ -196,7 +190,7 @@ static func build(parent: Node2D) -> Dictionary:
 	var standups := []
 	var ich := ["I", "C", "H"]
 	for i in 3:
-		var s := Standup.new(Vector2(31, 370 + i * 60), ich[i])
+		var s := Standup.new(Vector2(31, 310 + i * 60), ich[i])
 		parent.add_child(s)
 		standups.append(s)
 	refs["standups"] = standups
@@ -209,7 +203,7 @@ static func build(parent: Node2D) -> Dictionary:
 	if FEATURE_EGO:
 		var ego_letters := ["E", "G", "O"]
 		for i in 3:
-			var e := Standup.new(Vector2(459, 370 + i * 60), ego_letters[i], 180.0)
+			var e := Standup.new(Vector2(459, 310 + i * 60), ego_letters[i], 180.0)
 			parent.add_child(e)
 			ego_bank.append(e)
 	refs["ego_bank"] = ego_bank
@@ -266,10 +260,8 @@ static func build(parent: Node2D) -> Dictionary:
 	refs["plunger"] = plunger
 	parent.add_child(TableDeco.new("star", Vector2(218, 705), Color(1.6, 1.5, 1.2)))
 	parent.add_child(TableDeco.new("star", Vector2(322, 668), Color(1.6, 1.5, 1.2), 0.7))
-	# Kometen tiefer gesetzt: sie sassen den nach unten gerueckten Standup-
-	# Baenken im Weg.
-	parent.add_child(TableDeco.new("comet", Vector2(38, 550), NEON_GOLD, 1.0, 15.0))
-	parent.add_child(TableDeco.new("comet", Vector2(452, 550), NEON_GOLD, 1.0, -15.0))
+	parent.add_child(TableDeco.new("comet", Vector2(38, 540), NEON_GOLD, 1.0, 15.0))
+	parent.add_child(TableDeco.new("comet", Vector2(445, 500), NEON_GOLD, 1.0, -15.0))
 	parent.add_child(TableDeco.new("saturn", Vector2(82, 475), NEON_GOLD))
 	parent.add_child(TableDeco.new("arrow", Vector2(375, 520), NEON_CYAN, 1.0, -35.0))
 	# Lane-Pfeile: blinken, solange ein Ball abschussbereit ist (main.gd)
