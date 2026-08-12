@@ -40,7 +40,7 @@ func _on_enter(body: Node2D) -> void:
 	# abwaerts (nicht quer) unterwegs sein und darf nicht rasen.  Sonst
 	# schluckt die Mulde auch Kugeln, die gerade erst vom Flipper kommen.
 	var v: Vector2 = body.linear_velocity
-	if v.y < 30.0 or v.y < absf(v.x) * 0.8 or v.length() > 780.0:
+	if v.y < 30.0 or v.y < absf(v.x) * 0.8 or v.length() > 1250.0:
 		return
 	_busy = true
 	queue_redraw()
