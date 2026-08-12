@@ -50,7 +50,6 @@ var charging := false
 var _crank_step := 0
 
 var streak_letters := {}
-var _streak_done := false
 
 var hurry_active := false
 var hurry_value := 0
@@ -383,19 +382,27 @@ func _on_bumper(letter: String) -> void:
 	streak_letters[letter] = true
 	# Keine 6-Sekunden-Regel: die Markierungen bleiben bis zum Ballverlust.
 	# Der Kill zuendet beim vierten Bumper genau einmal pro Ball.
-	if streak_letters.size() >= 4 and not _streak_done and not hurry_active:
-		_streak_done = true
+	if streak_letters.size() >= 4:
+		# Serie sofort wieder freigeben - ein Kill ist beliebig oft pro Ball
+		# moeglich.
+		streak_letters.clear()
 		Game.kills += 1
 		var pts := Game.add_score(3000)
-		Sfx.play("mode", -3.0)
+		# Der Kill ist die einzige Quelle fuer den Ego-Multiplikator.
+		Game.ego_level_up()
+		Sfx.play("ego_up", -3.0)
 		Game.emit("kill")
-		# Die volle W-A-S-D-Serie startet das Hurry-Up; kassiert wird es am
-		# blinkenden Durchlauf in der Mitte (siehe _on_event "gate").
-		hurry_active = true
-		hurry_value = 25000
-		hurry_time = 12.0
-		hud.show_message("KILL BESTAETIGT (%d)" % Game.kills,
-				"Hurry-Up: ab durch die MITTE! +" + Hud.fmt(pts), 2.5)
+		if hurry_active:
+			hud.show_message("KILL BESTAETIGT (%d)" % Game.kills,
+					"EGO x%d. +%s" % [Game.ego_mult, Hud.fmt(pts)], 2.2)
+		else:
+			# Zusaetzlich startet die Serie das Hurry-Up; kassiert wird es am
+			# blinkenden Durchlauf in der Mitte (siehe _on_event "gate").
+			hurry_active = true
+			hurry_value = 25000
+			hurry_time = 12.0
+			hud.show_message("KILL BESTAETIGT (%d)" % Game.kills,
+					"EGO x%d - Hurry-Up: ab durch die MITTE!" % Game.ego_mult, 2.5)
 	_update_bumper_marks()
 
 
@@ -420,18 +427,17 @@ func _check_bank() -> void:
 	# Die volle Bank bleibt bis zum Ballverlust an (Reset in _start_ball)
 
 
-## E-G-O komplett: der Multiplikator steigt um eine Stufe, die Bank stellt
-## sich danach wieder auf.
+## E-G-O komplett: reine Punktebank, der Multiplikator kommt allein aus der
+## Kill-Serie.  Die Bank stellt sich danach wieder auf.
 func _check_ego_bank() -> void:
 	if ego_bank.is_empty():
 		return
 	for s in ego_bank:
 		if not s.lit:
 			return
-	Game.ego_level_up()
-	Game.add_score(2500)
-	Sfx.play("ego_up", -2.0)
-	hud.show_message("E-G-O KOMPLETT.", "EGO x%d. Skaliert. Natuerlich." % Game.ego_mult, 2.2)
+	var pts := Game.add_score(2500)
+	Sfx.play("jackpot", -6.0)
+	hud.show_message("E-G-O KOMPLETT.", "+" + Hud.fmt(pts), 2.0)
 	await get_tree().create_timer(1.0, false).timeout
 	for s in ego_bank:
 		s.reset()
@@ -490,13 +496,9 @@ func _check_ich() -> void:
 	hud.show_message("ICH. WER SONST.", "+" + Hud.fmt(pts), 2.2)
 
 
-## Hurry-Up beendet - ob kassiert oder abgelaufen.  Die Bumper-Serie wird
-## freigegeben, damit man es erneut starten kann.
+## Hurry-Up beendet - ob kassiert oder abgelaufen.
 func _end_hurry() -> void:
 	hurry_active = false
-	streak_letters.clear()
-	_streak_done = false
-	_update_bumper_marks()
 
 
 func _on_throne_captured(ball: PinBall) -> void:
@@ -755,7 +757,6 @@ func _restart() -> void:
 	if throne:
 		throne.release_ready()
 	streak_letters.clear()
-	_streak_done = false
 	_update_bumper_marks()
 	hurry_active = false
 	frenzy_time = 0.0
@@ -780,7 +781,6 @@ func _start_ball(first: bool = false) -> void:
 	# Ballwechsel.  Der EGO-Multiplikator bleibt dagegen ueber das ganze
 	# Spiel stehen.
 	streak_letters.clear()
-	_streak_done = false
 	_update_bumper_marks()
 	for d in drops:
 		d.reset()
