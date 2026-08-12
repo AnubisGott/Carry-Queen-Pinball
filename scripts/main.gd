@@ -57,6 +57,8 @@ var hurry_value := 0
 var hurry_time := 0.0
 
 var save_time := 0.0
+## I-C-H gibt es nur einmal pro Ball
+var _ich_done := false
 
 var frenzy_time := 0.0
 var wizard_time := 0.0
@@ -472,20 +474,20 @@ func _start_ggez_multiball() -> void:
 		_spawn_ball(Vector2(270, 185), false, Vector2(randf_range(-60, 60), 300))
 
 
-## I-C-H komplett: zaehlt sofort als Disziplin, die Bank stellt sich danach
-## wieder auf.
+## I-C-H komplett: zaehlt sofort als Disziplin.  Die Bank bleibt danach
+## stehen und laesst sich erst mit dem naechsten Ball erneut abraeumen.
 func _check_ich() -> void:
+	if _ich_done:
+		return
 	for s in standups:
 		if not s.lit:
 			return
+	_ich_done = true
 	var pts := Game.add_score(5000)
 	Game.discipline_done("ICH")
 	Sfx.play("jackpot", -4.0)
 	Sfx.say("beste")
 	hud.show_message("ICH. WER SONST.", "+" + Hud.fmt(pts), 2.2)
-	await get_tree().create_timer(1.0, false).timeout
-	for s in standups:
-		s.reset()
 
 
 ## Hurry-Up beendet - ob kassiert oder abgelaufen.  Die Bumper-Serie wird
@@ -586,6 +588,8 @@ func _start_wizard() -> void:
 func _end_wizard() -> void:
 	Game.wizard = false
 	hud.set_wizard(false)
+	# Neue Runde fuer die Disziplinen - auch I-C-H ist wieder frei
+	_ich_done = false
 	Game.reset_disciplines()
 	for d in drops:
 		d.reset()
@@ -772,13 +776,17 @@ func _start_ball(first: bool = false) -> void:
 	Game.damage_points = 0
 	Game.tilted = false
 	nudge_heat = 0.0
-	# Kill-Serie und volle DAMAGE-Bank erloeschen beim Ballwechsel.  Der
-	# EGO-Multiplikator bleibt dagegen ueber das ganze Spiel stehen.
+	# Kill-Serie, volle DAMAGE-Bank und die I-C-H-Bank erloeschen beim
+	# Ballwechsel.  Der EGO-Multiplikator bleibt dagegen ueber das ganze
+	# Spiel stehen.
 	streak_letters.clear()
 	_streak_done = false
 	_update_bumper_marks()
 	for d in drops:
 		d.reset()
+	for s in standups:
+		s.reset()
+	_ich_done = false
 	plunger.release()
 	Game.emit("save_armed")
 	_spawn_ball(SPAWN)
