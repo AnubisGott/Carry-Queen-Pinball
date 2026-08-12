@@ -1,8 +1,8 @@
 class_name Bumper
 extends StaticBody2D
-## Pop-Bumper im RGB-Tastatur-Look.  `letter` ist die interne Kennung
-## (W/A/S/D - steuert Klang und Kill-Serie), `label` der aufgedruckte
-## Buchstabe.  Aufgedruckt steht K-I-L-L.
+## Pop-Bumper im RGB-Tastatur-Look (W / A / S / D).  `letter` ist die
+## Kennung fuer Klang und Kill-Serie, `label` der aufgedruckte Buchstabe -
+## normalerweise derselbe.
 
 const RADIUS := 30.0
 const KICK := 620.0

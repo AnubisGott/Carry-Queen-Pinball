@@ -181,12 +181,10 @@ static func build(parent: Node2D) -> Dictionary:
 	# WASD-Bumper auf dem Pad, S liegt tiefer und fuettert die Mulde.
 	# Die ganze Mittelgruppe steht auf der Spielfeld-Mittelachse x=245
 	# (Mitte zwischen linker Bande und Trennwand), nicht auf der Bogenmitte.
-	# Aufgedruckt steht K-I-L-L (links, oben, rechts, unten); die Kennungen
-	# W/A/S/D bleiben intern fuer Klang und Kill-Serie.
 	var bumpers := {}
-	for b in [["A", Vector2(150, 350), "K"], ["W", Vector2(245, 300), "I"],
-			["D", Vector2(340, 350), "L"], ["S", Vector2(245, 395), "L"]]:
-		var bu := Bumper.new(b[1], b[0], b[2])
+	for b in [["W", Vector2(245, 300)], ["A", Vector2(150, 350)],
+			["D", Vector2(340, 350)], ["S", Vector2(245, 395)]]:
+		var bu := Bumper.new(b[1], b[0])
 		parent.add_child(bu)
 		bumpers[b[0]] = bu
 	refs["bumpers"] = bumpers
