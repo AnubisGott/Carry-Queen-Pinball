@@ -5,9 +5,20 @@ extends StaticBody2D
 const W := 10.0
 const H := 34.0
 
+## Solange das Target leuchtet, wandert seine Innenfarbe langsam durch die
+## Neonfarben des Tisches - sonst haelt man die stehenden Schalter fuer Deko.
+const LIT_CYCLE := [
+	Color(0.04, 0.34, 0.40),
+	Color(0.38, 0.07, 0.23),
+	Color(0.25, 0.10, 0.44),
+	Color(0.42, 0.07, 0.10),
+]
+const CYCLE_TIME := 2.6
+
 var letter := "I"
 var lit := false
 var _cool := 0.0
+var _cycle_t := 0.0
 
 
 func _init(pos: Vector2, l: String, rot_deg: float = 0.0) -> void:
@@ -35,12 +46,21 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	_cool = maxf(0.0, _cool - delta)
+	if lit:
+		_cycle_t += delta
+		queue_redraw()
 
 
 func _draw() -> void:
 	var r := Rect2(-W / 2, -H / 2, W, H)
 	var col := Color(0.18, 1.5, 0.95) if lit else Color(0.1, 0.5, 0.4)
-	draw_rect(r, Color(0.03, 0.09, 0.08))
+	var bg := Color(0.03, 0.09, 0.08)
+	if lit:
+		# Langsamer Durchlauf durch die Neonfarben Cyan, Pink, Lila, Rot
+		var f := fmod(_cycle_t / CYCLE_TIME, float(LIT_CYCLE.size()))
+		var i := int(f)
+		bg = LIT_CYCLE[i].lerp(LIT_CYCLE[(i + 1) % LIT_CYCLE.size()], f - i)
+	draw_rect(r, bg)
 	draw_rect(r, col, false, 2.0)
 	# Buchstabe bleibt aufrecht, auch wenn das Target gedreht montiert ist
 	var f := ThemeDB.fallback_font

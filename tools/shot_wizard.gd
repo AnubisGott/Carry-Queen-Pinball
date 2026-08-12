@@ -20,6 +20,19 @@ func _ready() -> void:
 	var main := MAIN.instantiate()
 	add_child(main)
 	await get_tree().create_timer(1.0).timeout
+	if "--banks" in OS.get_cmdline_user_args():
+		# I-C-H und E-G-O anzuenden und den Farbwechsel ueber mehrere
+		# Aufnahmen festhalten
+		for s in main.standups:
+			s.lit = true
+		for s in main.ego_bank:
+			s.lit = true
+		for i in 4:
+			await get_tree().create_timer(1.3).timeout
+			await _shot("bank_%d" % (i + 1))
+		print("screenshots -> ", out_dir)
+		get_tree().quit()
+		return
 	if "--frenzy" in OS.get_cmdline_user_args():
 		# DAMAGE-Bank fallen lassen und die Frenzy anwerfen
 		for d in main.drops:
