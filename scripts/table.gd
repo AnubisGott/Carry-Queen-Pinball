@@ -76,12 +76,12 @@ static func build(parent: Node2D) -> Dictionary:
 	# Inlane-Fuehrungen als Winkel, gebaut wie die Aussenbanden: Leuchtkante
 	# als Lauflaeche, dahinter das Blechband mit Schellen (Rand-Material).
 	# Das Schraegstueck liegt auf der Achse des ruhenden Flippers
-	# (y = 850 - (160-x) * tan 28 Grad), damit Fuehrung und Flipperblatt eine
+	# (y = 846 - (146-x) * tan 20 Grad), damit Fuehrung und Flipperblatt eine
 	# durchgehende Linie bilden.  Die unteren Enden ueberlappen den
 	# Schwenkkreis der hinteren Flipper-Ecke - sonst bildet sich dort je nach
 	# Flipperstellung eine Kerbe, in der die Kugel liegen bleibt.
-	var inlane_l := [Vector2(86, 679), Vector2(86, 811), Vector2(148, 844)]
-	var inlane_r := [Vector2(404, 679), Vector2(404, 811), Vector2(342, 844)]
+	var inlane_l := [Vector2(86, 679), Vector2(86, 824), Vector2(146, 846)]
+	var inlane_r := [Vector2(404, 679), Vector2(404, 824), Vector2(344, 846)]
 	# Rein passive Banden: kein Abstoss, kein Aufleuchten bei Beruehrung.
 	_wall(parent, inlane_l, NEON_CYAN)
 	_wall(parent, inlane_r, NEON_CYAN)
@@ -158,12 +158,12 @@ static func build(parent: Node2D) -> Dictionary:
 	# Drehpunkte 16 Einheiten tiefer als die Inlane-Fuehrung endet: so faellt
 	# die Kugel vom Schraegstueck auf das Blatt, statt in der Kerbe zwischen
 	# Fuehrungsende und hinterer Flipper-Ecke liegen zu bleiben.
-	# Drehpunkte wieder weiter aussen: zwischen den Blattspitzen bleiben 32
-	# Einheiten, die Kugel faellt dort also durch.  Dafuer sitzt die
+	# Drehpunkte weit genug aussen: bei 20 Grad Ruhewinkel bleiben zwischen
+	# den Blattspitzen 31 Einheiten, die Kugel faellt dort also durch.  Dafuer sitzt die
 	# Blattwurzel dicht am Ende der Inlane-Fuehrung, sodass dazwischen keine
 	# Luecke klafft, durch die die Kugel verschwinden koennte.
-	var fl := Flipper.new(true, Vector2(160, 866))
-	var fr := Flipper.new(false, Vector2(330, 866))
+	var fl := Flipper.new(true, Vector2(156, 866))
+	var fr := Flipper.new(false, Vector2(334, 866))
 	parent.add_child(fl)
 	parent.add_child(fr)
 	refs["flipper_l"] = fl

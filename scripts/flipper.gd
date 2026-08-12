@@ -1,4 +1,4 @@
-﻿class_name Flipper
+class_name Flipper
 extends AnimatableBody2D
 ## Flipperfinger, kinematisch rotiert (sync_to_physics schiebt die Kugel).
 ##
@@ -20,12 +20,16 @@ const TIP_X := 78.0
 const FLIP_POWER := 2150.0
 ## Anteil, den die Kugel am Blattansatz mindestens abbekommt (an der Spitze
 ## wirkt der volle Schub - so bleibt die Stelle des Treffers spuerbar).
-const FLIP_BASE := 0.62
+const FLIP_BASE := 0.66
 ## Abschusswinkel ueber der Waagerechten, zur Tischmitte hin.  Am Blattansatz
-## steil (geht aufs Oberfeld zu den G-G-E-Z-Gassen), an der Spitze flacher
+## steil (geht aufs Oberfeld zu den G-G-E-Z-Gassen), an der Spitze flach
 ## (der klassische Querschuss auf die gegenueberliegende Seite).
-const FLIP_ANGLE_BASE := 72.0
-const FLIP_ANGLE_TIP := 60.0
+const FLIP_ANGLE_BASE := 74.0
+const FLIP_ANGLE_TIP := 52.0
+## Auf dem gehaltenen Hebel liegt die Kugel rund 25 px vom Drehpunkt weg -
+## das ist der Ansatz.  Erst ab da faechert der Treffpunkt auf, sonst waere
+## der Unterschied zwischen Ansatz und Spitze im Spiel nicht zu spueren.
+const ARM_BASE := 25.0
 
 var is_left := true
 var rest_deg := 28.0
@@ -43,12 +47,16 @@ var _boost_left := 0.0
 func _init(left: bool, pivot: Vector2) -> void:
 	is_left = left
 	position = pivot
+	# Flacher Ruhewinkel: die Kugel liegt auf dem Blatt wie auf einem Brett
+	# statt sofort zur Spitze zu rutschen, und der Schlag traegt weiter nach
+	# oben.  Damit zwischen den Blattspitzen weiterhin eine Kugel durchfaellt,
+	# stehen die Drehpunkte entsprechend weiter aussen (siehe table.gd).
 	if left:
-		rest_deg = 28.0
-		pressed_deg = -32.0
+		rest_deg = 20.0
+		pressed_deg = -34.0
 	else:
-		rest_deg = -28.0
-		pressed_deg = 32.0
+		rest_deg = -20.0
+		pressed_deg = 34.0
 	rotation = deg_to_rad(rest_deg)
 	_target = rotation
 
@@ -170,7 +178,7 @@ func _kick_resting_balls() -> bool:
 		if ball == null or ball.freeze:
 			continue
 		var arm := ball.global_position - global_position
-		var reach := clampf(arm.length() / TIP_X, 0.0, 1.0)
+		var reach := clampf((arm.length() - ARM_BASE) / (TIP_X - ARM_BASE), 0.0, 1.0)
 		var deg := lerpf(FLIP_ANGLE_BASE, FLIP_ANGLE_TIP, reach)
 		var push := Vector2(cos(deg_to_rad(deg)) * side, -sin(deg_to_rad(deg)))
 		var power := FLIP_POWER * lerpf(FLIP_BASE, 1.0, reach)
@@ -192,3 +200,7 @@ func _physics_process(delta: float) -> void:
 	if _flash > 0.0:
 		_flash = maxf(0.0, _flash - delta * 3.0)
 		_art.queue_redraw()
+
+
+
+

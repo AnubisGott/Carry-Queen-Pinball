@@ -6,15 +6,15 @@
 ##   godot --headless --path . res://tools/diag_flip.tscn [-- --cradle]
 
 const MAIN := preload("res://scenes/main.tscn")
-const PIVOT := Vector2(160, 866)
+const PIVOT := Vector2(156, 866)
 
 ## Ablagen: [Name, Ort, erst zur Ruhe kommen lassen?].  Auf dem gehaltenen
 ## Hebel rutscht die Kugel immer zum Ansatz - Blattmitte und Spitze werden
 ## deshalb direkt aufgelegt und sofort geschlagen.
 const DROPS := [
 	["Inlane", Vector2(100, 700), true],
-	["Blattmitte", Vector2(188, 817), false],
-	["Blattspitze", Vector2(215, 808), false],
+	["Blattmitte", Vector2(186, 821), false],
+	["Blattspitze", Vector2(203, 811), false],
 ]
 
 var _cradle := false
