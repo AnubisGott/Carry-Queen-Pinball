@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://h1diagkill01"]
+
+[ext_resource type="Script" path="res://tools/diag_kill.gd" id="1"]
+
+[node name="DiagKill" type="Node"]
+script = ExtResource("1")
+

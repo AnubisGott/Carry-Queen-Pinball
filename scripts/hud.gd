@@ -21,7 +21,7 @@ const CHAT_USERS := ["xX_NoScope_Xx", "HealPlsThx", "TeamPlayer04", "OP_Fanboy88
 const USER_COLORS := [Color(1.0, 0.35, 0.7), Color(0.4, 0.9, 0.4), Color(0.35, 0.8, 0.95), Color(0.95, 0.75, 0.25), Color(0.75, 0.55, 0.95), Color(0.95, 0.55, 0.35)]
 
 const CHAT := {
-	"bumper": ["WASD spam lol", "POG", "schneller als mein Ping", "W = Content"],
+	"bumper": ["kill spam lol", "POG", "schneller als mein Ping", "K-I-L-L, ganz subtil"],
 	"sling": ["die Schulterpolster leben", "autsch", "F"],
 	"spinner": ["OP OP OP", "clip it!!", "der Spinner dreht durch"],
 	"drop_target": ["DAMAGE geht hoch", "tank diff", "98% dmg incoming"],

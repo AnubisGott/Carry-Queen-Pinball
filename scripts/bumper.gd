@@ -1,11 +1,14 @@
 class_name Bumper
 extends StaticBody2D
-## Pop-Bumper im RGB-Tastatur-Look (W / A / S / D).
+## Pop-Bumper im RGB-Tastatur-Look.  `letter` ist die interne Kennung
+## (W/A/S/D - steuert Klang und Kill-Serie), `label` der aufgedruckte
+## Buchstabe.  Aufgedruckt steht K-I-L-L.
 
 const RADIUS := 30.0
 const KICK := 620.0
 
 var letter := "W"
+var label := "W"
 var sfx_name := "bump_w"
 var _cool := 0.0
 var _flash := 0.0
@@ -15,9 +18,10 @@ var marked := false
 var _lbl: Label
 
 
-func _init(pos: Vector2, l: String) -> void:
+func _init(pos: Vector2, l: String, aufdruck: String = "") -> void:
 	position = pos
 	letter = l
+	label = aufdruck if aufdruck != "" else l
 	sfx_name = "bump_" + l.to_lower()
 
 
@@ -39,7 +43,7 @@ func _ready() -> void:
 	add_child(area)
 	area.body_entered.connect(_on_hit)
 	var lbl := Label.new()
-	lbl.text = letter
+	lbl.text = label
 	lbl.add_theme_font_size_override("font_size", 22)
 	lbl.add_theme_color_override("font_color", Color(0.9, 1.0, 0.95))
 	lbl.position = Vector2(-8, -16)
