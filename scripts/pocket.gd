@@ -36,8 +36,11 @@ func _draw() -> void:
 func _on_enter(body: Node2D) -> void:
 	if _busy or not body is PinBall or body.freeze:
 		return
-	# Nur von oben faellt die Kugel hinein - von unten kommend fliegt sie durch
-	if body.linear_velocity.y < 30.0:
+	# Nur eine gemaechlich herabrollende Kugel bleibt haengen: sie muss
+	# abwaerts (nicht quer) unterwegs sein und darf nicht rasen.  Sonst
+	# schluckt die Mulde auch Kugeln, die gerade erst vom Flipper kommen.
+	var v: Vector2 = body.linear_velocity
+	if v.y < 30.0 or v.y < absf(v.x) * 0.8 or v.length() > 780.0:
 		return
 	_busy = true
 	queue_redraw()

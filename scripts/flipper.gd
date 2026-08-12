@@ -21,6 +21,11 @@ const FLIP_POWER := 2150.0
 ## Anteil, den die Kugel am Blattansatz mindestens abbekommt (an der Spitze
 ## wirkt der volle Schub - so bleibt die Stelle des Treffers spuerbar).
 const FLIP_BASE := 0.62
+## Abschusswinkel ueber der Waagerechten, zur Tischmitte hin.  Am Blattansatz
+## steil (geht aufs Oberfeld zu den G-G-E-Z-Gassen), an der Spitze flacher
+## (der klassische Querschuss auf die gegenueberliegende Seite).
+const FLIP_ANGLE_BASE := 72.0
+const FLIP_ANGLE_TIP := 60.0
 
 var is_left := true
 var rest_deg := 28.0
@@ -30,7 +35,9 @@ var _held := false
 var _flash := 0.0
 var _art: Node2D
 var _area: Area2D
-var _boost_pending := false
+## Wie lange der Stoss nach dem Druecken noch bereitsteht.  Eine Kugel, die
+## beim Nachdruecken kurz keinen Blattkontakt hat, bekommt ihn so trotzdem.
+var _boost_left := 0.0
 
 
 func _init(left: bool, pivot: Vector2) -> void:
@@ -134,7 +141,7 @@ func set_pressed(on: bool) -> void:
 	var new_target := deg_to_rad(pressed_deg if on else rest_deg)
 	if on and new_target != _target:
 		Sfx.play("flip", -8.0)
-		_boost_pending = true
+		_boost_left = 0.16
 	_target = new_target
 	_held = on
 
@@ -145,41 +152,42 @@ func _on_touch(body: Node2D) -> void:
 		_art.queue_redraw()
 
 
-## Schlag aus dem Stand: alles, was im Moment des Druecken auf dem Blatt
-## liegt, bekommt einen Stoss quer zum Blatt.  Die reine Drehung reicht
-## dafuer nicht - eine am Ansatz liegende Kugel wuerde kaum wegkommen.
-func _kick_resting_balls() -> void:
-	if _area == null:
-		return
-	if _target == rotation:
-		return
-	# Die Kugel geht quer zum Blatt weg, und zwar so, wie das Blatt in der
-	# Ruhelage steht: schraeg nach oben zur Tischmitte (links nach rechts
-	# oben, rechts nach links oben).  Waere die aktuelle Blattstellung
-	# massgeblich, ginge ein Schlag aus dem gehaltenen Hebel seitwaerts
-	# in den Slingshot statt nach oben.
-	var axis := (Vector2.RIGHT if is_left else Vector2.LEFT).rotated(deg_to_rad(rest_deg))
-	var push := Vector2(axis.y, -axis.x) if is_left else Vector2(-axis.y, axis.x)
+## Schlag aus dem Stand: alles, was beim Hochschwingen auf dem Blatt liegt,
+## bekommt einen Stoss quer zum Blatt.  Die reine Drehung reicht dafuer nicht -
+## eine am Ansatz liegende Kugel wuerde kaum wegkommen.  Gibt zurueck, ob eine
+## Kugel getroffen wurde.
+func _kick_resting_balls() -> bool:
+	if _area == null or _target == rotation:
+		return false
+	var hit := false
+	# Die Kugel geht schraeg nach oben zur Tischmitte weg - links nach rechts
+	# oben, rechts nach links oben.  Wie steil, haengt vom Treffpunkt ab.
+	# Waere die aktuelle Blattstellung massgeblich, ginge ein Schlag aus dem
+	# gehaltenen Hebel seitwaerts in den Slingshot statt nach oben.
+	var side := 1.0 if is_left else -1.0
 	for b in _area.get_overlapping_bodies():
 		var ball := b as PinBall
 		if ball == null or ball.freeze:
 			continue
 		var arm := ball.global_position - global_position
 		var reach := clampf(arm.length() / TIP_X, 0.0, 1.0)
+		var deg := lerpf(FLIP_ANGLE_BASE, FLIP_ANGLE_TIP, reach)
+		var push := Vector2(cos(deg_to_rad(deg)) * side, -sin(deg_to_rad(deg)))
 		var power := FLIP_POWER * lerpf(FLIP_BASE, 1.0, reach)
 		# Nur so viel zugeben, dass die Kugel auf Solltempo kommt - eine
 		# schon schnell anfliegende Kugel wird dadurch nicht doppelt beschleunigt
 		var have := ball.linear_velocity.dot(push)
 		if have < power:
 			ball.apply_central_impulse(push * (power - have))
+		hit = true
 		_flash = 1.0
 		_art.queue_redraw()
+	return hit
 
 
 func _physics_process(delta: float) -> void:
-	if _boost_pending:
-		_boost_pending = false
-		_kick_resting_balls()
+	if _boost_left > 0.0:
+		_boost_left = 0.0 if _kick_resting_balls() else _boost_left - delta
 	rotation = move_toward(rotation, _target, (SPEED if _held else RETURN_SPEED) * delta)
 	if _flash > 0.0:
 		_flash = maxf(0.0, _flash - delta * 3.0)
