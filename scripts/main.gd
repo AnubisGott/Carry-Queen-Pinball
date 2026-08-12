@@ -370,7 +370,6 @@ func _on_event(kind: String, data: Dictionary) -> void:
 			if hurry_active:
 				var pts := Game.add_score(hurry_value)
 				_end_hurry()
-				Game.discipline_done("KILLS")
 				hud.show_message("KILL KASSIERT.", "+" + Hud.fmt(pts), 2.2)
 				Sfx.play("jackpot")
 				Sfx.say("beste")
@@ -438,6 +437,7 @@ func _check_ego_bank() -> void:
 			return
 	_ego_done = true
 	var pts := Game.add_score(5000)
+	Game.discipline_done("EGO")
 	Sfx.play("jackpot", -6.0)
 	hud.show_message("E-G-O KOMPLETT.", "+" + Hud.fmt(pts), 2.0)
 
