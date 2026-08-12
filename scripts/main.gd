@@ -437,7 +437,7 @@ func _check_ego_bank() -> void:
 		if not s.lit:
 			return
 	_ego_done = true
-	var pts := Game.add_score(2500)
+	var pts := Game.add_score(5000)
 	Sfx.play("jackpot", -6.0)
 	hud.show_message("E-G-O KOMPLETT.", "+" + Hud.fmt(pts), 2.0)
 
