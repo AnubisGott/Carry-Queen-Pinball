@@ -190,7 +190,7 @@ static func build(parent: Node2D) -> Dictionary:
 	var standups := []
 	var ich := ["I", "C", "H"]
 	for i in 3:
-		var s := Standup.new(Vector2(31, 310 + i * 60), ich[i])
+		var s := Standup.new(Vector2(31, 370 + i * 60), ich[i])
 		parent.add_child(s)
 		standups.append(s)
 	refs["standups"] = standups
@@ -203,7 +203,7 @@ static func build(parent: Node2D) -> Dictionary:
 	if FEATURE_EGO:
 		var ego_letters := ["E", "G", "O"]
 		for i in 3:
-			var e := Standup.new(Vector2(459, 310 + i * 60), ego_letters[i], 180.0)
+			var e := Standup.new(Vector2(459, 370 + i * 60), ego_letters[i], 180.0)
 			parent.add_child(e)
 			ego_bank.append(e)
 	refs["ego_bank"] = ego_bank
