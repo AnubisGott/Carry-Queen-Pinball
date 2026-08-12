@@ -201,8 +201,10 @@ static func build(parent: Node2D) -> Dictionary:
 		parent.add_child(EgoButton.new(Vector2(131, 201), "EGO", 43.6))
 	refs["ego_bank"] = ego_bank
 
-	# OP-Spinner in der Einfahrt oben links
-	var sp := Spinner.new(Vector2(55, 222))
+	# OP-Spinner quer im Ausgang der Abschussbahn: jede abgeschossene Kugel
+	# faehrt hindurch, und wie lange er dreht haengt am Federzug.  Die
+	# Rechteck-Zone (56 breit) deckt die 50 Einheiten breite Bahn genau ab.
+	var sp := Spinner.new(Vector2(495, 330))
 	parent.add_child(sp)
 	refs["spinner"] = sp
 

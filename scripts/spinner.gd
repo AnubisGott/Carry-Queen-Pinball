@@ -2,9 +2,16 @@ class_name Spinner
 extends Area2D
 ## "OP"-Spinner in der linken Orbit-Bahn.
 
+## Punkte gibt es pro Umdrehung, nicht pro Durchfahrt: ein kraeftiger
+## Federzug laesst die Scheibe lange ausdrehen und zahlt entsprechend mehr.
+const PER_REV := 40
+
 var _cool := 0.0
 var _spin := 0.0
 var _spin_speed := 0.0
+var _rev_acc := 0.0
+var _revs := 0
+var _ball: PinBall = null
 
 
 func _init(pos: Vector2) -> void:
@@ -24,7 +31,16 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	_cool = maxf(0.0, _cool - delta)
 	if _spin_speed > 0.1:
-		_spin += _spin_speed * delta
+		var step := _spin_speed * delta
+		_spin += step
+		# Eine halbe Drehung ist ein sichtbarer Blatt-Durchgang und zaehlt
+		_rev_acc += step
+		while _rev_acc >= PI:
+			_rev_acc -= PI
+			_revs += 1
+			Game.add_score(PER_REV, _ball if is_instance_valid(_ball) else null)
+			if _revs % 2 == 0:
+				Sfx.play("spin", -14.0)
 		_spin_speed = lerpf(_spin_speed, 0.0, delta * 2.0)
 		queue_redraw()
 
@@ -44,6 +60,8 @@ func _on_pass(body: Node2D) -> void:
 	_cool = 0.5
 	var pb := body as RigidBody2D
 	_spin_speed = clampf(pb.linear_velocity.length() / 30.0, 8.0, 60.0)
+	_rev_acc = 0.0
+	_revs = 0
+	_ball = body as PinBall
 	Sfx.play("spin", -8.0)
-	Game.add_score(200, body)
 	Game.emit("spinner")
