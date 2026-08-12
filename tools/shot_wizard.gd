@@ -20,6 +20,20 @@ func _ready() -> void:
 	var main := MAIN.instantiate()
 	add_child(main)
 	await get_tree().create_timer(1.0).timeout
+	if "--frenzy" in OS.get_cmdline_user_args():
+		# DAMAGE-Bank fallen lassen und die Frenzy anwerfen
+		for d in main.drops:
+			d.dropped = true
+			d.queue_redraw()
+		Game.frenzy = true
+		main.frenzy_time = main.FRENZY_TIME
+		await get_tree().create_timer(0.4).timeout
+		await _shot("frenzy_a")
+		await get_tree().create_timer(0.32).timeout
+		await _shot("frenzy_b")
+		print("screenshots -> ", out_dir)
+		get_tree().quit()
+		return
 	main._start_wizard()
 	await get_tree().create_timer(0.6).timeout
 	await _shot("wizard_a")

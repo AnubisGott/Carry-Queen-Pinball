@@ -9,6 +9,8 @@ const SPAWN := Vector2(495, 854)
 const SAVE_WINDOW := 20.0
 ## Laufzeit des Wizard-Modus "Der Bericht"
 const WIZARD_TIME := 40.0
+## Laufzeit der Damage-Frenzy
+const FRENZY_TIME := 20.0
 
 const QUEEN_SPOTT := [
 	"Warst du nicht gut genug?",
@@ -301,9 +303,14 @@ func _update_timers(delta: float) -> void:
 			hud.show_sub("Hurry-Up vorbei. " + spott(), 1.8)
 	if frenzy_time > 0.0:
 		frenzy_time -= delta
+		# Die DAMAGE-Bank blinkt, solange die Frenzy laeuft - und zwar umso
+		# schneller, je weniger Zeit uebrig ist.
+		var hektik := 5.0 + 12.0 * (1.0 - frenzy_time / FRENZY_TIME)
+		for d in drops:
+			d.set_pulsing(frenzy_time > 0.0, hektik)
 		if frenzy_time <= 0.0:
 			Game.frenzy = false
-			hud.show_sub("Frenzy vorbei.", 1.5)
+			hud.show_sub("Frenzy vorbei. " + spott(), 1.8)
 	if Game.wizard:
 		wizard_time -= delta
 		hud.set_wizard(true, wizard_time / WIZARD_TIME)
@@ -404,7 +411,7 @@ func _check_bank() -> void:
 	var pts := Game.add_score(3000)
 	Game.discipline_done("DAMAGE")
 	Game.frenzy = true
-	frenzy_time = 20.0
+	frenzy_time = FRENZY_TIME
 	Sfx.play("mode", -3.0)
 	hud.show_message("DAMAGE-FRENZY!", "Alles zaehlt doppelt. +" + Hud.fmt(pts), 2.5)
 	Game.emit("frenzy")
