@@ -801,19 +801,9 @@ func _start_ball(first: bool = false) -> void:
 	Game.damage_points = 0
 	Game.tilted = false
 	nudge_heat = 0.0
-	# Kill-Serie, volle DAMAGE-Bank und die I-C-H-Bank erloeschen beim
-	# Ballwechsel.  Der EGO-Multiplikator bleibt dagegen ueber das ganze
-	# Spiel stehen.
-	streak_letters.clear()
-	_update_bumper_marks()
-	for d in drops:
-		d.reset()
-	for s in standups:
-		s.reset()
-	for s in ego_bank:
-		s.reset()
-	_ich_done = false
-	_ego_done = false
+	# Der Ballverlust loescht nichts: alle Baenke, die Kill-Markierungen und
+	# der EGO-Multiplikator bleiben, wie sie sind.  Zurueckgesetzt wird nur
+	# beim neuen Spiel und nach dem Wizard.
 	plunger.release()
 	Game.emit("save_armed")
 	_spawn_ball(SPAWN)
