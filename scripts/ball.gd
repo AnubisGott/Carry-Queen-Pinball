@@ -3,7 +3,10 @@ extends RigidBody2D
 ## Die Kugel. "is_carry" = die pinke Carry-Kugel (zaehlt im Multiball x10).
 
 const RADIUS := 13.0
-const MAX_SPEED := 2400.0
+## Tempolimit, egal woher der Schwung kommt (Flipper, Feder, Bumper,
+## Slingshot).  Darueber wird die Kugel unspielbar: bei 2400 px/s springt sie
+## pro Bild um anderthalb Kugeldurchmesser weiter, statt sichtbar zu fliegen.
+const MAX_SPEED := 1600.0
 
 var is_carry := false
 
@@ -15,7 +18,9 @@ func _ready() -> void:
 	# wenn sich der Feder-Teller unter ihr nach unten bewegt.
 	can_sleep = false
 	continuous_cd = RigidBody2D.CCD_MODE_CAST_SHAPE
-	linear_damp = 0.06
+	# Rollreibung wie auf echtem Holz: die Kugel verliert unterwegs Tempo,
+	# im Oberfeld laeuft sie dadurch ruhiger als direkt nach dem Schlag.
+	linear_damp = 0.16
 	var pm := PhysicsMaterial.new()
 	pm.bounce = 0.32
 	pm.friction = 0.08
