@@ -73,6 +73,7 @@ func _one_flip(main: Node2D, name: String, drop: Vector2, settle: bool) -> void:
 	var vmax := 0.0
 	var top := rest
 	var after := rest
+	var landung := rest
 	for i in 300:
 		await get_tree().physics_frame
 		if not is_instance_valid(ball):
@@ -82,9 +83,12 @@ func _one_flip(main: Node2D, name: String, drop: Vector2, settle: bool) -> void:
 			top = ball.global_position
 		if i == 60:
 			after = ball.global_position
+		if i == 108:
+			landung = ball.global_position
 	Input.action_release(_key())
-	print("%-12s: Ablage (%.0f,%.0f) Arm %.0f px -> Tempo %.0f px/s, hoechster Punkt (%.0f,%.0f), nach 0.5s (%.0f,%.0f)" % [
-			name, rest.x, rest.y, arm.length(), vmax, top.x, top.y, after.x, after.y])
+	print("%-12s: Ablage (%.0f,%.0f) Arm %.0f px -> Tempo %.0f px/s, hoechster Punkt (%.0f,%.0f), nach 0.5s (%.0f,%.0f), nach 0.9s (%.0f,%.0f)" % [
+			name, rest.x, rest.y, arm.length(), vmax, top.x, top.y, after.x, after.y,
+			landung.x, landung.y])
 	if is_instance_valid(ball):
 		ball.queue_free()
 	await get_tree().create_timer(0.4).timeout

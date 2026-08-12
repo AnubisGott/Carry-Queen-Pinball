@@ -24,12 +24,15 @@ const FLIP_BASE := 0.66
 ## Abschusswinkel ueber der Waagerechten, zur Tischmitte hin.  Am Blattansatz
 ## steil (geht aufs Oberfeld zu den G-G-E-Z-Gassen), an der Spitze flach
 ## (der klassische Querschuss auf die gegenueberliegende Seite).
-const FLIP_ANGLE_BASE := 74.0
-const FLIP_ANGLE_TIP := 52.0
-## Auf dem gehaltenen Hebel liegt die Kugel rund 25 px vom Drehpunkt weg -
-## das ist der Ansatz.  Erst ab da faechert der Treffpunkt auf, sonst waere
-## der Unterschied zwischen Ansatz und Spitze im Spiel nicht zu spueren.
-const ARM_BASE := 25.0
+const FLIP_ANGLE_BASE := 82.0
+const FLIP_ANGLE_TIP := 60.0
+## Bis hierhin liegt die Kugel praktisch auf dem Lager.  Dort hat auch ein
+## echter Flipper keine Hebelwirkung: es gibt keinen Schuss, sondern einen
+## flachen Pass hinueber aufs Blatt des anderen Hebels.  Ab dieser Entfernung
+## faechert der Treffpunkt zum Schuss auf.
+const ARM_PASS := 34.0
+const PASS_SPEED := 420.0
+const PASS_ANGLE := 40.0
 
 var is_left := true
 var rest_deg := 28.0
@@ -177,11 +180,14 @@ func _kick_resting_balls() -> bool:
 		var ball := b as PinBall
 		if ball == null or ball.freeze:
 			continue
-		var arm := ball.global_position - global_position
-		var reach := clampf((arm.length() - ARM_BASE) / (TIP_X - ARM_BASE), 0.0, 1.0)
-		var deg := lerpf(FLIP_ANGLE_BASE, FLIP_ANGLE_TIP, reach)
+		var dist := (ball.global_position - global_position).length()
+		var deg := PASS_ANGLE
+		var power := PASS_SPEED
+		if dist >= ARM_PASS:
+			var reach := clampf((dist - ARM_PASS) / (TIP_X - ARM_PASS), 0.0, 1.0)
+			deg = lerpf(FLIP_ANGLE_BASE, FLIP_ANGLE_TIP, reach)
+			power = FLIP_POWER * lerpf(FLIP_BASE, 1.0, reach)
 		var push := Vector2(cos(deg_to_rad(deg)) * side, -sin(deg_to_rad(deg)))
-		var power := FLIP_POWER * lerpf(FLIP_BASE, 1.0, reach)
 		# Nur so viel zugeben, dass die Kugel auf Solltempo kommt - eine
 		# schon schnell anfliegende Kugel wird dadurch nicht doppelt beschleunigt
 		var have := ball.linear_velocity.dot(push)
@@ -200,6 +206,9 @@ func _physics_process(delta: float) -> void:
 	if _flash > 0.0:
 		_flash = maxf(0.0, _flash - delta * 3.0)
 		_art.queue_redraw()
+
+
+
 
 
 
