@@ -56,8 +56,9 @@ var hurry_value := 0
 var hurry_time := 0.0
 
 var save_time := 0.0
-## I-C-H gibt es nur einmal pro Ball
+## I-C-H und E-G-O gibt es je einmal pro Ball
 var _ich_done := false
+var _ego_done := false
 
 var frenzy_time := 0.0
 var wizard_time := 0.0
@@ -428,19 +429,17 @@ func _check_bank() -> void:
 
 
 ## E-G-O komplett: reine Punktebank, der Multiplikator kommt allein aus der
-## Kill-Serie.  Die Bank stellt sich danach wieder auf.
+## Kill-Serie.  Wie I-C-H nur einmal pro Ball - die Bank bleibt danach stehen.
 func _check_ego_bank() -> void:
-	if ego_bank.is_empty():
+	if _ego_done or ego_bank.is_empty():
 		return
 	for s in ego_bank:
 		if not s.lit:
 			return
+	_ego_done = true
 	var pts := Game.add_score(2500)
 	Sfx.play("jackpot", -6.0)
 	hud.show_message("E-G-O KOMPLETT.", "+" + Hud.fmt(pts), 2.0)
-	await get_tree().create_timer(1.0, false).timeout
-	for s in ego_bank:
-		s.reset()
 
 
 func _check_ggez() -> void:
@@ -590,8 +589,11 @@ func _start_wizard() -> void:
 func _end_wizard() -> void:
 	Game.wizard = false
 	hud.set_wizard(false)
-	# Neue Runde fuer die Disziplinen - auch I-C-H ist wieder frei
+	# Neue Runde fuer die Disziplinen - I-C-H und E-G-O sind wieder frei
 	_ich_done = false
+	_ego_done = false
+	for s in ego_bank:
+		s.reset()
 	Game.reset_disciplines()
 	for d in drops:
 		d.reset()
@@ -786,7 +788,10 @@ func _start_ball(first: bool = false) -> void:
 		d.reset()
 	for s in standups:
 		s.reset()
+	for s in ego_bank:
+		s.reset()
 	_ich_done = false
+	_ego_done = false
 	plunger.release()
 	Game.emit("save_armed")
 	_spawn_ball(SPAWN)
