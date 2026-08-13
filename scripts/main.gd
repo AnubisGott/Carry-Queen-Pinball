@@ -495,6 +495,9 @@ func _gluecksrad_zahlt(data: Dictionary) -> void:
 	var rang := str(data.get("rang", ""))
 	var roh := int(data.get("roh", 0))
 	var pts := int(data.get("punkte", roh))
+	# Nur der Hauptgewinn wird gefeiert.  Alles darunter bekommt den eigenen
+	# kurzen Auszahl-Klang des Rades - vorher lieh es sich je nach Hoehe die
+	# Jingles von Jackpot, Ego und Countdown und blies den Jubel im Spiel auf.
 	var spruch := "Immerhin gedreht."
 	if roh >= 25000:
 		spruch = "CHALLENGER. Also mein Niveau."
@@ -503,13 +506,13 @@ func _gluecksrad_zahlt(data: Dictionary) -> void:
 		Game.emit("jackpot")
 	elif roh >= 5000:
 		spruch = "Geht doch. Fast wie ich."
-		Sfx.play("ego_up", -4.0)
+		Sfx.play("rad_zahlt", -3.0)
 	elif roh >= 2000:
 		spruch = "Solide. Also unterdurchschnittlich."
-		Sfx.play("count_go", -5.0)
+		Sfx.play("rad_zahlt", -7.0)
 	else:
 		spruch = "Hardstuck. Wer haette das gedacht."
-		Sfx.play("count", -5.0)
+		Sfx.play("rad_zahlt", -12.0)
 	# Die Chat-Zeile holt sich der HUD selbst aus dem Ereignis
 	hud.show_message(rang + "!", "+" + Hud.fmt(pts) + "  " + spruch, 2.4)
 

@@ -5,8 +5,10 @@ extends Node
 ##   godot --headless --path . res://tools/diag_klangstatistik.tscn [-- <sekunden>]
 
 const MAIN := preload("res://scenes/main.tscn")
-## Was als Jubel gilt: die feiernden Jingles, nicht die Mechanik.
-const JUBEL := ["jackpot", "save", "mode", "ego_up", "count_go", "eject"]
+## Was als Jubel gilt: die feiernden Jingles, nicht die Mechanik.  Der
+## Auswurf der Mulde zaehlt nicht dazu, der ist Mechanik; die Auszahlung des
+## Gluecksrads schon, auch wenn sie jetzt einen eigenen kurzen Klang hat.
+const JUBEL := ["jackpot", "save", "mode", "ego_up", "count_go", "rad_zahlt"]
 
 var _dauer := 180.0
 var _zaehler := {}

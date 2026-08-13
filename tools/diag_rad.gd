@@ -68,6 +68,23 @@ func _ready() -> void:
 			vorher, _rad._speed,
 			"wieder auf Start OK" if _rad._speed >= FortuneWheel.START_SPEED - 0.5 else "KEIN NEUSTART"])
 
+	print("--- welcher Klang bei welcher Auszahlung ---")
+	# Frueher lieh sich das Rad je nach Hoehe die Jingles von Jackpot, Ego und
+	# Countdown.  Jetzt soll nur der Hauptgewinn den Jackpot bekommen.
+	for stufe in [[25000, "CHALLENGER"], [10000, "MASTER"], [2000, "GOLD"], [500, "BRONZE"]]:
+		_main._gluecksrad_zahlt({"punkte": stufe[0], "rang": stufe[1], "roh": stufe[0]})
+		await get_tree().process_frame
+		await get_tree().process_frame
+		var laufen := []
+		for p in Sfx._players:
+			if not p.playing:
+				continue
+			for n in Sfx._streams:
+				if p.stream == Sfx._streams[n]:
+					laufen.append(n)
+		print("  %-12s %6d -> %s" % [stufe[1], stufe[0], str(laufen)])
+		await get_tree().create_timer(1.2).timeout
+
 	print("--- prallt ab, schluckt nicht ---")
 	var ball := PinBall.new()
 	ball.position = _rad.global_position + Vector2(-55, -45)

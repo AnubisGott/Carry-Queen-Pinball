@@ -829,6 +829,12 @@ func _build_all() -> Dictionary:
 			_stotter(_kreisch(0.9, 0.35, 240.0, 40.0, 4000.0, 300.0, 5.5), 9.0, 0.55),
 			_wumms(140.0, 32.0, 0.5, 0.85)]), 0.88))
 	s["tick"] = _wav(_norm(_crush(_klack(0.012, 0.4, 6000.0, 0.6), 4, 2), 0.6))
+	# Auszahlung des Gluecksrads: kurz und eigenstaendig.  Vorher lieh sich das
+	# Rad je nach Gewinnhoehe die Jingles von Jackpot, Ego und Countdown - vier
+	# fremde Klaenge fuer ein Element, was den Jubel im Spiel verdoppelt hat.
+	s["rad_zahlt"] = _wav(_norm(_stack([
+			_crush(_kreisch(0.16, 0.5, 700.0, 1500.0, 2200.0, 5200.0, 5.0), 5, 2),
+			_wumms(280.0, 110.0, 0.12, 0.55)]), 0.75))
 	# Bandenkontakt: kurzer Blechtick.  Lautstaerke kommt vom Aufpralltempo,
 	# deshalb hier eher zurueckhaltend gebaut.
 	s["rail"] = _wav(_norm(_stack([
