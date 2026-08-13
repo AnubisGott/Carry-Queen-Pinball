@@ -5,7 +5,7 @@
 - wozu ist der cyan farbene Pfeil
 - manchmal geht die Kugel durch zwei Durchgänge gleichzeitig, also zwei Lichter gehen gleichzeitig an.
 - Aus dem Stand komme ich nicht mehr weit genug nach oben um alle durchgans-lanes zu treffen. Versuche irgendwie, dass man beim ruhenden Abschlag höher kommt.
-  
+- den YouTube link einfügen (chat?)  
 
 To continue this session, run codex resume 019fe73f-ff94-72e2-862a-f500a5904c5e
 d:\daten\development\gaming\Flipper02Codex>

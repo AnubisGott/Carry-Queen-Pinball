@@ -1,56 +1,53 @@
 class_name RolloverLane
-extends Area2D
+extends Node2D
 ## Rollover-Gasse: die Kugel rollt durch, der Buchstabe leuchtet auf.
 ## Ob die ganze Bank komplett ist, prueft main.gd (Event "rollover").
 ##
-## Der Sensor ist ein schmales Rechteck laengs der Gasse, kein Kreis: bei 38
-## Einheiten Gassenabstand beruehrt eine Kugel (Radius 13) zwei runde Felder
-## mit Radius 12 gleichzeitig und setzt zwei Buchstaben auf einmal.  Mit halber
-## Breite 5 bleiben 5+13=18 < 19, die Kugel liegt also immer nur in einer
-## Gasse.  Zusaetzlich muss sie die Gasse entlang laufen: die Stege sind nur
-## 28 Einheiten lang, darueber und darunter kommt man quer ueber die ganze
-## Reihe.
+## Erkannt wird der Durchgang an der Flugbahn, nicht ueber ein Sensorfeld:
+## jedes Physikbild wird die Lage der Kugel in Gassenkoordinaten festgehalten
+## (laengs u, quer w).  Wechselt u das Vorzeichen, hat sie die Gassenmitte
+## ueberquert; der Kreuzungspunkt wird zwischen den beiden Bildern
+## interpoliert und muss quer innerhalb der Gasse liegen.
+##
+## Ein Sensorfeld waere hier zu grob: bei Flippertempo legt die Kugel 13
+## Einheiten je Bild zurueck und springt ueber ein schmales Feld hinweg, ohne
+## dass eine Beruehrung gemeldet wird - schraege Treffer zaehlten dann nicht.
+## Breiter darf das Feld aber nicht sein, sonst liegt die Kugel gleichzeitig
+## in zwei Gassen (Abstand 38, Kugeldurchmesser 26).
 
-## Gezaehlt wird, wer wirklich durchrollt: die Kugel muss auf der anderen Seite
-## wieder herauskommen als sie hereingekommen ist - von oben herab genauso wie
-## von unten herauf.  Ueber die Flugrichtung laesst sich das nicht entscheiden
-## (eine vom Bumper hochkommende Kugel faehrt oft schraeg), und ueber die
-## Eintrittsstelle allein auch nicht: wer quer ueber die Reihe rutscht, kommt
-## aus Sicht der Gasse durch deren oberes Ende herein.  Der Buchstabe geht
-## deshalb erst beim Verlassen an, wenige Hundertstel spaeter.
-## Ein Durchgang, ein Buchstabe: nach einem Treffer ist die ganze Bank fuer
-## dieselbe Kugel kurz gesperrt.  Schraeg unter den kurzen Stegen hindurch
-## streift sie sonst zwei Gassen nacheinander und setzt zwei Lichter.
-const BANK_SPERRE := 0.45
+## Halbe Gassenbreite: der Kreuzungspunkt muss so nah an der Gassenmitte
+## liegen.  15+15 = 30 < 38, zwei Gassen koennen also nie gleichzeitig passen.
+const HALB_BREITE := 15.0
+## Nur Kugeln in diesem Umkreis werden verfolgt.
+const NAEHE := 52.0
+## Ein Anlauf, ein Buchstabe: prallt die Kugel oben am Bogen ab und faellt
+## gleich durch die Nachbargasse zurueck, sieht das aus wie zwei Lichter auf
+## einmal.  Innerhalb dieser Zeit zaehlt deshalb nur der erste Durchgang.
+const BANK_SPERRE := 0.35
 
 ## Gilt fuer alle Gassen gemeinsam - deshalb statisch.
 static var _sperr_kugel := 0
 static var _sperr_zeit := 0.0
+## Nur fuer die Diagnose (tools/diag_gassen): meldet jede Ueberquerung.
+static var debug := false
 
 var letter := ""
 var lit := false
 var _dir := Vector2.DOWN
+var _quer := Vector2.RIGHT
 var _label: Label
-## Kugel-Kennung -> auf welcher Seite der Gasse sie hereinkam (+1 / -1)
-var _eintritt := {}
+## Kugel-Kennung -> letzte Lage als (laengs, quer)
+var _spur := {}
 
 
 func _init(pos: Vector2, letter_: String, dir: Vector2) -> void:
 	position = pos
 	letter = letter_
 	_dir = dir.normalized()
+	_quer = Vector2(-_dir.y, _dir.x)
 
 
 func _ready() -> void:
-	var cs := CollisionShape2D.new()
-	var sh := RectangleShape2D.new()
-	sh.size = Vector2(10.0, 34.0)
-	cs.shape = sh
-	# Lange Achse des Rechtecks auf die Gassenrichtung drehen
-	cs.rotation = _dir.angle() - PI / 2.0
-	add_child(cs)
-	body_entered.connect(_on_enter)
-	body_exited.connect(_on_pass)
 	z_index = 3
 	_label = Label.new()
 	_label.text = letter
@@ -75,38 +72,47 @@ func _update() -> void:
 			Table.NEON_GOLD if lit else Color(0.55, 0.5, 0.7))
 
 
-## Eintrittsseite merken: laengs der Gasse vorne (+1) oder hinten (-1).
-func _on_enter(body: Node2D) -> void:
-	if not body is PinBall:
-		return
-	_eintritt[body.get_instance_id()] = signf(
-			(body.global_position - global_position).dot(_dir))
+func _physics_process(_delta: float) -> void:
+	var gesehen := {}
+	for b in get_tree().get_nodes_in_group("balls"):
+		var ball := b as PinBall
+		if ball == null or ball.freeze:
+			continue
+		var rel: Vector2 = ball.global_position - global_position
+		if rel.length() > NAEHE:
+			continue
+		var id := ball.get_instance_id()
+		var jetzt := Vector2(rel.dot(_dir), rel.dot(_quer))
+		gesehen[id] = true
+		if _spur.has(id):
+			var vor: Vector2 = _spur[id]
+			# Vorzeichenwechsel laengs = die Kugel hat die Mitte ueberquert
+			if vor.x != 0.0 and signf(vor.x) != signf(jetzt.x):
+				var t: float = vor.x / (vor.x - jetzt.x)
+				var quer_kreuz := absf(lerpf(vor.y, jetzt.y, t))
+				if debug:
+					print("    [%s] Ueberquerung bei quer=%.1f (Grenze %.0f), laengs %.1f -> %.1f" % [
+							letter, quer_kreuz, HALB_BREITE, vor.x, jetzt.x])
+				if quer_kreuz <= HALB_BREITE:
+					_durchgang(ball)
+		_spur[id] = jetzt
+	for id in _spur.keys():
+		if not gesehen.has(id):
+			_spur.erase(id)
 
 
-func _on_pass(body: Node2D) -> void:
-	if not body is PinBall:
+func _durchgang(ball: PinBall) -> void:
+	var zeit := float(Time.get_ticks_msec()) / 1000.0
+	if ball.get_instance_id() == _sperr_kugel and zeit - _sperr_zeit < BANK_SPERRE:
 		return
-	var id := body.get_instance_id()
-	var vorher: float = _eintritt.get(id, 0.0)
-	_eintritt.erase(id)
-	if body.freeze or vorher == 0.0:
-		return
-	# Durchgerollt heisst: auf der anderen Seite wieder heraus.  Wer auf
-	# derselben Seite umkehrt oder quer ueber die Reihe streift, zaehlt nicht.
-	var nachher := signf((body.global_position - global_position).dot(_dir))
-	if nachher == 0.0 or nachher == vorher:
-		return
-	var jetzt := float(Time.get_ticks_msec()) / 1000.0
-	if body.get_instance_id() == _sperr_kugel and jetzt - _sperr_zeit < BANK_SPERRE:
-		return
-	_sperr_kugel = body.get_instance_id()
-	_sperr_zeit = jetzt
+	_sperr_kugel = ball.get_instance_id()
+	_sperr_zeit = zeit
 	if lit:
 		Sfx.play("tick", -8.0)
 		return
 	set_lit(true)
 	Sfx.play("standup", -6.0)
-	Game.add_score(500, body)
+	Game.add_score(500, ball)
 	Game.emit("rollover", {"letter": letter, "index": get_index()})
 
 
