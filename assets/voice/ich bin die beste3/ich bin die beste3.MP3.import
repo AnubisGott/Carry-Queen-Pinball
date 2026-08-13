@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://dmqvwuk1kckqn"
+path="res://.godot/imported/ich bin die beste3.MP3-defacdb5e5c1458961d43b128f6b4916.mp3str"
+
+[deps]
+
+source_file="res://assets/voice/ich bin die beste3/ich bin die beste3.MP3"
+dest_files=["res://.godot/imported/ich bin die beste3.MP3-defacdb5e5c1458961d43b128f6b4916.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

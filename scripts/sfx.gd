@@ -76,7 +76,13 @@ var _roll_player: AudioStreamPlayer
 var _rakete_player: AudioStreamPlayer
 var _rakete_db := -60.0
 var _rakete_pitch := RAKETE_PITCH_START
+## Fach -> Liste der Aufnahmen.  Mehrere Fassungen desselben Satzes sorgen
+## dafuer, dass sie sich nicht wie ein Anrufbeantworter anhoert.
 var _voice: Dictionary = {}
+## Fach -> zuletzt gespielte Fassung, damit sie sich nicht wiederholt
+var _voice_letzte := {}
+## Tondateien in assets/voice/, die zu keinem Satz passten
+var _stimme_offen: Array = []
 var _duck: Tween
 ## Die Klaenge entstehen in einem Nebenlaeufer, damit der Start nicht
 ## sekundenlang haengt.  Bis sie fertig sind, bleibt es still - das faellt
@@ -98,7 +104,54 @@ const VOICE_FILES := {
 	# das Wort sagen.
 	"outro": "spiel_vorbei",
 	"bericht": "der_bericht",
+	"ball_start": "zeig_was_du_kannst",
+	# Die acht Spott-Sprueche und die fuenf Kanal-Antworten einzeln, damit sie
+	# genau das sagen kann, was daneben auf dem Feld steht.
+	"spott_1": "spott_1", "spott_2": "spott_2", "spott_3": "spott_3",
+	"spott_4": "spott_4", "spott_5": "spott_5", "spott_6": "spott_6",
+	"spott_7": "spott_7", "spott_8": "spott_8",
+	"kanal_1": "kanal_1", "kanal_2": "kanal_2", "kanal_3": "kanal_3",
+	"kanal_4": "kanal_4", "kanal_5": "kanal_5",
 }
+
+## Zweiter Weg zur Aufnahme: ein Ordner, der so heisst wie der gesprochene
+## Satz.  Darin liegen die Fassungen, durchnummeriert - "Multiball1.mp3" bis
+## "Multiball4.mp3".  Der Schluessel hier ist der eingedampfte Satz (klein,
+## ohne Umlaute, ohne Satzzeichen, ohne die Nummer am Ende), der Wert das
+## Fach.  So kann man einen Ordner ablegen und muss nichts umbenennen.
+const VOICE_TEXTE := {
+	"ich_bin_die_beste": "beste",
+	"multiball": "koop",
+	"koop_modus": "koop",
+	"zeig_doch_mal_was_du_kannst": "ball_start",
+	"mein_carry_rettet": "carry_rettet",
+	"kein_skill": "kein_skill",
+	"die_ulti_beginnt": "bericht",
+	"der_bericht": "bericht",
+	"gern_geschehen": "gern",
+	"kein_plan": "kein_plan",
+	"ohne_mich": "ohne_mich",
+	"spiel_vorbei": "outro",
+	"du_warst_auch_dabei_das_war_bestimmt_schoen_fuer_dich": "outro",
+	"warst_du_nicht_gut_genug": "spott_1",
+	"einfach_mal_besser_sein": "spott_2",
+	"skill_issue_nicht_meins": "spott_3",
+	"ich_haette_den_gehalten_locker": "spott_4",
+	"reflexe_wie_ein_ladebildschirm": "spott_5",
+	"soll_ich_das_auch_noch_fuer_dich_machen": "spott_6",
+	"uebung_ganz_viel_uebung": "spott_7",
+	"war_bestimmt_der_ping_ne": "spott_8",
+	"oben_ist_der_kanal_klicken_jetzt": "kanal_1",
+	"abonnieren_kostet_nichts_skill_schon": "kanal_2",
+	"im_stream_mache_ich_das_mit_einer_hand": "kanal_3",
+	"zuschauen_kannst_du_ja_wenigstens": "kanal_4",
+	"der_knopf_oben_links_nicht_so_schwer": "kanal_5",
+}
+
+## Faecher, die einen laufenden Satz unterbrechen duerfen.  Alles andere ist
+## Beiwerk und schweigt, solange sie noch spricht - sonst redet sie sich
+## selbst tot.
+const VOICE_WICHTIG := ["beste", "koop", "bericht", "carry_rettet", "kein_skill", "outro"]
 
 
 func _ready() -> void:
@@ -130,6 +183,15 @@ func _ready() -> void:
 	_rng.randomize()
 	_bau_task = WorkerThreadPool.add_task(_baue_im_hintergrund)
 	_load_optional_audio()
+
+
+func _exit_tree() -> void:
+	# Beim Beenden kann der Nebenlaeufer noch mitten im Bauen stecken.  Ohne
+	# dieses Warten arbeitet er auf einem Objekt weiter, das es nicht mehr
+	# gibt - beim schnellen Schliessen gab das eine Fehlermeldung.
+	if _bau_task != -1:
+		WorkerThreadPool.wait_for_task_completion(_bau_task)
+		_bau_task = -1
 
 
 func _baue_im_hintergrund() -> void:
@@ -295,12 +357,31 @@ func _rakete_regeln(delta: float) -> void:
 			_rakete_player.pitch_scale, _rakete_pitch, RAKETE_PITCH_TEMPO * delta)
 
 
+## Einen Satz sprechen.  Gibt es mehrere Fassungen, wird gewuerfelt - nur
+## nicht dieselbe zweimal hintereinander.
 func say(line: String) -> void:
-	if not _voice.has(line):
+	var fassungen: Array = _voice.get(line, [])
+	if fassungen.is_empty():
 		return
-	_voice_player.stream = _voice[line]
+	# Beiwerk (Spott, Kanal, Nachsaetze) faellt aus, solange noch ein Satz
+	# laeuft.  Sonst schneidet sie sich selbst das Wort ab.
+	if _voice_player.playing and not (line in VOICE_WICHTIG):
+		return
+	var i := 0
+	if fassungen.size() > 1:
+		i = _rng.randi_range(0, fassungen.size() - 1)
+		if i == int(_voice_letzte.get(line, -1)):
+			i = (i + 1) % fassungen.size()
+	_voice_letzte[line] = i
+	var s: AudioStream = fassungen[i]
+	_voice_player.stream = s
 	_voice_player.play()
-	_ducke(_voice[line].get_length())
+	_ducke(s.get_length())
+
+
+## Liegt fuer dieses Fach ueberhaupt eine Aufnahme? (Fuer die Pruefwerkzeuge.)
+func hat_stimme(line: String) -> bool:
+	return not (_voice.get(line, []) as Array).is_empty()
 
 
 ## Musik zurueckdrehen, solange gesprochen wird.
@@ -929,11 +1010,26 @@ func _setze_schleife(s: AudioStream) -> void:
 		s.loop_end = s.data.size() / (2 if s.format == AudioStreamWAV.FORMAT_16_BITS else 1)
 
 
+## Alles einsammeln, was in assets/voice/ liegt - flach abgelegte Dateien
+## genauso wie ganze Ordner mit mehreren Fassungen.  Zugeordnet wird ueber den
+## Namen: erst die Datei, dann ersatzweise der Ordner darum.
 func _load_optional_audio() -> void:
-	for key in VOICE_FILES:
-		var s := _load_stream("res://assets/voice/" + VOICE_FILES[key])
-		if s != null:
-			_voice[key] = s
+	var gefunden := {}
+	_stimme_offen.clear()
+	_sammle_stimmen("res://assets/voice", gefunden, 0)
+	for fach in gefunden:
+		var pfade: Array = gefunden[fach]
+		# Sortiert, damit Fassung 1 auch die erste ist - das Wuerfeln kommt
+		# spaeter und soll nicht schon von der Dateireihenfolge abhaengen.
+		pfade.sort()
+		for p in pfade:
+			var st := _lade_datei(str(p))
+			if st == null:
+				continue
+			if not _voice.has(fach):
+				_voice[fach] = []
+			_voice[fach].append(st)
+	_stimme_bericht()
 	var m := _load_stream("res://assets/music/loop")
 	if m != null:
 		if m is AudioStreamOggVorbis:
@@ -945,15 +1041,119 @@ func _load_optional_audio() -> void:
 
 
 func _load_stream(base: String) -> AudioStream:
-	if FileAccess.file_exists(base + ".ogg"):
-		return AudioStreamOggVorbis.load_from_file(base + ".ogg")
-	if FileAccess.file_exists(base + ".wav"):
-		return AudioStreamWAV.load_from_file(base + ".wav")
-	if FileAccess.file_exists(base + ".mp3"):
-		var f := FileAccess.open(base + ".mp3", FileAccess.READ)
-		if f:
-			var mp3 := AudioStreamMP3.new()
-			mp3.data = f.get_buffer(f.get_length())
-			return mp3
+	for e in ["ogg", "wav", "mp3"]:
+		if FileAccess.file_exists(base + "." + e):
+			return _lade_datei(base + "." + e)
 	return null
+
+
+## Eine einzelne Tondatei laden - an der Endung entscheidet sich, wie.  Die
+## Dateien gehen nicht durch den Import des Editors, sie werden beim Start
+## direkt gelesen; deshalb genuegt es, sie ins Verzeichnis zu legen.
+func _lade_datei(pfad: String) -> AudioStream:
+	match pfad.get_extension().to_lower():
+		"ogg":
+			return AudioStreamOggVorbis.load_from_file(pfad)
+		"wav":
+			return AudioStreamWAV.load_from_file(pfad)
+		"mp3":
+			var f := FileAccess.open(pfad, FileAccess.READ)
+			if f:
+				var mp3 := AudioStreamMP3.new()
+				mp3.data = f.get_buffer(f.get_length())
+				return mp3
+	return null
+
+
+## Verzeichnis samt Unterordnern durchgehen und die Tondateien den Faechern
+## zuordnen.  Geladen wird erst spaeter und nur, was zugeordnet werden konnte -
+## eine 30-MB-Rohaufnahme, die hier herumliegt, kostet so keinen Speicher.
+func _sammle_stimmen(pfad: String, gefunden: Dictionary, tiefe: int) -> void:
+	var d := DirAccess.open(pfad)
+	if d == null:
+		return
+	d.list_dir_begin()
+	var n := d.get_next()
+	while n != "":
+		if n != "." and n != "..":
+			var voll := pfad + "/" + n
+			if d.current_is_dir():
+				if tiefe < 3:
+					_sammle_stimmen(voll, gefunden, tiefe + 1)
+			elif n.get_extension().to_lower() in ["ogg", "wav", "mp3"]:
+				# Erst der Dateiname, dann der Ordner darum: manche Werkzeuge
+				# schreiben in einen schoen benannten Ordner eine Datei mit
+				# kryptischem Namen.
+				var fach := _fach_zu(_texthaken(n.get_basename()))
+				if fach == "":
+					fach = _fach_zu(_texthaken(pfad.get_file()))
+				if fach == "":
+					_stimme_offen.append(n)
+					n = d.get_next()
+					continue
+				if not gefunden.has(fach):
+					gefunden[fach] = []
+				gefunden[fach].append(voll)
+		n = d.get_next()
+	d.list_dir_end()
+
+
+## Aus einem Datei- oder Ordnernamen den Satz herausschaelen: klein schreiben,
+## Umlaute aufloesen, Satzzeichen und Leerzeichen zu Unterstrichen, die
+## angehaengte Nummer der Fassung abschneiden.  "Ich bin die beste2" und
+## "ich_bin_die_beste (2)" ergeben beide "ich_bin_die_beste".
+func _texthaken(name: String) -> String:
+	var t := name.to_lower()
+	t = t.replace("ä", "ae").replace("ö", "oe").replace("ü", "ue")
+	t = t.replace("ß", "ss").replace("é", "e")
+	const ERLAUBT := "abcdefghijklmnopqrstuvwxyz0123456789"
+	var roh := ""
+	for c in t:
+		roh += c if ERLAUBT.contains(c) else "_"
+	while roh.contains("__"):
+		roh = roh.replace("__", "_")
+	roh = roh.trim_prefix("_").trim_suffix("_")
+	# Nummer der Fassung am Ende weg
+	while roh.length() > 0 and roh[-1] >= "0" and roh[-1] <= "9":
+		roh = roh.substr(0, roh.length() - 1)
+	return roh.trim_suffix("_")
+
+
+## Welcher Satz gehoert in welches Fach?  Erst genau, dann nachsichtig: wer
+## seinen Ordner "kein Plan oder was" nennt, landet trotzdem bei "kein_plan".
+func _fach_zu(haken: String) -> String:
+	if haken == "":
+		return ""
+	if VOICE_TEXTE.has(haken):
+		return VOICE_TEXTE[haken]
+	# Auch die Fachnamen selbst gelten - "spott_3.mp3" liegt dann richtig.
+	for key in VOICE_FILES:
+		if haken == key or haken == VOICE_FILES[key]:
+			return key
+	var beste := ""
+	var laenge := 0
+	for k in VOICE_TEXTE:
+		var s := str(k)
+		if s.length() < 8 or s.length() <= laenge:
+			continue
+		if haken.begins_with(s) or s.begins_with(haken):
+			beste = VOICE_TEXTE[k]
+			laenge = s.length()
+	return beste
+
+
+## Was gefunden wurde, steht beim Start in der Ausgabe - und ebenso, was
+## danebenlag und zu keinem Satz passte.
+func _stimme_bericht() -> void:
+	if not _voice.is_empty():
+		var zeilen := PackedStringArray()
+		var faecher := _voice.keys()
+		faecher.sort()
+		for f in faecher:
+			zeilen.append("%s %d" % [f, (_voice[f] as Array).size()])
+		print("Stimme: " + ", ".join(zeilen))
+	if not _stimme_offen.is_empty():
+		_stimme_offen.sort()
+		print("Stimme: ohne Fach liegen geblieben: " + ", ".join(
+				PackedStringArray(_stimme_offen)))
 

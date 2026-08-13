@@ -240,9 +240,12 @@ func _kanal_werbung(delta: float) -> void:
 	var zeilen: Array = CHAT["kanal"]
 	chat(zeilen[randi() % zeilen.size()])
 	# Die Queen antwortet im Chat, nicht mitten auf dem Spielfeld - dort ist
-	# Platz fuer Spielereignisse, nicht fuer Werbung.
+	# Platz fuer Spielereignisse, nicht fuer Werbung.  Gesprochen wird genau
+	# die Zeile, die sie schreibt (Fach "kanal_1" bis "kanal_5").
 	if randf() < 0.5:
-		chat(KANAL_QUEEN[randi() % KANAL_QUEEN.size()], "CarryQueen")
+		var i := randi() % KANAL_QUEEN.size()
+		chat(KANAL_QUEEN[i], "CarryQueen")
+		Sfx.say("kanal_%d" % (i + 1))
 
 
 func _process(delta: float) -> void:

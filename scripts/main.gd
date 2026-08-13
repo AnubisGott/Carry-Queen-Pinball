@@ -75,6 +75,13 @@ const DIM_COLOR := Color(0.38, 0.33, 0.48)
 var idle_time := 0.0
 var dimmed := false
 
+## So lange darf die Kugel unterwegs sein, ohne etwas zu treffen, bevor sie
+## nachfragt ("Kein Plan.").  Danach laeuft die Uhr von vorn.
+const OHNE_TREFFER_ZEIT := 18.0
+var _ohne_treffer := 0.0
+## Erst ab dem Abschuss zaehlt die Uhr - im Schacht wartet man manchmal.
+var _abgeschossen := false
+
 var _touch_flip := {}
 var _touch_launch := {}
 
@@ -326,7 +333,9 @@ func _update_timers(delta: float) -> void:
 		hurry_value = maxi(5000, hurry_value - int(1600.0 * delta))
 		if hurry_time <= 0.0:
 			_end_hurry()
-			hud.show_sub("Hurry-Up vorbei. " + spott(), 1.8)
+			var i := spott_index()
+			hud.show_sub("Hurry-Up vorbei. " + QUEEN_SPOTT[i], 1.8)
+			Sfx.say("spott_%d" % (i + 1))
 	if frenzy_time > 0.0:
 		frenzy_time -= delta
 		# Die DAMAGE-Bank blinkt, solange die Frenzy laeuft - und zwar umso
@@ -363,6 +372,14 @@ func _update_timers(delta: float) -> void:
 	idle_time += delta
 	if idle_time >= IDLE_DIM_AFTER:
 		_set_dimmed(true)
+	# Lange nichts getroffen: sie fragt nach.  Gezaehlt wird ab dem Abschuss
+	# und nur, solange eine Kugel unterwegs ist - im Schacht wartet man
+	# manchmal absichtlich.
+	if _abgeschossen and not Game.tilted and not get_tree().get_nodes_in_group("balls").is_empty():
+		_ohne_treffer += delta
+		if _ohne_treffer >= OHNE_TREFFER_ZEIT:
+			_ohne_treffer = 0.0
+			Sfx.say("kein_plan")
 
 
 func _cleanup_lost_balls() -> void:
@@ -388,8 +405,13 @@ func _on_event(kind: String, data: Dictionary) -> void:
 			extra = " x" + str(data["mult"])
 		print("AUTOTEST event %s%s t=%.1f ball=%d" % [kind, extra,
 				_at_pulses * 0.4, Game.ball_number])
+	# Jedes Ereignis ausser diesen dreien ist ein Treffer und setzt die Uhr
+	# zurueck, nach der sie "Kein Plan." fragt.
+	if not kind in ["drain", "save_armed", "gameover"]:
+		_ohne_treffer = 0.0
 	match kind:
 		"launch":
+			_abgeschossen = true
 			# Erst ab dem Abschuss laeuft das Zeitfenster des Carry-Save
 			if Game.ball_save_armed:
 				save_time = SAVE_WINDOW
@@ -697,7 +719,13 @@ func _end_wizard() -> void:
 
 ## Ein zufaelliger Spott-Spruch der Queen.
 func spott() -> String:
-	return QUEEN_SPOTT[randi() % QUEEN_SPOTT.size()]
+	return QUEEN_SPOTT[spott_index()]
+
+
+## Derselbe Griff in den Topf, aber mit der Nummer: nur so kann sie den Satz
+## auch sprechen, der gerade dasteht (Fach "spott_1" bis "spott_8").
+func spott_index() -> int:
+	return randi() % QUEEN_SPOTT.size()
 
 
 ## Tisch dunkel bzw. wieder hell schalten (Ruhe-Modus).
@@ -725,6 +753,14 @@ func _on_drain(body: Node2D) -> void:
 		return
 	body.queue_free()
 	call_deferred("_after_drain")
+
+
+## Einen Satz mit Abstand hinterherschicken.  Ist das Spiel bis dahin vorbei
+## oder laeuft schon wieder etwas anderes, faellt er aus.
+func _nachsatz(fach: String, warten: float) -> void:
+	await get_tree().create_timer(warten, false).timeout
+	if not Game.game_over:
+		Sfx.say(fach)
 
 
 func _free_ball_count() -> int:
@@ -755,6 +791,9 @@ func _after_drain() -> void:
 		hud.show_message("MEIN CARRY RETTET.", "Gern geschehen.", 2.5)
 		Game.emit("save")
 		_save_return()
+		# Der Nachsatz kommt erst, wenn der erste Satz durch ist - sonst
+		# faellt er nach der Regel in Sfx.say() ohnehin aus.
+		_nachsatz("gern", 2.8)
 		return
 	# Der Ballverlust ist der lauteste Moment im Spiel - er soll wehtun.
 	Sfx.play("drain", 4.0)
@@ -891,8 +930,18 @@ func _start_ball(first: bool = false) -> void:
 	# Auch der erste Ball meldet sich nur als Ballwechsel.  "KO-OP MODUS"
 	# gehoert zum Multiball und nirgendwo sonst hin - sonst verspricht der
 	# Spielstart etwas, das gar nicht laeuft.
-	hud.show_message("BALL %d" % Game.ball_number,
-			"Zeig doch mal, was du kannst." if first else spott(), 2.5)
+	if first:
+		hud.show_message("BALL %d" % Game.ball_number,
+				"Zeig doch mal, was du kannst.", 2.5)
+		Sfx.say("ball_start")
+	else:
+		# Bei den weiteren Baellen spottet sie - und spricht denselben Spruch,
+		# der dasteht, sofern es dafuer eine Aufnahme gibt.
+		var i := spott_index()
+		hud.show_message("BALL %d" % Game.ball_number, QUEEN_SPOTT[i], 2.5)
+		Sfx.say("spott_%d" % (i + 1))
+	_ohne_treffer = 0.0
+	_abgeschossen = false
 
 
 func _spawn_ball(pos: Vector2, carry: bool = false, impulse: Vector2 = Vector2.ZERO) -> PinBall:

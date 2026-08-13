@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://i1diagstimme01"]
+
+[ext_resource type="Script" path="res://tools/diag_stimme.gd" id="1"]
+
+[node name="DiagStimme" type="Node"]
+script = ExtResource("1")
