@@ -732,7 +732,8 @@ func _after_drain() -> void:
 		Game.emit("save")
 		_save_return()
 		return
-	Sfx.play("drain", -2.0)
+	# Der Ballverlust ist der lauteste Moment im Spiel - er soll wehtun.
+	Sfx.play("drain", 4.0)
 	Sfx.say("kein_skill")
 	Game.emit("drain")
 	if god_mode:

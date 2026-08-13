@@ -36,8 +36,9 @@ func _ready() -> void:
 				AudioServer.get_bus_send(i), str(effekte)])
 
 	print("--- Zwei Ebenen: erzeugt plus Aufnahme ---")
+	# Pegel wie im Spiel: der Ballverlust liegt deutlich ueber dem Rest
 	for name in ["flip", "bump_w", "drain", "jackpot"]:
-		Sfx.play(name, -6.0)
+		Sfx.play(name, 4.0 if name == "drain" else -6.0)
 		await get_tree().process_frame
 		await get_tree().process_frame
 		var laufen := []
