@@ -62,6 +62,11 @@ const DAUERKLAENGE := ["roll", "rakete"]
 ## ihn zu verdecken.  Wert ist der Abstand zum jeweiligen Spielpegel.
 const DATEI_DB := -9.0
 
+## Ausnahmen dazu: hier soll die Aufnahme lauter liegen als sonst.  Beim
+## Ballverlust traegt die echte Kugel unter den Flippern den Moment, der
+## erzeugte Absturz ist nur noch Beiwerk.
+const DATEI_LAUTER := {"drain": 9.0}
+
 var _streams: Dictionary = {}
 var _players: Array[AudioStreamPlayer] = []
 var _next := 0
@@ -241,7 +246,8 @@ func play(snd: String, volume_db: float = 0.0) -> void:
 	# Die echte Aufnahme laeuft leise darunter mit, mit derselben Streuung -
 	# sonst laufen Klang und Aufnahme in der Tonhoehe auseinander.
 	if _aus_datei.has(snd):
-		_spiele(_aus_datei[snd], pegel + DATEI_DB, tonhoehe)
+		_spiele(_aus_datei[snd], pegel + DATEI_DB + float(DATEI_LAUTER.get(snd, 0.0)),
+				tonhoehe)
 
 
 func _spiele(stream: AudioStream, pegel: float, tonhoehe: float) -> void:

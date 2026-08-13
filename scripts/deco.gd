@@ -77,7 +77,10 @@ func _draw() -> void:
 					bild_uv.append((gr * 0.5 + d * kante * 0.5) / gr)
 				draw_colored_polygon(ecken, Color(1, 1, 1, 0.5), bild_uv, _queen)
 			draw_arc(Vector2.ZERO, 74.0 * deco_size, 0, TAU, 48, Color(1.15, 0.8, 0.2, 0.5), 2.0)
-			draw_circle(Vector2.ZERO, 10.0 * deco_size, Color(1.15, 0.8, 0.2, 0.8))
+			# Die orange Nabe gibt es nur ohne Bild - auf dem Gesicht laege sie
+			# genau auf einem Auge.
+			if _queen == null:
+				draw_circle(Vector2.ZERO, 10.0 * deco_size, Color(1.15, 0.8, 0.2, 0.8))
 		"comet":
 			draw_circle(Vector2.ZERO, 5.0 * deco_size, col)
 			for i in 3:
