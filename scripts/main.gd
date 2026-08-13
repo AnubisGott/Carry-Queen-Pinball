@@ -445,10 +445,13 @@ func _on_bumper(letter: String) -> void:
 
 
 ## Goldene Markierung an allen Bumpern, die in der laufenden Kill-Serie
-## schon getroffen wurden.
+## schon getroffen wurden.  Solange das Hurry-Up laeuft und die Hoerner
+## blinken, bleiben alle vier an: die Serie ist ja komplett und wartet nur
+## noch darauf, am Durchlauf kassiert zu werden.  Aus gehen sie erst, wenn
+## das Hurry-Up vorbei ist - kassiert oder abgelaufen.
 func _update_bumper_marks() -> void:
 	for letter in bumpers:
-		bumpers[letter].set_marked(streak_letters.has(letter))
+		bumpers[letter].set_marked(hurry_active or streak_letters.has(letter))
 
 
 func _check_bank() -> void:
@@ -558,9 +561,11 @@ func _check_ich() -> void:
 	hud.show_message("ICH. WER SONST.", "+" + Hud.fmt(pts), 2.2)
 
 
-## Hurry-Up beendet - ob kassiert oder abgelaufen.
+## Hurry-Up beendet - ob kassiert oder abgelaufen.  Erst jetzt gehen die
+## vier Bumper-Markierungen aus (siehe _update_bumper_marks).
 func _end_hurry() -> void:
 	hurry_active = false
+	_update_bumper_marks()
 
 
 func _on_throne_captured(ball: PinBall) -> void:

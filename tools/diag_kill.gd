@@ -17,12 +17,35 @@ func _ready() -> void:
 		await get_tree().physics_frame
 	print("nachher: Kills=%d  EGO x%d  Hurry=%s" % [Game.kills, Game.ego_mult,
 			str(main.hurry_active)])
+	# Solange die Hoerner blinken, muessen alle vier Bumper markiert bleiben
+	print("waehrend das Hurry-Up laeuft: markiert %s -> %s" % [
+			_marken(main), "OK" if _alle_markiert(main) else "FEHLER"])
+	# Hurry-Up ablaufen lassen - erst danach gehen sie aus
+	main.hurry_time = 0.05
+	await get_tree().create_timer(0.4).timeout
+	print("nach Ablauf des Hurry-Ups:    markiert %s -> %s" % [
+			_marken(main), "OK" if _marken(main) == "[]" else "FEHLER"])
 	# Zweite Runde - muss erneut zuenden
 	for id in ["W", "A", "S", "D"]:
 		main._on_bumper(id)
 		await get_tree().physics_frame
 	print("2. Runde: Kills=%d  EGO x%d" % [Game.kills, Game.ego_mult])
 	get_tree().quit()
+
+
+func _marken(main: Node2D) -> String:
+	var out := []
+	for k in main.bumpers:
+		if main.bumpers[k].marked:
+			out.append(str(k))
+	return str(out)
+
+
+func _alle_markiert(main: Node2D) -> bool:
+	for k in main.bumpers:
+		if not main.bumpers[k].marked:
+			return false
+	return true
 
 
 func _labels(main: Node2D) -> String:

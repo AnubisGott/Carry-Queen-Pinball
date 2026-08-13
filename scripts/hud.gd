@@ -131,7 +131,9 @@ func _build_bar() -> void:
 	_save_label = _label("CARRY-SAVE ●", Vector2(10, 68), 10, GREEN, bar)
 	_god_label = _label("GOD", Vector2(78, 50), 13, GOLD, bar)
 	_god_label.visible = false
-	var disc_names := {"DAMAGE": "DMG", "EGO": "EGO", "CARRY": "CARRY", "ICH": "ICH"}
+	# Die Disziplin heisst intern weiter CARRY, in der Leiste steht aber, was
+	# man dafuer tun muss: die vier Bumper.
+	var disc_names := {"DAMAGE": "DMG", "EGO": "EGO", "CARRY": "ASWD", "ICH": "ICH"}
 	var xs := {"DAMAGE": 285, "EGO": 330, "CARRY": 375, "ICH": 432}
 	for k in disc_names:
 		_disc_labels[k] = _label(disc_names[k], Vector2(xs[k], 62), 11, DIM, bar)

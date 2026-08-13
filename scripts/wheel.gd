@@ -25,26 +25,32 @@ const PER_TICK := 25
 ## Punkte allein fuers Anstossen
 const ANSTOSS := 120
 
-## Sektorfarben nach Hoehe des Gewinns: das Gold des Tisches fuer den
-## Hauptgewinn, danach Lila, Rot, Blau, Gruen und Weiss fuer den kleinsten.
-const F_GOLD := Color(1.22, 0.9, 0.2)
-const F_LILA := Color(1.1, 0.4, 1.9)
-const F_ROT := Color(1.75, 0.22, 0.3)
-const F_BLAU := Color(0.3, 0.62, 2.0)
-const F_GRUEN := Color(0.3, 1.35, 0.22)
-## Weiss bewusst unter der Ueberstrahlungsschwelle: heller gesetzt frisst der
-## Leuchtschleier die dunkle Beschriftung darauf auf.
-const F_WEISS := Color(0.95, 0.95, 1.02)
+## Sektorfarben: alle sechs kommen so schon auf dem Spielfeld vor - die vier
+## Wabenfelder in den Ecken (Cyan oben links, Magenta oben rechts, Lila unten
+## rechts, Gruen unten links), das Gold der Hoerner und das Rot der
+## DAMAGE-Buchstaben.
+##
+## Der Tisch leuchtet ueber Farbwerte groesser 1 (HDR-Glow der Umgebung).  Das
+## Rad soll nicht leuchten, deshalb sind alle Werte so herunterskaliert, dass
+## der groesste Kanal genau 1 ist: gleiche Farbe, kein Schein.
+## Gold etwas gelber als die reine Skalierung (0.74 Gruen), weil das Gold der
+## Hoerner durch seinen Leuchtschein heller und gelber wirkt als sein Grundwert.
+const F_GOLD := Color(1.0, 0.85, 0.18)    # Hoerner,      Tisch: 1.22,0.9,0.2
+const F_LILA := Color(0.58, 0.21, 1.0)    # Ecke u. re.,  Tisch: 1.1,0.4,1.9
+const F_ROT := Color(1.0, 0.17, 0.28)     # DAMAGE,       Tisch: 1.8,0.3,0.5
+const F_CYAN := Color(0.08, 0.89, 1.0)    # Ecke o. li.,  Tisch: 0.15,1.6,1.8
+const F_GRUEN := Color(0.22, 1.0, 0.16)   # Ecke u. li.,  Tisch: 0.3,1.35,0.22
+const F_MAGENTA := Color(1.0, 0.16, 0.59) # Ecke o. re.,  Tisch: 1.7,0.28,1.0
 
 ## Reihenfolge auf der Scheibe: hohe und niedrige Ligen wechseln sich ab,
 ## damit nicht ein ganzer Bogen wertlos ist.  Die Farbe haengt dagegen am
 ## Wert, nicht am Platz.
 const SEKTOREN := [
-	{"punkte": 500, "kurz": "500", "rang": "BRONZE", "farbe": F_WEISS},
+	{"punkte": 500, "kurz": "500", "rang": "BRONZE", "farbe": F_MAGENTA},
 	{"punkte": 5000, "kurz": "5K", "rang": "DIAMANT", "farbe": F_ROT},
 	{"punkte": 1000, "kurz": "1K", "rang": "SILBER", "farbe": F_GRUEN},
 	{"punkte": 25000, "kurz": "25K", "rang": "CHALLENGER", "farbe": F_GOLD},
-	{"punkte": 2000, "kurz": "2K", "rang": "GOLD", "farbe": F_BLAU},
+	{"punkte": 2000, "kurz": "2K", "rang": "GOLD", "farbe": F_CYAN},
 	{"punkte": 10000, "kurz": "10K", "rang": "MASTER", "farbe": F_LILA},
 ]
 
@@ -159,19 +165,19 @@ func _draw() -> void:
 		# sonst verschwindet die Zahl im Untergrund.
 		var mitte := von + pro * 0.5
 		var txt := str(SEKTOREN[i]["kurz"])
-		var schrift := Color(0.05, 0.03, 0.08) if grund == F_WEISS or grund == F_GOLD \
-				else Color(1.6, 1.6, 1.7)
+		var schrift := Color(0.04, 0.03, 0.07) if grund.get_luminance() > 0.45 \
+				else Color(1.0, 1.0, 1.0)
 		draw_set_transform(Vector2.RIGHT.rotated(mitte) * (RADIUS * 0.62), mitte + PI / 2.0, Vector2.ONE)
 		draw_string(f, Vector2(-11, 4), txt, HORIZONTAL_ALIGNMENT_CENTER, 22, 11, schrift)
 		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
-	# Rand, Nabe und Krone
-	var rand := Table.NEON_GOLD if dreht else Table.NEON_VIOLET
+	# Rand, Nabe und Krone - ebenfalls hoechstens Wert 1, damit nichts strahlt
+	var rand := F_GOLD if dreht else F_LILA
 	draw_arc(Vector2.ZERO, RADIUS, 0.0, TAU, 48,
 			Color(rand.r, rand.g, rand.b, 0.85 + 0.15 * _leuchten), 2.5)
 	draw_circle(Vector2.ZERO, 7.0, Color(0.08, 0.06, 0.12))
-	draw_arc(Vector2.ZERO, 7.0, 0.0, TAU, 20, Table.NEON_CYAN, 1.5)
+	draw_arc(Vector2.ZERO, 7.0, 0.0, TAU, 20, F_CYAN, 1.5)
 	# Krone als Zeiger ueber dem Rad
-	var kz := Color(1.4, 1.05, 0.3)
+	var kz := F_GOLD
 	draw_colored_polygon(PackedVector2Array([
 			Vector2(-9, -RADIUS - 12), Vector2(9, -RADIUS - 12),
 			Vector2(0, -RADIUS - 1)]), kz)
