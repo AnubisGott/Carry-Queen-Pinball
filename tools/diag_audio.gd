@@ -14,11 +14,15 @@ func _ready() -> void:
 		if args[i] == "--wav" and i + 1 < args.size():
 			_wav_out = args[i + 1]
 
-	# Sfx ist Autoload und hat sich beim Start schon aufgebaut - fuer die
-	# Zeitmessung noch einmal erzeugen lassen.
+	# Sfx baut die Klaenge im Hintergrund - erst abwarten.
+	var t_start := Time.get_ticks_msec()
+	while Sfx._streams.is_empty():
+		await get_tree().process_frame
+	print("Fertig nach %d ms (Nebenlaeufer, blockiert den Start nicht)" % (
+			Time.get_ticks_msec() - t_start))
 	var t0 := Time.get_ticks_msec()
 	Sfx._build_all()
-	print("Aufbauzeit aller Klaenge: %d ms" % (Time.get_ticks_msec() - t0))
+	print("Reine Rechenzeit aller Klaenge: %d ms" % (Time.get_ticks_msec() - t0))
 
 	print("--- Busse ---")
 	for i in AudioServer.bus_count:
