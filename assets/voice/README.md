@@ -12,24 +12,26 @@ lassen.
 
 ## Die Sprüche und wann sie kommen
 
-Die dritte Spalte ist der Text, der dabei auf dem Spielfeld steht. Die
-Aufnahme sollte dazu passen, aber nicht dasselbe sagen - sonst liest man mit.
+**Der Dateiname ist nur das Ablagefach, nicht der Text.** `spiel_vorbei` heißt
+also nicht, dass sie „Spiel vorbei" sagen soll - dort gehört die Zeile hin,
+die beim Spielende kommt. Was gesprochen wird, entscheidest du; die letzte
+Spalte ist nur ein Vorschlag.
 
-| Datei | Wann sie kommt | Steht dabei auf dem Feld |
-|---|---|---|
-| `ich_bin_die_beste` | I-C-H-Bank komplett · Hurry-Up am Durchlauf kassiert · Hauptgewinn am Glücksrad (25K) | „ICH. WER SONST." / „KILL KASSIERT." / „CHALLENGER!" |
-| `mein_carry_rettet` | Carry-Save: der Ball war verloren und wird gerettet | „MEIN CARRY RETTET." – „Gern geschehen." |
-| `kein_skill` | Ball endgültig verloren | (nichts, die Meldung kommt erst beim nächsten Ball) |
-| `der_bericht` | Wizard startet, alle vier Disziplinen geschafft | „DER BERICHT." – „40 Sekunden lang zählt alles fünffach." |
-| `koop_modus` | G-G-E-Z-Multiball startet | „G-G-E-Z: KO-OP-MULTIBALL!" – „Vier Spieler. Ein Carry. Ich." |
-| `outro` | Game Over | Punktefenster mit Bestwert |
+| Datei | Wann sie kommt | Auf dem Feld steht dabei | Könnte sie sagen |
+|---|---|---|---|
+| `ich_bin_die_beste` | I-C-H-Bank komplett · Hurry-Up am Durchlauf kassiert · Hauptgewinn am Glücksrad (25K) | „ICH. WER SONST." | „Ich bin die Beste." |
+| `mein_carry_rettet` | Carry-Save: der Ball war verloren und wird gerettet | „MEIN CARRY RETTET." – „Gern geschehen." | „Hab ich dich wieder rausgehauen." |
+| `kein_skill` | Ball endgültig verloren | (nichts, die Meldung kommt erst beim nächsten Ball) | „Kein Skill." |
+| `der_bericht` | Wizard startet, alle vier Disziplinen geschafft | „DER BERICHT." – „40 Sekunden lang zählt alles fünffach." | „Jetzt kommt der Bericht." |
+| `koop_modus` | G-G-E-Z-Multiball startet | „G-G-E-Z: KO-OP-MULTIBALL!" | „Vier Spieler. Ein Carry. Ich." |
+| `spiel_vorbei` | Game Over | Punktefenster mit Bestwert | „Gern geschehen. Und tschüss." |
 
 **Wie oft man sie hört**, von oft nach selten:
 
 1. `kein_skill` – bei jedem Ballverlust, also mindestens dreimal je Spiel
 2. `mein_carry_rettet` – höchstens einmal je Ball
 3. `ich_bin_die_beste` – mehrmals je Spiel, aus drei verschiedenen Anlässen
-4. `outro` – einmal je Spiel
+4. `spiel_vorbei` – einmal je Spiel
 5. `der_bericht` und `koop_modus` – die beiden Höhepunkte, oft gar nicht
 
 Die beiden letzten dürfen entsprechend groß klingen. `kein_skill` dagegen
@@ -41,11 +43,11 @@ Vorstellung, die beim vierten Mal nervt.
 Diese drei sind vorgesehen, werden aber an keiner Stelle abgerufen. Wenn du
 sie aufnimmst, sag Bescheid - dann bekommen sie ihren Platz:
 
-| Datei | Vorschlag, wo sie hingehört |
-|---|---|
-| `gern_geschehen` | als Nachsatz nach der Rettung, ein paar Sekunden nach `mein_carry_rettet` |
-| `kein_plan` | wenn eine Weile nichts getroffen wird |
-| `ohne_mich` | beim Verlust des letzten Balls, vor dem Game Over |
+| Datei | Vorschlag, wo sie hingehört | Könnte sie sagen |
+|---|---|---|
+| `gern_geschehen` | als Nachsatz nach der Rettung, ein paar Sekunden nach `mein_carry_rettet` | „Gern geschehen." |
+| `kein_plan` | wenn eine Weile nichts getroffen wird | „Kein Plan, oder?" |
+| `ohne_mich` | beim Verlust des letzten Balls, vor dem Spielende | „Ohne mich wärt ihr nichts." |
 
 ## Format
 

@@ -94,7 +94,9 @@ const VOICE_FILES := {
 	"kein_skill": "kein_skill",
 	"kein_plan": "kein_plan",
 	"ohne_mich": "ohne_mich",
-	"outro": "outro",
+	# Die Zeile zum Schluss.  Hiess frueher "outro" - das klang, als solle sie
+	# das Wort sagen.
+	"outro": "spiel_vorbei",
 	"bericht": "der_bericht",
 }
 
