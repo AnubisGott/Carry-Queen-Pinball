@@ -290,7 +290,10 @@ static func build(parent: Node2D) -> Dictionary:
 	parent.add_child(TableDeco.new("comet", Vector2(38, 540), NEON_GOLD, 1.0, 15.0))
 	parent.add_child(TableDeco.new("comet", Vector2(445, 540), NEON_GOLD, 1.0, -15.0))
 	# (Der Saturn sass hier - an seiner Stelle steht jetzt das Gluecksrad.)
-	parent.add_child(TableDeco.new("arrow", Vector2(375, 520), NEON_CYAN, 1.0, -35.0))
+	# Pfeil unterhalb des Gluecksrads, auf dessen Mitte gedreht: von (95,320)
+	# nach (139,235) sind das 27 Grad aus der Senkrechten.  Er steht weit genug
+	# vom Bumper-Pad entfernt, um nicht darauf zu liegen.
+	parent.add_child(TableDeco.new("arrow", Vector2(95, 320), NEON_CYAN, 1.0, 27.0))
 	# Lane-Pfeile: blinken, solange ein Ball abschussbereit ist (main.gd)
 	var lane_chevrons := []
 	for i in 5:

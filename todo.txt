@@ -1,7 +1,5 @@
-- sound dateien
 - Punkte aufsteigen lassen, damit man Ursache wirkung bessert sieht
 - Sonderfunktionen justieren
-- Flipper Sound Samples (free usage) downloaden oder in Suno generieren (cyberspace/cyberpunk sounds)
 - wozu ist der cyan farbene Pfeil
 - manchmal geht die Kugel durch zwei Durchgänge gleichzeitig, also zwei Lichter gehen gleichzeitig an.
 - Aus dem Stand komme ich nicht mehr weit genug nach oben um alle durchgans-lanes zu treffen. Versuche irgendwie, dass man beim ruhenden Abschlag höher kommt.
@@ -24,3 +22,4 @@ der Ball ist wieder durch die linke Mulde durchgegangen
 
 Wave Sound lauter wenn der Ball herunterfällt.
 
+zu viele Jubel-Sounds?
