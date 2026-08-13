@@ -17,6 +17,20 @@ func _ready() -> void:
 		await get_tree().physics_frame
 	print("nachher: Kills=%d  EGO x%d  Hurry=%s" % [Game.kills, Game.ego_mult,
 			str(main.hurry_active)])
+	# Die Disziplin in der oberen Leiste (dort als WSAD beschriftet) muss mit
+	# den vier Bumpern angehen - nicht erst beim Multiball.
+	print("WSAD-Lampe oben: %s -> %s" % [str(Game.disciplines["CARRY"]),
+			"OK" if Game.disciplines["CARRY"] else "FEHLER"])
+	# Ballverlust darf sie nicht loeschen
+	main._start_ball()
+	await get_tree().create_timer(0.3).timeout
+	print("nach Ballwechsel:  %s -> %s" % [str(Game.disciplines["CARRY"]),
+			"bleibt an OK" if Game.disciplines["CARRY"] else "FEHLER"])
+	# Erst der fertige Bericht setzt sie zurueck
+	main._end_wizard()
+	await get_tree().create_timer(0.3).timeout
+	print("nach dem Bericht:  %s -> %s" % [str(Game.disciplines["CARRY"]),
+			"aus OK" if not Game.disciplines["CARRY"] else "FEHLER"])
 	# Solange die Hoerner blinken, muessen alle vier Bumper markiert bleiben
 	print("waehrend das Hurry-Up laeuft: markiert %s -> %s" % [
 			_marken(main), "OK" if _alle_markiert(main) else "FEHLER"])

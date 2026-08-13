@@ -425,6 +425,10 @@ func _on_bumper(letter: String) -> void:
 		# moeglich.
 		streak_letters.clear()
 		Game.kills += 1
+		# Alle vier Bumper einmal getroffen - das ist die Disziplin, die oben
+		# in der Leiste als WSAD steht.  Sie bleibt an bis zum Spielende oder
+		# bis der Bericht durch ist (dort setzt _end_wizard sie zurueck).
+		Game.discipline_done("CARRY")
 		var pts := Game.add_score(3000)
 		# Der Kill ist die einzige Quelle fuer den Ego-Multiplikator.
 		Game.ego_level_up()
@@ -531,7 +535,6 @@ func _check_ggez() -> void:
 ## Feld - nur die pinke Carry-Kugel zaehlt richtig (x10).
 func _start_ggez_multiball() -> void:
 	Game.multiball = true
-	Game.discipline_done("CARRY")
 	Sfx.play("mode")
 	Sfx.say("koop")
 	hud.show_message("G-G-E-Z: KO-OP-MULTIBALL!", "Vier Spieler. Ein Carry. Ich.", 3.0)
@@ -618,7 +621,6 @@ func _eject_after(ball: PinBall, t: float) -> void:
 func _start_multiball(ball: PinBall) -> void:
 	Game.multiball = true
 	Game.locks = 0
-	Game.discipline_done("CARRY")
 	Sfx.play("mode")
 	Sfx.say("koop")
 	hud.show_message("VIER SPIELER. EIN CARRY.", "ICH.", 3.0)
