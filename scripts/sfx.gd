@@ -40,8 +40,11 @@ const RAKETE_PITCH_START := 0.70
 const RAKETE_PITCH_VOLL := 1.50
 ## Hochfahren traege (das Triebwerk braucht seine Zeit), Abschalten schnell -
 ## beim Abschuss soll das Brausen mit der Kugel weg sein, nicht nachhaengen.
-const RAKETE_DB_AUF := 60.0
+const RAKETE_DB_AUF := 95.0
 const RAKETE_DB_AB := 220.0
+## Pegel, auf den das Brausen beim ersten Antippen sofort springt.  Ohne den
+## Ansprung kriecht es aus der Stille hoch und setzt hoerbar zu spaet ein.
+const RAKETE_DB_EINSATZ := -36.0
 const RAKETE_PITCH_TEMPO := 1.6
 
 ## Melodische Klaenge bekommen keine Tonhoehen-Streuung - sonst klingen die
@@ -235,6 +238,9 @@ func rakete(spannung: float) -> void:
 	var s: float = clampf(spannung, 0.0, 1.0)
 	_rakete_db = lerpf(RAKETE_DB_START, RAKETE_DB_VOLL, s)
 	_rakete_pitch = lerpf(RAKETE_PITCH_START, RAKETE_PITCH_VOLL, s)
+	# Aus der Stille heraus sofort auf Einsatzpegel springen
+	if _rakete_player != null and _rakete_player.volume_db < RAKETE_DB_EINSATZ:
+		_rakete_player.volume_db = RAKETE_DB_EINSATZ
 
 
 func _rakete_regeln(delta: float) -> void:

@@ -61,8 +61,8 @@ func _ready() -> void:
 func _feder_test() -> void:
 	print("--- Feder spannen ---")
 	Input.action_press("launch")
-	for i in 6:
-		await get_tree().create_timer(0.25).timeout
+	for i in 11:
+		await get_tree().create_timer(0.13).timeout
 		print("  Ladung %.2f -> %6.1f dB, Tonhoehe %.2f" % [
 				_main.charge, Sfx._rakete_player.volume_db,
 				Sfx._rakete_player.pitch_scale])
