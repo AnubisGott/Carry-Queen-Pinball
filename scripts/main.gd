@@ -787,7 +787,9 @@ func _save_return() -> void:
 		lbl.scale = Vector2(1.4, 1.4)
 		var tw2 := create_tween()
 		tw2.tween_property(lbl, "scale", Vector2.ONE, 0.2)
-		Sfx.play("count", -3.0)
+		# Im Carry-Save nur erzeugte Klaenge: die echten Aufnahmen gehoeren zu
+		# Score-Reel und Feder und haben hier nichts zu suchen.
+		Sfx.play("count", -3.0, true)
 		b.position = home + Vector2(randf_range(-2.0, 2.0), 0)
 		await get_tree().create_timer(0.5, false).timeout
 	lbl.queue_free()
@@ -795,8 +797,8 @@ func _save_return() -> void:
 		b.position = home
 		b.freeze = false
 		b.linear_velocity = Vector2(randf_range(-35, 35), randf_range(-1400, -1250))
-		Sfx.play("count_go", -2.0)
-		Sfx.play("launch", -4.0)
+		Sfx.play("count_go", -2.0, true)
+		Sfx.play("launch", -4.0, true)
 
 
 func _on_continue() -> void:

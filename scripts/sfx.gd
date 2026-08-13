@@ -234,7 +234,11 @@ func _neuer_bus(bus_name: String) -> int:
 
 # -------------------------------------------------------------- Abspielen --
 
-func play(snd: String, volume_db: float = 0.0) -> void:
+## `nur_erzeugt` laesst die Aufnahme weg und spielt allein den synthetischen
+## Klang - fuer Stellen, an denen echte Mechanik nicht passt, etwa im
+## Carry-Save-Countdown: dort waere die Federabschuss-Aufnahme irrefuehrend,
+## weil gerade keine Feder gespannt wird.
+func play(snd: String, volume_db: float = 0.0, nur_erzeugt: bool = false) -> void:
 	if not _streams.has(snd):
 		return
 	var tonhoehe := 1.0
@@ -245,7 +249,7 @@ func play(snd: String, volume_db: float = 0.0) -> void:
 	_spiele(_streams[snd], pegel, tonhoehe)
 	# Die echte Aufnahme laeuft leise darunter mit, mit derselben Streuung -
 	# sonst laufen Klang und Aufnahme in der Tonhoehe auseinander.
-	if _aus_datei.has(snd):
+	if _aus_datei.has(snd) and not nur_erzeugt:
 		_spiele(_aus_datei[snd], pegel + DATEI_DB + float(DATEI_LAUTER.get(snd, 0.0)),
 				tonhoehe)
 
