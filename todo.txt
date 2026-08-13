@@ -2,7 +2,6 @@
 - Punkte aufsteigen lassen, damit man Ursache wirkung bessert sieht
 - Sonderfunktionen justieren
 - Flipper Sound Samples (free usage) downloaden oder in Suno generieren (cyberspace/cyberpunk sounds)
-- Spinner mit Sound hinzufügen
 - wozu ist der cyan farbene Pfeil
 - manchmal geht die Kugel durch zwei Durchgänge gleichzeitig, also zwei Lichter gehen gleichzeitig an.
 - Aus dem Stand komme ich nicht mehr weit genug nach oben um alle durchgans-lanes zu treffen. Versuche irgendwie, dass man beim ruhenden Abschlag höher kommt.
@@ -79,8 +78,6 @@ Womit soll ich anfangen?
   5. [ ] Type something
      Submit
 ───────────────────────────────────────────────────────────────────────────────────────────────
-  6. Chat about this
-  
-    Sound beim start wenn man die Feder spannt muss sich das Anhören wie bei einem Raketenstart und wenn man loslässt und die Kugel losschnellt und wisch sound wie bei einem schnell vorbei fahrenden Auto, Zug, Düsenflieger
+
   
   

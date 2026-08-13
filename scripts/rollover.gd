@@ -2,6 +2,25 @@ class_name RolloverLane
 extends Area2D
 ## Rollover-Gasse: die Kugel rollt durch, der Buchstabe leuchtet auf.
 ## Ob die ganze Bank komplett ist, prueft main.gd (Event "rollover").
+##
+## Der Sensor ist ein schmales Rechteck laengs der Gasse, kein Kreis: bei 38
+## Einheiten Gassenabstand beruehrt eine Kugel (Radius 13) zwei runde Felder
+## mit Radius 12 gleichzeitig und setzt zwei Buchstaben auf einmal.  Mit halber
+## Breite 5 bleiben 5+13=18 < 19, die Kugel liegt also immer nur in einer
+## Gasse.  Zusaetzlich muss sie die Gasse entlang laufen: die Stege sind nur
+## 28 Einheiten lang, darueber und darunter kommt man quer ueber die ganze
+## Reihe.
+
+## Wie sehr die Fahrtrichtung mit der Gassenrichtung uebereinstimmen muss.
+const LAENGS_MIN := 0.55
+## Ein Durchgang, ein Buchstabe: nach einem Treffer ist die ganze Bank fuer
+## dieselbe Kugel kurz gesperrt.  Schraeg unter den kurzen Stegen hindurch
+## streift sie sonst zwei Gassen nacheinander und setzt zwei Lichter.
+const BANK_SPERRE := 0.45
+
+## Gilt fuer alle Gassen gemeinsam - deshalb statisch.
+static var _sperr_kugel := 0
+static var _sperr_zeit := 0.0
 
 var letter := ""
 var lit := false
@@ -17,9 +36,11 @@ func _init(pos: Vector2, letter_: String, dir: Vector2) -> void:
 
 func _ready() -> void:
 	var cs := CollisionShape2D.new()
-	var sh := CircleShape2D.new()
-	sh.radius = 12.0
+	var sh := RectangleShape2D.new()
+	sh.size = Vector2(10.0, 34.0)
 	cs.shape = sh
+	# Lange Achse des Rechtecks auf die Gassenrichtung drehen
+	cs.rotation = _dir.angle() - PI / 2.0
 	add_child(cs)
 	body_entered.connect(_on_pass)
 	z_index = 3
@@ -49,6 +70,17 @@ func _update() -> void:
 func _on_pass(body: Node2D) -> void:
 	if not body is PinBall or body.freeze:
 		return
+	# Nur wer die Gasse entlang faehrt, loest aus - eine Kugel, die oberhalb
+	# oder unterhalb der Stege quer ueber die Reihe rutscht, setzt sonst
+	# mehrere Buchstaben auf einmal.
+	var v: Vector2 = body.linear_velocity
+	if v.length() > 1.0 and absf(v.normalized().dot(_dir)) < LAENGS_MIN:
+		return
+	var jetzt := float(Time.get_ticks_msec()) / 1000.0
+	if body.get_instance_id() == _sperr_kugel and jetzt - _sperr_zeit < BANK_SPERRE:
+		return
+	_sperr_kugel = body.get_instance_id()
+	_sperr_zeit = jetzt
 	if lit:
 		Sfx.play("tick", -8.0)
 		return
