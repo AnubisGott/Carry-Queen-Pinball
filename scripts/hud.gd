@@ -133,7 +133,7 @@ func _build_bar() -> void:
 	_god_label.visible = false
 	# Die Disziplin heisst intern weiter CARRY, in der Leiste steht aber, was
 	# man dafuer tun muss: die vier Bumper.
-	var disc_names := {"DAMAGE": "DMG", "EGO": "EGO", "CARRY": "ASWD", "ICH": "ICH"}
+	var disc_names := {"DAMAGE": "DMG", "EGO": "EGO", "CARRY": "WSAD", "ICH": "ICH"}
 	var xs := {"DAMAGE": 285, "EGO": 330, "CARRY": 375, "ICH": 432}
 	for k in disc_names:
 		_disc_labels[k] = _label(disc_names[k], Vector2(xs[k], 62), 11, DIM, bar)
