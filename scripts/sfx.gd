@@ -23,8 +23,8 @@ const MUSIK_DB := -6.0
 ## Kugel - das ist der Klang, der einem Tisch am meisten Leben gibt.
 const ROLL_MIN := 70.0
 const ROLL_MAX := 1100.0
-const ROLL_DB_LEISE := -33.0
-const ROLL_DB_LAUT := -12.0
+const ROLL_DB_LEISE := -45.0
+const ROLL_DB_LAUT := -24.0
 const ROLL_PITCH_LEISE := 0.70
 const ROLL_PITCH_LAUT := 1.60
 ## Wie schnell Lautstaerke (dB je Sekunde) und Tonhoehe nachgefuehrt werden.

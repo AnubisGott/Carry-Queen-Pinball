@@ -5,6 +5,8 @@
 - Spinner mit Sound hinzufügen
 - wozu ist der cyan farbene Pfeil
 - manchmal geht die Kugel durch zwei Durchgänge gleichzeitig, also zwei Lichter gehen gleichzeitig an.
+- Aus dem Stand komme ich nicht mehr weit genug nach oben um alle durchgans-lanes zu treffen. Versuche irgendwie, dass man beim ruhenden Abschlag höher kommt.
+  
 
 To continue this session, run codex resume 019fe73f-ff94-72e2-862a-f500a5904c5e
 d:\daten\development\gaming\Flipper02Codex>
@@ -79,10 +81,6 @@ Womit soll ich anfangen?
 ───────────────────────────────────────────────────────────────────────────────────────────────
   6. Chat about this
   
+    Sound beim start wenn man die Feder spannt muss sich das Anhören wie bei einem Raketenstart und wenn man loslässt und die Kugel losschnellt und wisch sound wie bei einem schnell vorbei fahrenden Auto, Zug, Düsenflieger
   
-  Die Sounds hören sich besser an. Ich habe bei e:\multimed\Musikideen\work\SunoAI\Der Beste\sound_preview\ reingehört. Alle sounds bis auf rumble.wav gefallen mir nicht. Ich brauche distortion, sägezahn, stottern, kreischend, beißend, bissig, bombast sound, mehrstimmig. Die Tonhöhe schnell veränderndernd, bässe, punch, ...
-  
-  Sound beim start wenn man die Feder spannt muss sich das Anhören wie bei einem Raketenstart und wenn man loslässt und die Kugel losschnellt und wisch sound wie bei einem schnell vorbei fahrenden Auto, Zug, Düsenflieger
-  
-  Aus dem Stand komme ich nicht mehr weit genug nach oben um alle durchgans-lanes zu treffen. Versuche irgendwie, dass man beim ruhenden Abschlag höher kommt.
   
