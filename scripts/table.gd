@@ -266,6 +266,14 @@ static func build(parent: Node2D) -> Dictionary:
 	parent.add_child(gate)
 	refs["gate"] = gate
 
+	# Gluecksrad links im offenen Feld zwischen I-C-H-Bank und Komet: von der
+	# linken Orbitbahn und von steilen Flipperschuessen gut erreichbar.
+	# Zwischen Aussenwand und Scheibe bleiben 44 Einheiten, die Kugel kommt
+	# also weiter daran vorbei.
+	var rad := FortuneWheel.new(Vector2(100, 470))
+	parent.add_child(rad)
+	refs["wheel"] = rad
+
 	# Fang-Mulden an beiden Seitenlaeufen: kurz fangen, sofort zurueck ins Feld
 	parent.add_child(SidePocket.new(Vector2(438, 612), -1.0))
 	parent.add_child(SidePocket.new(Vector2(52, 612), 1.0))
@@ -282,7 +290,7 @@ static func build(parent: Node2D) -> Dictionary:
 	parent.add_child(TableDeco.new("star", Vector2(322, 668), Color(1.6, 1.5, 1.2), 0.7))
 	parent.add_child(TableDeco.new("comet", Vector2(38, 540), NEON_GOLD, 1.0, 15.0))
 	parent.add_child(TableDeco.new("comet", Vector2(445, 540), NEON_GOLD, 1.0, -15.0))
-	parent.add_child(TableDeco.new("saturn", Vector2(82, 475), NEON_GOLD))
+	# (Der Saturn sass hier - an seiner Stelle steht jetzt das Gluecksrad.)
 	parent.add_child(TableDeco.new("arrow", Vector2(375, 520), NEON_CYAN, 1.0, -35.0))
 	# Lane-Pfeile: blinken, solange ein Ball abschussbereit ist (main.gd)
 	var lane_chevrons := []

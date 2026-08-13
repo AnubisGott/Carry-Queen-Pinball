@@ -41,8 +41,11 @@ const CHAT := {
 	"pocket": ["kurz geparkt lol", "rein und sofort wieder raus", "die Fang-Mulde carried"],
 	"ggez": ["gg ez", "EZ Clap", "vier Gassen, null Gegenwehr"],
 	"ego_level": ["ihr EGO skaliert besser als wir", "x-fach?? okay"],
+	"wheel_hit": ["RAD DREHT", "ranked roulette lol", "sie spinnt es an"],
+	"wheel": ["gerankt lmao", "das Rad hat gesprochen", "PAY2WIN vibes",
+			"kein Skill, nur Rad"],
 }
-const CHAT_PROB := {"bumper": 0.06, "sling": 0.15, "spinner": 0.3, "drop_target": 0.25, "standup": 0.4, "ego_level": 0.5}
+const CHAT_PROB := {"bumper": 0.06, "sling": 0.15, "spinner": 0.3, "drop_target": 0.25, "standup": 0.4, "ego_level": 0.5, "wheel_hit": 0.35}
 
 var popup_kind := ""
 

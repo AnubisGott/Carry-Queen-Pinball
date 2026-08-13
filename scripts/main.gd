@@ -371,10 +371,13 @@ func _cleanup_lost_balls() -> void:
 func _on_event(kind: String, data: Dictionary) -> void:
 	if autotest and kind in ["spinner", "gate", "save", "pocket", "ggez",
 			"rollover", "standup", "kill", "frenzy", "wizard", "multiball",
-			"jackpot", "discipline", "all_disciplines", "ego_level", "tilt"]:
+			"jackpot", "discipline", "all_disciplines", "ego_level", "tilt",
+			"wheel", "wheel_hit"]:
 		var extra := ""
 		if data.has("letter"):
 			extra = " " + str(data["letter"])
+		elif data.has("rang"):
+			extra = " " + str(data["rang"]) + " " + str(data.get("roh", 0))
 		elif data.has("name"):
 			extra = " " + str(data["name"])
 		elif data.has("mult"):
@@ -395,6 +398,8 @@ func _on_event(kind: String, data: Dictionary) -> void:
 			_check_ego_bank()
 		"rollover":
 			_check_ggez()
+		"wheel":
+			_gluecksrad_zahlt(data)
 		"all_disciplines":
 			_start_wizard()
 		"gate":
@@ -473,6 +478,31 @@ func _check_ego_bank() -> void:
 	Game.discipline_done("EGO")
 	Sfx.play("jackpot", -6.0)
 	hud.show_message("E-G-O KOMPLETT.", "+" + Hud.fmt(pts), 2.0)
+
+
+## Das Gluecksrad ist ausgedreht und hat einen Rang ausgezahlt.  Die Queen
+## kommentiert das Ergebnis - nach oben hin gnaediger.
+func _gluecksrad_zahlt(data: Dictionary) -> void:
+	var rang := str(data.get("rang", ""))
+	var roh := int(data.get("roh", 0))
+	var pts := int(data.get("punkte", roh))
+	var spruch := "Immerhin gedreht."
+	if roh >= 25000:
+		spruch = "CHALLENGER. Also mein Niveau."
+		Sfx.play("jackpot", -4.0)
+		Sfx.say("beste")
+		Game.emit("jackpot")
+	elif roh >= 5000:
+		spruch = "Geht doch. Fast wie ich."
+		Sfx.play("ego_up", -4.0)
+	elif roh >= 2000:
+		spruch = "Solide. Also unterdurchschnittlich."
+		Sfx.play("count_go", -5.0)
+	else:
+		spruch = "Hardstuck. Wer haette das gedacht."
+		Sfx.play("count", -5.0)
+	# Die Chat-Zeile holt sich der HUD selbst aus dem Ereignis
+	hud.show_message(rang + "!", "+" + Hud.fmt(pts) + "  " + spruch, 2.4)
 
 
 func _check_ggez() -> void:
