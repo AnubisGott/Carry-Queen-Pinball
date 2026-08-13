@@ -35,7 +35,16 @@ func _ready() -> void:
 	print("  direkt danach: Tempo %.1f rad/s (Start %.0f)" % [
 			_rad._speed, FortuneWheel.START_SPEED])
 	var tempo_start := _rad._speed
-	await get_tree().create_timer(2.0).timeout
+	# Punktestand im Takt des Tickens mitschreiben: er muss waehrend des
+	# Drehens immer wieder steigen, nicht erst am Ende springen.
+	var stand := Game.score
+	var stufen := 0
+	for i in 10:
+		await get_tree().create_timer(0.2).timeout
+		if Game.score > stand:
+			stufen += 1
+			stand = Game.score
+	print("  waehrend des Drehens stieg der Punktestand in %d von 10 Abschnitten" % stufen)
 	print("  nach 2 s: Tempo %.1f rad/s -> %s" % [_rad._speed,
 			"wird langsamer OK" if _rad._speed < tempo_start else "BREMST NICHT"])
 	# ausdrehen lassen
@@ -61,9 +70,9 @@ func _ready() -> void:
 
 	print("--- prallt ab, schluckt nicht ---")
 	var ball := PinBall.new()
-	ball.position = _rad.global_position + Vector2(0, -95)
+	ball.position = _rad.global_position + Vector2(-55, -45)
 	_main.add_child(ball)
-	ball.linear_velocity = Vector2(60, 700)
+	ball.linear_velocity = Vector2(520, 420)
 	var min_abstand := 999.0
 	for i in 90:
 		await get_tree().physics_frame
@@ -97,7 +106,7 @@ func _ein_anstoss() -> void:
 		b.queue_free()
 	await get_tree().physics_frame
 	var vorher := _rad._speed
-	_stosse_an(Vector2(0, -95), Vector2(0, 650))
+	_stosse_an(Vector2(-55, -45), Vector2(520, 420))
 	for i in 90:
 		await get_tree().physics_frame
 		if _rad._speed > vorher:
@@ -117,4 +126,5 @@ func _stosse_an(versatz: Vector2, tempo: Vector2) -> void:
 func _on_event(kind: String, data: Dictionary) -> void:
 	if kind == "wheel":
 		_letzte_auszahlung = data.duplicate()
+
 

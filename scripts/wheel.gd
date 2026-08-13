@@ -3,8 +3,9 @@ extends StaticBody2D
 ## Gluecksrad: die Kugel stoesst die Scheibe an, sie dreht sich aus und zahlt
 ## am Ende den Sektor aus, der oben unter der Krone steht.
 ##
-## Waehrend des Drehens gibt es Punkte je Umdrehung wie beim Spinner - wer
-## kraeftig trifft, kassiert also schon beim Ausdrehen.  Ein weiterer Treffer
+## Waehrend des Drehens tickt jeder Sektor, der unter der Krone durchlaeuft,
+## und zahlt dabei - der Punktestand klettert also sichtbar im Takt des
+## Tickens, bis die Scheibe steht.  Ein weiterer Treffer
 ## bringt die Scheibe wieder auf Anfangstempo: wer nachlegt, dreht laenger,
 ## verschiebt aber auch, wo sie stehen bleibt.
 ##
@@ -16,25 +17,39 @@ const RADIUS := 36.0
 const START_SPEED := 14.0
 ## Bremsung je Sekunde - daraus ergeben sich rund 6 Sekunden Auslauf
 const REIBUNG := 2.3
-## Punkte je Umdrehung waehrend des Drehens
-const PER_REV := 60
+## Punkte je Tick, also jedes Mal, wenn ein Sektor unter der Krone
+## durchlaeuft.  So steigt der Punktestand sichtbar mit dem Ticken mit,
+## statt nur einmal je Umdrehung zu springen.  Sechs Sektoren ergeben
+## 150 Punkte je Umdrehung.
+const PER_TICK := 25
 ## Punkte allein fuers Anstossen
 const ANSTOSS := 120
 
+## Sektorfarben nach Hoehe des Gewinns: das Gold des Tisches fuer den
+## Hauptgewinn, danach Lila, Rot, Blau, Gruen und Weiss fuer den kleinsten.
+const F_GOLD := Color(1.22, 0.9, 0.2)
+const F_LILA := Color(1.1, 0.4, 1.9)
+const F_ROT := Color(1.75, 0.22, 0.3)
+const F_BLAU := Color(0.3, 0.62, 2.0)
+const F_GRUEN := Color(0.3, 1.35, 0.22)
+## Weiss bewusst unter der Ueberstrahlungsschwelle: heller gesetzt frisst der
+## Leuchtschleier die dunkle Beschriftung darauf auf.
+const F_WEISS := Color(0.95, 0.95, 1.02)
+
 ## Reihenfolge auf der Scheibe: hohe und niedrige Ligen wechseln sich ab,
-## damit nicht ein ganzer Bogen wertlos ist.
+## damit nicht ein ganzer Bogen wertlos ist.  Die Farbe haengt dagegen am
+## Wert, nicht am Platz.
 const SEKTOREN := [
-	{"punkte": 500, "kurz": "500", "rang": "BRONZE"},
-	{"punkte": 5000, "kurz": "5K", "rang": "DIAMANT"},
-	{"punkte": 1000, "kurz": "1K", "rang": "SILBER"},
-	{"punkte": 25000, "kurz": "25K", "rang": "CHALLENGER"},
-	{"punkte": 2000, "kurz": "2K", "rang": "GOLD"},
-	{"punkte": 10000, "kurz": "10K", "rang": "MASTER"},
+	{"punkte": 500, "kurz": "500", "rang": "BRONZE", "farbe": F_WEISS},
+	{"punkte": 5000, "kurz": "5K", "rang": "DIAMANT", "farbe": F_ROT},
+	{"punkte": 1000, "kurz": "1K", "rang": "SILBER", "farbe": F_GRUEN},
+	{"punkte": 25000, "kurz": "25K", "rang": "CHALLENGER", "farbe": F_GOLD},
+	{"punkte": 2000, "kurz": "2K", "rang": "GOLD", "farbe": F_BLAU},
+	{"punkte": 10000, "kurz": "10K", "rang": "MASTER", "farbe": F_LILA},
 ]
 
 var _winkel := 0.0
 var _speed := 0.0
-var _rev_acc := 0.0
 var _cool := 0.0
 var _letzter_sektor := -1
 var _leuchten := 0.0
@@ -82,18 +97,13 @@ func _process(delta: float) -> void:
 		queue_redraw()
 	if _speed <= 0.0:
 		return
-	var schritt := _speed * delta
-	_winkel = fmod(_winkel + schritt, TAU)
-	# Punkte je Umdrehung, wie beim Spinner
-	_rev_acc += schritt
-	while _rev_acc >= TAU:
-		_rev_acc -= TAU
-		Game.add_score(PER_REV, _ball if is_instance_valid(_ball) else null)
-	# Ticken, sobald ein Sektor an der Krone vorbeilaeuft
+	_winkel = fmod(_winkel + _speed * delta, TAU)
+	# Jeder Sektor, der unter der Krone durchlaeuft, tickt und zahlt
 	var sekt := _sektor_oben()
 	if sekt != _letzter_sektor:
 		_letzter_sektor = sekt
 		Sfx.play("tick", -18.0)
+		Game.add_score(PER_TICK, _ball if is_instance_valid(_ball) else null)
 	_speed = maxf(0.0, _speed - REIBUNG * delta)
 	if _speed <= 0.0:
 		_auszahlen()
@@ -117,7 +127,6 @@ func _on_hit(body: Node2D) -> void:
 	_ball = body as PinBall
 	# Jeder Treffer setzt wieder aufs Anfangstempo - auch mitten im Auslauf
 	_speed = START_SPEED
-	_rev_acc = 0.0
 	_gewinn_sektor = -1
 	Sfx.play("spin", -6.0)
 	Game.add_score(ANSTOSS, _ball)
@@ -134,24 +143,26 @@ func _draw() -> void:
 	draw_circle(Vector2.ZERO, RADIUS, Color(0.05, 0.04, 0.09))
 	for i in SEKTOREN.size():
 		var von := _winkel + i * pro
-		var hoch: bool = int(SEKTOREN[i]["punkte"]) >= 5000
-		var grund := Table.NEON_VIOLET if i % 2 == 0 else Table.NEON_PINK
-		if hoch:
-			grund = Table.NEON_GOLD
-		var stark: float = 0.16 + (0.5 if i == _gewinn_sektor else 0.0) * _leuchten
+		var grund: Color = SEKTOREN[i]["farbe"]
+		# Fast deckend: bei halber Deckkraft wird das Gold ueber dem dunklen
+		# Tisch braun statt golden.  Der Gewinnsektor leuchtet beim Auszahlen
+		# zusaetzlich kurz auf.
+		var stark: float = 0.85 + 0.15 * (_leuchten if i == _gewinn_sektor else 0.0)
 		# Sektorflaeche als Faecher
 		var punkte := PackedVector2Array([Vector2.ZERO])
 		for k in 9:
 			punkte.append(Vector2.RIGHT.rotated(von + pro * float(k) / 8.0) * (RADIUS - 2.0))
 		draw_colored_polygon(punkte, Color(grund.r, grund.g, grund.b, stark))
 		draw_line(Vector2.ZERO, Vector2.RIGHT.rotated(von) * (RADIUS - 2.0),
-				Color(grund.r, grund.g, grund.b, 0.55), 1.5)
-		# Beschriftung mitdrehend
+				Color(0.02, 0.02, 0.04, 0.9), 1.5)
+		# Beschriftung mitdrehend.  Auf hellem Grund dunkel, sonst hell -
+		# sonst verschwindet die Zahl im Untergrund.
 		var mitte := von + pro * 0.5
 		var txt := str(SEKTOREN[i]["kurz"])
+		var schrift := Color(0.05, 0.03, 0.08) if grund == F_WEISS or grund == F_GOLD \
+				else Color(1.6, 1.6, 1.7)
 		draw_set_transform(Vector2.RIGHT.rotated(mitte) * (RADIUS * 0.62), mitte + PI / 2.0, Vector2.ONE)
-		draw_string(f, Vector2(-11, 4), txt, HORIZONTAL_ALIGNMENT_CENTER, 22, 11,
-				grund if not hoch else Color(1.5, 1.2, 0.4))
+		draw_string(f, Vector2(-11, 4), txt, HORIZONTAL_ALIGNMENT_CENTER, 22, 11, schrift)
 		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 	# Rand, Nabe und Krone
 	var rand := Table.NEON_GOLD if dreht else Table.NEON_VIOLET
@@ -167,3 +178,4 @@ func _draw() -> void:
 	draw_line(Vector2(-9, -RADIUS - 12), Vector2(-9, -RADIUS - 19), kz, 2.0)
 	draw_line(Vector2(0, -RADIUS - 12), Vector2(0, -RADIUS - 21), kz, 2.0)
 	draw_line(Vector2(9, -RADIUS - 12), Vector2(9, -RADIUS - 19), kz, 2.0)
+

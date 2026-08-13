@@ -266,11 +266,10 @@ static func build(parent: Node2D) -> Dictionary:
 	parent.add_child(gate)
 	refs["gate"] = gate
 
-	# Gluecksrad links im offenen Feld zwischen I-C-H-Bank und Komet: von der
-	# linken Orbitbahn und von steilen Flipperschuessen gut erreichbar.
-	# Zwischen Aussenwand und Scheibe bleiben 44 Einheiten, die Kugel kommt
-	# also weiter daran vorbei.
-	var rad := FortuneWheel.new(Vector2(100, 470))
+	# Gluecksrad oben links, wo bisher nichts passierte: die Kugel kommt vom
+	# Bogen herum und trifft es im Vorbeilaufen.  Rundherum ist Platz - zur
+	# Leitplanke 78, zum Ablenker 93, zur ersten G-G-E-Z-Gasse 85 Einheiten.
+	var rad := FortuneWheel.new(Vector2(139, 235))
 	parent.add_child(rad)
 	refs["wheel"] = rad
 
