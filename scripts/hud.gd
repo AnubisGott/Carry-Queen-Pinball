@@ -41,6 +41,15 @@ const CHAT := {
 	"pocket": ["kurz geparkt lol", "rein und sofort wieder raus", "die Fang-Mulde carried"],
 	"ggez": ["gg ez", "EZ Clap", "vier Gassen, null Gegenwehr"],
 	"ego_level": ["ihr EGO skaliert besser als wir", "x-fach?? okay"],
+	# Der Kanal wird im Chat beworben - von "Zuschauern", versteht sich.
+	"kanal": [
+		"youtube.com/@carryqueen - LIVE",
+		"Link ist oben, drueckt einfach drauf",
+		"abonniert oder heult",
+		"sie streamt das grad, oben der Knopf",
+		"YT-Kanal in der Leiste, nicht so schwer",
+		"ich guck das lieber im Stream als hier",
+	],
 	"wheel_hit": ["RAD DREHT", "ranked roulette lol", "sie spinnt es an"],
 	"wheel": ["gerankt lmao", "das Rad hat gesprochen", "PAY2WIN vibes",
 			"kein Skill, nur Rad"],
@@ -56,6 +65,8 @@ var _wizard_t := 0.0
 var _wizard_frac := 0.0
 var _frenzy := false
 var _frenzy_frac := 0.0
+## Zeit bis zur naechsten Kanal-Erwaehnung im Chat
+var _kanal_t := randf_range(30.0, 50.0)
 var _wizard_bar: ColorRect
 var _wizard_label: Label
 
@@ -127,6 +138,10 @@ func _build_bar() -> void:
 	bar.size = Vector2(540, 84)
 	add_child(bar)
 	_label("● EMPRESS LIVE!", Vector2(10, 4), 13, PINK, bar)
+	# Anklickbares YouTube-Abzeichen neben dem Schriftzug
+	var yt := YoutubeBadge.new()
+	yt.position = Vector2(126, 3)
+	bar.add_child(yt)
 	# Punktestand als Segmentanzeige wie bei den Flippern der Achtziger.
 	# Sie zeichnet sich um ihren Mittelpunkt, deshalb sitzt sie mittig ueber
 	# der Leiste statt in einem Kasten.
@@ -205,7 +220,33 @@ func _update_modus() -> void:
 		_wizard_label.text = "DAMAGE x%d" % Game.FRENZY_MULT
 
 
+## Ab und zu erwaehnt der Chat den Kanal, und die Queen legt nach.
+const KANAL_QUEEN := [
+	"Oben ist der Kanal. Klicken. Jetzt.",
+	"Abonnieren kostet nichts. Skill schon.",
+	"Im Stream mache ich das mit einer Hand.",
+	"Zuschauen kannst du ja wenigstens.",
+	"Der Knopf oben links. Nicht so schwer.",
+]
+
+
+func _kanal_werbung(delta: float) -> void:
+	if Game.game_over:
+		return
+	_kanal_t -= delta
+	if _kanal_t > 0.0:
+		return
+	_kanal_t = randf_range(55.0, 100.0)
+	var zeilen: Array = CHAT["kanal"]
+	chat(zeilen[randi() % zeilen.size()])
+	# Nur bei jeder zweiten Erwaehnung meldet sich die Queen dazu - sonst
+	# wird aus dem Gag eine Dauerwerbesendung.
+	if randf() < 0.5:
+		show_sub(KANAL_QUEEN[randi() % KANAL_QUEEN.size()], 2.4)
+
+
 func _process(delta: float) -> void:
+	_kanal_werbung(delta)
 	if not _wizard and not _frenzy:
 		return
 	_wizard_t += delta * 5.0
