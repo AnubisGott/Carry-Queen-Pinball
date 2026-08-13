@@ -888,11 +888,11 @@ func _start_ball(first: bool = false) -> void:
 	plunger.release()
 	Game.emit("save_armed")
 	_spawn_ball(SPAWN)
-	if first:
-		hud.show_message("KO-OP MODUS.", "Vier Spieler. Ein Carry. Ich.", 3.0)
-		Sfx.say("koop")
-	else:
-		hud.show_message("BALL %d" % Game.ball_number, spott(), 2.5)
+	# Auch der erste Ball meldet sich nur als Ballwechsel.  "KO-OP MODUS"
+	# gehoert zum Multiball und nirgendwo sonst hin - sonst verspricht der
+	# Spielstart etwas, das gar nicht laeuft.
+	hud.show_message("BALL %d" % Game.ball_number,
+			"Zeig doch mal, was du kannst." if first else spott(), 2.5)
 
 
 func _spawn_ball(pos: Vector2, carry: bool = false, impulse: Vector2 = Vector2.ZERO) -> PinBall:

@@ -17,7 +17,7 @@ lassen.
 | `ich_bin_die_beste` | ICH-Bank komplett, Hurry-Up am Durchlauf kassiert, Hauptgewinn am Glücksrad (25K) | oft - die meistgehörte Zeile |
 | `mein_carry_rettet` | Carry-Save: der Ball war verloren und wird gerettet | oft |
 | `kein_skill` | Ball endgültig verloren | bei jedem Ballverlust |
-| `koop_modus` | Spielstart und G-G-E-Z-Multiball | einmal je Spiel plus Multiball |
+| `koop_modus` | G-G-E-Z-Multiball startet | selten - nur bei Multiball |
 | `der_bericht` | Wizard-Modus startet (alle vier Disziplinen geschafft) | selten, der große Moment |
 | `outro` | Game Over | einmal je Spiel |
 
