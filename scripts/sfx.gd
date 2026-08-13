@@ -1130,16 +1130,22 @@ func _fach_zu(haken: String) -> String:
 	for key in VOICE_FILES:
 		if haken == key or haken == VOICE_FILES[key]:
 			return key
-	var beste := ""
-	var laenge := 0
+	# Nachsichtig ueber den gemeinsamen Anfang: wer beim Tippen ein Wort
+	# auslaesst ("das bestimmt schoen" statt "das war bestimmt schoen"), landet
+	# trotzdem richtig.  14 Zeichen sind genug, um Verwechslungen zu
+	# vermeiden - "kein_plan" und "kein_skill" teilen nur fuenf.
+	const MINDEST := 14
+	var treffer := ""
+	var laenge := MINDEST - 1
 	for k in VOICE_TEXTE:
 		var s := str(k)
-		if s.length() < 8 or s.length() <= laenge:
-			continue
-		if haken.begins_with(s) or s.begins_with(haken):
-			beste = VOICE_TEXTE[k]
-			laenge = s.length()
-	return beste
+		var i := 0
+		while i < s.length() and i < haken.length() and s[i] == haken[i]:
+			i += 1
+		if i > laenge:
+			treffer = VOICE_TEXTE[k]
+			laenge = i
+	return treffer
 
 
 ## Was gefunden wurde, steht beim Start in der Ausgabe - und ebenso, was

@@ -156,17 +156,17 @@ erwarte - ein anderer Name geht auch, solange er nah genug dran ist.
 
 | Fach | Ordner heißt | Gehört zu | Da liegen |
 |---|---|---|---|
-| `beste` | Ich bin die Beste | M5, M6 (nur 25K), M9, M12 | **3 Fassungen** |
-| `koop` | Multiball | M8, M14 | **4 Fassungen** |
-| `ball_start` | zeig doch mal was du kannst | M1, erster Ball | **3 Fassungen** |
-| `carry_rettet` | Mein Carry rettet | M17 | – |
-| `kein_skill` | Kein Skill | Ball endgültig verloren (kein Text auf dem Feld) | – |
-| `bericht` | Die Ulti beginnt | M15 | – |
-| `outro` | Du warst auch dabei … | E1, Spielende | – |
-| `gern` | Gern geschehen | Nachsatz 2,8 s nach M17 | – |
-| `kein_plan` | Kein Plan | 18 s lang nichts getroffen | – |
+| `beste` | Ich bin die Beste | M5, M6 (nur 25K), M9, M12 | **3** · 1,6-1,9 s |
+| `koop` | Multiball | M8, M14 | **4** · 1,9-2,2 s |
+| `ball_start` | zeig doch mal was du kannst | M1, erster Ball | **3** · 2,4-2,7 s |
+| `carry_rettet` | Mein Carry rettet | M17 | **4** · 1,8-2,2 s |
+| `kein_skill` | Kein Skill | Ball endgültig verloren (kein Text auf dem Feld) | **4** · 0,8-0,9 s |
+| `bericht` | Die Ulti beginnt | M15 | **4** · 2,3-2,5 s |
+| `outro` | Du warst auch dabei … | E1, Spielende | **4** · 5,5-6,1 s, eine mit 26 s |
+| `gern` | Gern geschehen | Nachsatz 2,8 s nach M17 | **4** · 1,6-1,8 s |
+| `kein_plan` | Kein Plan | 18 s lang nichts getroffen | **3** · 1,1-1,5 s |
+| `kanal_1` … `kanal_5` | die jeweilige Zeile, siehe Abschnitt 5 | Chat-Antwort | je **1** · 2,5-3,4 s |
 | `spott_1` … `spott_8` | der jeweilige Spruch, siehe Abschnitt 3 | M2, K2 | – |
-| `kanal_1` … `kanal_5` | die jeweilige Zeile, siehe Abschnitt 5 | Chat-Antwort | – |
 | `ohne_mich` | Ohne mich | noch nirgends - Sprechtext eintragen, dann verdrahte ich es | – |
 
 `kein_skill` hat als einzige Zeile keinen Text auf dem Feld: beim Ballverlust

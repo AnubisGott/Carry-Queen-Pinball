@@ -29,6 +29,29 @@ func _ready() -> void:
 		print("  %s  \"%s\" -> %s%s" % ["ok " if ok else "FEHL", roh, ist,
 				"" if ok else "  (erwartet: %s)" % soll])
 
+	print("--- Zuordnung: aehnliche Saetze duerfen nicht zusammenfallen ---")
+	var paare := {
+		"kein_plan": "kein_plan",
+		"kein_skill": "kein_skill",
+		"der_bericht": "bericht",
+		"der_knopf_oben_links_nicht_so_schwer": "kanal_5",
+		"die_ulti_beginnt": "bericht",
+		# ein ausgelassenes Wort mitten im Satz
+		"du_warst_auch_dabei_das_bestimmt_schoen_fuer_dich": "outro",
+		"zuschauen_kannst_du_ja_wenigstens": "kanal_4",
+		"zeig_doch_mal_was_du_kannst": "ball_start",
+		# nichts, was passt: darf zu keinem Fach fuehren
+		"vocals_carry_queen_lead_vocal": "",
+	}
+	for h in paare:
+		var ist2: String = Sfx._fach_zu(str(h))
+		var ok2: bool = ist2 == paare[h]
+		if not ok2:
+			fehler += 1
+		print("  %s  %s -> %s%s" % ["ok " if ok2 else "FEHL", h,
+				ist2 if ist2 != "" else "(kein Fach)",
+				"" if ok2 else "  (erwartet: %s)" % paare[h]])
+
 	print("--- Was liegt im Verzeichnis ---")
 	var dateien := _alle_dateien("res://assets/voice")
 	var zugeordnet := 0
