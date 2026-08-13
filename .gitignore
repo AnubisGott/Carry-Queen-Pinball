@@ -6,3 +6,11 @@ godot-engine/
 
 # Referenzbilder (Stock-Material, nicht veroeffentlichen)
 Flipper-Design/
+
+# Rohspuren aus dem Gesangs-Export (je rund 33 MB).  Das Spiel liest sie
+# ohnehin nicht - es nimmt nur, was sich einem Satz zuordnen laesst.  Die
+# geschnittenen Faecher darunter (assets/voice/<satz><nr>/) bleiben drin.
+assets/voice/*Lead Vocal*.wav
+assets/voice/*Lead Vocal*.wav.import
+assets/voice/Vocals-*.wav
+assets/voice/Vocals-*.wav.import
