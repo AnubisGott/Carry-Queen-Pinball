@@ -333,8 +333,10 @@ func _update_timers(delta: float) -> void:
 		var hektik := 5.0 + 12.0 * (1.0 - frenzy_time / FRENZY_TIME)
 		for d in drops:
 			d.set_pulsing(frenzy_time > 0.0, hektik)
+		hud.set_frenzy(true, frenzy_time / FRENZY_TIME)
 		if frenzy_time <= 0.0:
 			Game.frenzy = false
+			hud.set_frenzy(false)
 			# Bank wieder aufstellen: dunkel und damit erneut abraeumbar
 			for d in drops:
 				d.reset()

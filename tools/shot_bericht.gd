@@ -16,11 +16,18 @@ func _ready() -> void:
 	add_child(main)
 	main.god_mode = true
 	await get_tree().create_timer(1.0).timeout
-	# Alle vier Disziplinen abhaken - das startet den Bericht
-	for d in ["DAMAGE", "EGO", "CARRY", "ICH"]:
-		Game.discipline_done(d)
+	var nur_frenzy := "--frenzy" in OS.get_cmdline_user_args()
+	if nur_frenzy:
+		# Nur die Damage-Frenzy laufen lassen
+		Game.frenzy = true
+		main.frenzy_time = main.FRENZY_TIME * 0.7
+	else:
+		# Alle vier Disziplinen abhaken - das startet den Bericht
+		for d in ["DAMAGE", "EGO", "CARRY", "ICH"]:
+			Game.discipline_done(d)
 	await get_tree().create_timer(1.5).timeout
-	print("Bericht laeuft: %s, Restzeit %.1f s" % [str(Game.wizard), main.wizard_time])
+	print("Bericht: %s  Frenzy: %s  Restzeit %.1f / %.1f s" % [str(Game.wizard),
+			str(Game.frenzy), main.wizard_time, main.frenzy_time])
 	await RenderingServer.frame_post_draw
 	var bild := get_viewport().get_texture().get_image()
 	bild.save_png(ordner.path_join("bericht.png"))

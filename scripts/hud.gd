@@ -53,6 +53,9 @@ var popup_kind := ""
 ## Zeitbalken ab.
 var _wizard := false
 var _wizard_t := 0.0
+var _wizard_frac := 0.0
+var _frenzy := false
+var _frenzy_frac := 0.0
 var _wizard_bar: ColorRect
 var _wizard_label: Label
 
@@ -138,8 +141,9 @@ func _build_bar() -> void:
 	var xs := {"DAMAGE": 285, "EGO": 330, "CARRY": 375, "ICH": 432}
 	for k in disc_names:
 		_disc_labels[k] = _label(disc_names[k], Vector2(xs[k], 62), 11, DIM, bar)
-	# Titel des Wizard-Modus, rechtsbuendig direkt links neben dem Zeitbalken
-	_wizard_label = _label("", Vector2(110, 64), 12, GOLD, bar)
+	# Titel des laufenden Modus, rechtsbuendig links neben dem Zeitbalken - mit
+	# etwas Abstand dazu, sonst klebt die Zeile am Balken.
+	_wizard_label = _label("", Vector2(75, 64), 12, GOLD, bar)
 	_wizard_label.size = Vector2(168, 16)
 	_wizard_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	_wizard_label.visible = false
@@ -165,21 +169,52 @@ func set_wizard(on: bool, frac: float = 0.0) -> void:
 		_wizard_t = 0.0
 		if not on:
 			_update_disciplines()
-	_wizard_bar.visible = on
-	_wizard_label.visible = on
 	if on:
-		_wizard_bar.size = Vector2(167.0 * clampf(frac, 0.0, 1.0), 3)
+		_wizard_frac = frac
+	_update_modus()
+
+
+## Damage-Frenzy anzeigen - dieselbe Zeile und derselbe Balken wie beim
+## Bericht, nur in Rot.  Laufen beide, hat der Bericht den laengeren Atem und
+## bekommt den Balken; die Frenzy haengt sich an den Text an.
+func set_frenzy(on: bool, frac: float = 0.0) -> void:
+	_frenzy = on
+	if on:
+		_frenzy_frac = frac
+	_update_modus()
+
+
+func _update_modus() -> void:
+	var an := _wizard or _frenzy
+	_wizard_bar.visible = an
+	_wizard_label.visible = an
+	if not an:
+		return
+	if _wizard:
+		_wizard_bar.color = GOLD
+		_wizard_bar.size = Vector2(167.0 * clampf(_wizard_frac, 0.0, 1.0), 3)
 		_wizard_label.text = "DER BERICHT x%d" % Game.WIZARD_MULT
+		if _frenzy:
+			_wizard_label.text += " + DMG x%d" % Game.FRENZY_MULT
+	else:
+		_wizard_bar.color = PINK
+		_wizard_bar.size = Vector2(167.0 * clampf(_frenzy_frac, 0.0, 1.0), 3)
+		_wizard_label.text = "DAMAGE x%d" % Game.FRENZY_MULT
 
 
 func _process(delta: float) -> void:
-	if not _wizard:
+	if not _wizard and not _frenzy:
 		return
 	_wizard_t += delta * 5.0
-	var col := GOLD.lerp(Color(1.0, 1.0, 1.0), 0.5 + 0.5 * sin(_wizard_t))
+	# Beim Bericht pulsiert die ganze Disziplinen-Reihe mit, bei der Frenzy
+	# nur die Zeile darunter - und in Rot statt Gold.
+	var col := (GOLD if _wizard else PINK).lerp(
+			Color(1.0, 1.0, 1.0), 0.5 + 0.5 * sin(_wizard_t))
+	_wizard_label.add_theme_color_override("font_color", col)
+	if not _wizard:
+		return
 	for k in _disc_labels:
 		_disc_labels[k].add_theme_color_override("font_color", col)
-	_wizard_label.add_theme_color_override("font_color", col)
 
 
 func _try_avatar(bar: Panel) -> void:
