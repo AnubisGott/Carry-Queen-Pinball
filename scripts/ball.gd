@@ -18,6 +18,12 @@ func _ready() -> void:
 	# wenn sich der Feder-Teller unter ihr nach unten bewegt.
 	can_sleep = false
 	continuous_cd = RigidBody2D.CCD_MODE_CAST_SHAPE
+	# Kontakte melden lassen, damit jeder Bandenkontakt tickt.  Beim Rollen
+	# entlang einer Bande bleibt es ein Kontakt - es tickt also nur beim
+	# Aufprall, nicht dauernd.
+	contact_monitor = true
+	max_contacts_reported = 4
+	body_entered.connect(_on_bande)
 	# Rollreibung wie auf echtem Holz: die Kugel verliert unterwegs Tempo,
 	# im Oberfeld laeuft sie dadurch ruhiger als direkt nach dem Schlag.
 	linear_damp = 0.16
@@ -34,9 +40,26 @@ func _ready() -> void:
 
 
 var _still := 0.0
+var _tick_sperre := 0.0
+
+
+## Blechtick beim Aufprall auf eine Bande.  Bumper, Slingshots, Targets und
+## die Flipper bringen ihren eigenen Klang mit und werden uebersprungen.
+func _on_bande(body: Node) -> void:
+	if _tick_sperre > 0.0 or freeze:
+		return
+	if body is Bumper or body is Flipper or body is Slingshot \
+			or body is DropTarget or body is Standup or body is Plunger:
+		return
+	var tempo := linear_velocity.length()
+	if tempo < 130.0:
+		return
+	_tick_sperre = 0.05
+	Sfx.play("rail", lerpf(-27.0, -8.0, clampf(tempo / 1200.0, 0.0, 1.0)))
 
 
 func _physics_process(delta: float) -> void:
+	_tick_sperre = maxf(0.0, _tick_sperre - delta)
 	# Anti-Klemm: Ball, der irgendwo laenger festhaengt, bekommt einen Schubs.
 	if freeze or global_position.x > 470.0:
 		_still = 0.0

@@ -18,6 +18,20 @@ const MUSIK_BUS := "Musik"
 const STIMME_BUS := "Stimme"
 const MUSIK_DB := -6.0
 
+## Rollgeraeusch: unter ROLL_MIN px/s ist es still, ab ROLL_MAX voll da.
+## Lautstaerke und Tonhoehe haengen dazwischen linear am Tempo der schnellsten
+## Kugel - das ist der Klang, der einem Tisch am meisten Leben gibt.
+const ROLL_MIN := 70.0
+const ROLL_MAX := 1100.0
+const ROLL_DB_LEISE := -33.0
+const ROLL_DB_LAUT := -12.0
+const ROLL_PITCH_LEISE := 0.70
+const ROLL_PITCH_LAUT := 1.60
+## Wie schnell Lautstaerke (dB je Sekunde) und Tonhoehe nachgefuehrt werden.
+## Ohne Nachfuehrung knackt es bei jedem Abprall.
+const ROLL_DB_TEMPO := 95.0
+const ROLL_PITCH_TEMPO := 2.4
+
 ## Melodische Klaenge bekommen keine Tonhoehen-Streuung - sonst klingen die
 ## Jingles jedes Mal verstimmt.  Alles andere wird pro Treffer leicht
 ## variiert, damit eine Bumper-Serie nicht wie ein Maschinengewehr klingt.
@@ -29,6 +43,7 @@ var _players: Array[AudioStreamPlayer] = []
 var _next := 0
 var _voice_player: AudioStreamPlayer
 var _music_player: AudioStreamPlayer
+var _roll_player: AudioStreamPlayer
 var _voice: Dictionary = {}
 var _duck: Tween
 ## Die Klaenge entstehen in einem Nebenlaeufer, damit der Start nicht
@@ -64,6 +79,12 @@ func _ready() -> void:
 	_music_player = AudioStreamPlayer.new()
 	_music_player.bus = MUSIK_BUS
 	add_child(_music_player)
+	# Das Rollen laeuft in Schleife durch, geregelt wird nur ueber Lautstaerke
+	# und Tonhoehe - ein staendiges Neustarten wuerde man hoeren.
+	_roll_player = AudioStreamPlayer.new()
+	_roll_player.bus = SFX_BUS
+	_roll_player.volume_db = -60.0
+	add_child(_roll_player)
 	_rng.randomize()
 	_bau_task = WorkerThreadPool.add_task(_baue_im_hintergrund)
 	_load_optional_audio()
@@ -76,10 +97,40 @@ func _baue_im_hintergrund() -> void:
 	_streams = fertig
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if _bau_task != -1 and WorkerThreadPool.is_task_completed(_bau_task):
 		WorkerThreadPool.wait_for_task_completion(_bau_task)
 		_bau_task = -1
+	_rollen_regeln(delta)
+
+
+## Rollgeraeusch am Tempo der schnellsten Kugel ausrichten.  Eine ruhende,
+## eingefrorene (Carry-Save) oder gar keine Kugel bedeutet Stille.
+func _rollen_regeln(delta: float) -> void:
+	if _roll_player == null:
+		return
+	if _roll_player.stream == null:
+		if not _streams.has("roll"):
+			return
+		_roll_player.stream = _streams["roll"]
+		_roll_player.play()
+	var tempo := 0.0
+	if not get_tree().paused:
+		for b in get_tree().get_nodes_in_group("balls"):
+			var ball := b as PinBall
+			if ball == null or ball.freeze:
+				continue
+			tempo = maxf(tempo, ball.linear_velocity.length())
+	var ziel_db := -60.0
+	var ziel_pitch := ROLL_PITCH_LEISE
+	if tempo > ROLL_MIN:
+		var t: float = clampf((tempo - ROLL_MIN) / (ROLL_MAX - ROLL_MIN), 0.0, 1.0)
+		ziel_db = lerpf(ROLL_DB_LEISE, ROLL_DB_LAUT, t)
+		ziel_pitch = lerpf(ROLL_PITCH_LEISE, ROLL_PITCH_LAUT, t)
+	_roll_player.volume_db = move_toward(
+			_roll_player.volume_db, ziel_db, ROLL_DB_TEMPO * delta)
+	_roll_player.pitch_scale = move_toward(
+			_roll_player.pitch_scale, ziel_pitch, ROLL_PITCH_TEMPO * delta)
 
 
 # ---------------------------------------------------------------- Busse ----
@@ -430,6 +481,41 @@ func _wumms(f0: float, f1: float, dur: float, vol: float) -> PackedFloat32Array:
 	return out
 
 
+## Rollende Kugel als nahtlose Schleife.  Zwei Rauschbaender uebereinander:
+## ein tiefes Poltern des Untergrunds und feiner Grus darueber, dazu eine
+## langsame Schwebung - ohne die klingt gefiltertes Rauschen nur nach Zischen.
+## Das Ende wird in den Anfang ueberblendet, damit die Schleife nicht tickt.
+func _rollen(dur: float) -> PackedFloat32Array:
+	var n := int(dur * RATE)
+	var blende := int(0.06 * RATE)
+	var roh := PackedFloat32Array()
+	roh.resize(n + blende)
+	var t1 := 0.0
+	var b1 := 0.0
+	var t2 := 0.0
+	var b2 := 0.0
+	var f1: float = clampf(2.0 * sin(PI * 190.0 / RATE), 0.0, 1.4)
+	var f2: float = clampf(2.0 * sin(PI * 1500.0 / RATE), 0.0, 1.4)
+	var schweb := 0.0
+	for i in roh.size():
+		var x := _rng.randf() * 2.0 - 1.0
+		t1 += f1 * b1
+		b1 += f1 * (x - t1 - 0.9 * b1)
+		t2 += f2 * b2
+		b2 += f2 * (x - t2 - 1.5 * b2)
+		schweb = fmod(schweb + 2.7 / RATE, 1.0)
+		var am := 0.82 + 0.18 * sin(schweb * TAU)
+		roh[i] = clampf(b1 * 1.6 + b2 * 0.5 + t1 * 0.8, -1.0, 1.0) * am
+	var out := PackedFloat32Array()
+	out.resize(n)
+	for i in n:
+		out[i] = roh[i]
+	for j in blende:
+		var w := float(j) / float(blende)
+		out[n - blende + j] = roh[n - blende + j] * (1.0 - w) + roh[j] * w
+	return out
+
+
 ## Auf einen Zielpegel bringen - nach Verzerrung sonst kaum vorhersehbar.
 func _norm(s: PackedFloat32Array, ziel: float = 0.8) -> PackedFloat32Array:
 	var spitze := 0.0
@@ -464,6 +550,15 @@ func _stack(parts: Array) -> PackedFloat32Array:
 		for i in p.size():
 			out[i] += p[i]
 	return out
+
+
+## Wie _wav, aber als Endlosschleife - fuer das Rollgeraeusch.
+func _wav_schleife(samples: PackedFloat32Array) -> AudioStreamWAV:
+	var wav := _wav(samples)
+	wav.loop_mode = AudioStreamWAV.LOOP_FORWARD
+	wav.loop_begin = 0
+	wav.loop_end = samples.size() - 1
+	return wav
 
 
 func _wav(samples: PackedFloat32Array) -> AudioStreamWAV:
@@ -562,6 +657,13 @@ func _build_all() -> Dictionary:
 			_stotter(_kreisch(0.9, 0.35, 240.0, 40.0, 4000.0, 300.0, 5.5), 9.0, 0.55),
 			_wumms(140.0, 32.0, 0.5, 0.85)]), 0.88))
 	s["tick"] = _wav(_norm(_crush(_klack(0.012, 0.4, 6000.0, 0.6), 4, 2), 0.6))
+	# Bandenkontakt: kurzer Blechtick.  Lautstaerke kommt vom Aufpralltempo,
+	# deshalb hier eher zurueckhaltend gebaut.
+	s["rail"] = _wav(_norm(_stack([
+			_klack(0.022, 0.5, 2400.0, 1.3),
+			_koerper([840.0, 1930.0], 0.05, 0.3, 5.0)]), 0.7))
+	# Rollende Kugel, laeuft als Schleife durch (siehe _rollen_regeln)
+	s["roll"] = _wav_schleife(_norm(_rollen(1.2), 0.75))
 	s["count"] = _wav(_norm(_stack([
 			_verzerre(_supersaw(560.0, 480.0, 0.12, 0.5, 3, 0.03, 3.6), 3.0, 1),
 			_wumms(200.0, 70.0, 0.09, 0.5)]), 0.8))
