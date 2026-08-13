@@ -14,9 +14,11 @@ func _ready() -> void:
 		if args[i] == "--wav" and i + 1 < args.size():
 			_wav_out = args[i + 1]
 
-	# Sfx baut die Klaenge im Hintergrund - erst abwarten.
+	# Sfx baut die Klaenge im Hintergrund und ersetzt danach die, fuer die es
+	# eigene Dateien gibt.  Fertig ist beides erst, wenn der Bau-Auftrag
+	# abgemeldet ist - vorher gemessen, saehe man noch die erzeugten Klaenge.
 	var t_start := Time.get_ticks_msec()
-	while Sfx._streams.is_empty():
+	while Sfx._streams.is_empty() or Sfx._bau_task != -1:
 		await get_tree().process_frame
 	print("Fertig nach %d ms (Nebenlaeufer, blockiert den Start nicht)" % (
 			Time.get_ticks_msec() - t_start))
@@ -38,6 +40,12 @@ func _ready() -> void:
 	var namen := streams.keys()
 	namen.sort()
 	for n in namen:
+		# Aus Dateien geladene Klaenge sind je nach Format kein AudioStreamWAV -
+		# die lassen sich hier nicht Sample fuer Sample nachmessen.
+		if not streams[n] is AudioStreamWAV:
+			print("  %-10s %5.0f ms  [aus Datei, %s]" % [n,
+					1000.0 * streams[n].get_length(), streams[n].get_class()])
+			continue
 		var wav: AudioStreamWAV = streams[n]
 		var data := wav.data
 		var anzahl := data.size() / 2
@@ -52,8 +60,9 @@ func _ready() -> void:
 			if a > 0.995:
 				voll += 1
 		var rms := sqrt(summe / maxf(1.0, float(anzahl)))
-		print("  %-10s %5.0f ms  Spitze %.2f  Effektivwert %.3f  %s" % [
+		print("  %-10s %5.0f ms  Spitze %.2f  Effektivwert %.3f  %s%s" % [
 				n, 1000.0 * float(anzahl) / float(wav.mix_rate), spitze, rms,
+				"[aus Datei] " if Sfx._aus_datei.has(n) else "",
 				("ANSCHLAG %d Samples" % voll) if voll > 20 else ""])
 		if _wav_out != "":
 			_schreibe_wav(wav, "%s/%s.wav" % [_wav_out, n])

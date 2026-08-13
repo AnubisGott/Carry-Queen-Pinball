@@ -53,6 +53,10 @@ const RAKETE_PITCH_TEMPO := 1.6
 const KEIN_ZUFALL := ["jackpot", "save", "mode", "over", "ego_up", "count",
 		"count_go", "beste"]
 
+## Diese Klaenge laufen in Schleife.  Wird einer davon durch eine eigene Datei
+## ersetzt, muss die Schleife auch dort gesetzt werden.
+const DAUERKLAENGE := ["roll", "rakete"]
+
 var _streams: Dictionary = {}
 var _players: Array[AudioStreamPlayer] = []
 var _next := 0
@@ -69,6 +73,8 @@ var _duck: Tween
 ## nicht auf, weil das erste Geraeusch erst mit dem ersten Tastendruck kommt.
 var _bau_task := -1
 var _rng := RandomNumberGenerator.new()
+## Welche Klaenge aus assets/sfx/ kommen statt aus der Synthese
+var _aus_datei := {}
 
 const VOICE_FILES := {
 	"koop": "koop_modus",
@@ -123,6 +129,9 @@ func _process(delta: float) -> void:
 	if _bau_task != -1 and WorkerThreadPool.is_task_completed(_bau_task):
 		WorkerThreadPool.wait_for_task_completion(_bau_task)
 		_bau_task = -1
+		# Erst wenn die erzeugten Klaenge stehen, koennen eigene Dateien sie
+		# ersetzen - so ist die Liste der Namen vollstaendig bekannt.
+		_lade_sfx_dateien()
 	_rollen_regeln(delta)
 	_rakete_regeln(delta)
 
@@ -848,6 +857,35 @@ func _akkord(grundton: float, dur: float, vol: float,
 			drive, 0)
 
 
+## Eigene Aufnahmen haben Vorrang: liegt in assets/sfx/ eine Datei mit dem
+## Namen eines Klangs (.ogg, .wav oder .mp3), ersetzt sie den erzeugten.
+## Alles, wofuer keine Datei da ist, bleibt synthetisch - man kann also
+## einzelne Geraeusche austauschen, ohne den Rest anzufassen.
+func _lade_sfx_dateien() -> void:
+	for snd in _streams.keys():
+		var s := _load_stream("res://assets/sfx/" + str(snd))
+		if s == null:
+			continue
+		if str(snd) in DAUERKLAENGE:
+			_setze_schleife(s)
+		_streams[snd] = s
+		_aus_datei[snd] = true
+	if not _aus_datei.is_empty():
+		var namen := _aus_datei.keys()
+		namen.sort()
+		print("Sfx: eigene Dateien fuer %s" % ", ".join(PackedStringArray(namen)))
+
+
+## Dauerklaenge muessen in Schleife laufen, sonst brechen sie nach einmal ab.
+func _setze_schleife(s: AudioStream) -> void:
+	if s is AudioStreamOggVorbis or s is AudioStreamMP3:
+		s.loop = true
+	elif s is AudioStreamWAV:
+		s.loop_mode = AudioStreamWAV.LOOP_FORWARD
+		s.loop_begin = 0
+		s.loop_end = s.data.size() / (2 if s.format == AudioStreamWAV.FORMAT_16_BITS else 1)
+
+
 func _load_optional_audio() -> void:
 	for key in VOICE_FILES:
 		var s := _load_stream("res://assets/voice/" + VOICE_FILES[key])
@@ -866,6 +904,8 @@ func _load_optional_audio() -> void:
 func _load_stream(base: String) -> AudioStream:
 	if FileAccess.file_exists(base + ".ogg"):
 		return AudioStreamOggVorbis.load_from_file(base + ".ogg")
+	if FileAccess.file_exists(base + ".wav"):
+		return AudioStreamWAV.load_from_file(base + ".wav")
 	if FileAccess.file_exists(base + ".mp3"):
 		var f := FileAccess.open(base + ".mp3", FileAccess.READ)
 		if f:
