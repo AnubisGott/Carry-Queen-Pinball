@@ -40,18 +40,20 @@ const F_LILA := Color(0.58, 0.21, 1.0)    # Ecke u. re.,  Tisch: 1.1,0.4,1.9
 const F_ROT := Color(1.0, 0.17, 0.28)     # DAMAGE,       Tisch: 1.8,0.3,0.5
 const F_CYAN := Color(0.08, 0.89, 1.0)    # Ecke o. li.,  Tisch: 0.15,1.6,1.8
 const F_GRUEN := Color(0.22, 1.0, 0.16)   # Ecke u. li.,  Tisch: 0.3,1.35,0.22
-const F_MAGENTA := Color(1.0, 0.16, 0.59) # Ecke o. re.,  Tisch: 1.7,0.28,1.0
+const F_ORANGE := Color(1.0, 0.67, 0.27)  # Kometenkopf,  Tisch: 1.5,1.0,0.4
 
 ## Reihenfolge auf der Scheibe: hohe und niedrige Ligen wechseln sich ab,
 ## damit nicht ein ganzer Bogen wertlos ist.  Die Farbe haengt dagegen am
 ## Wert, nicht am Platz.
+## Wertigkeit der Farben von oben nach unten: Orange, Gelb, Lila, Rot, Cyan,
+## Gruen.  Auf der Scheibe stehen hohe und niedrige Sektoren abwechselnd.
 const SEKTOREN := [
-	{"punkte": 500, "kurz": "500", "rang": "BRONZE", "farbe": F_MAGENTA},
-	{"punkte": 5000, "kurz": "5K", "rang": "DIAMANT", "farbe": F_ROT},
-	{"punkte": 1000, "kurz": "1K", "rang": "SILBER", "farbe": F_GRUEN},
-	{"punkte": 25000, "kurz": "25K", "rang": "CHALLENGER", "farbe": F_GOLD},
-	{"punkte": 2000, "kurz": "2K", "rang": "GOLD", "farbe": F_CYAN},
-	{"punkte": 10000, "kurz": "10K", "rang": "MASTER", "farbe": F_LILA},
+	{"punkte": 500, "kurz": "500", "rang": "BRONZE", "farbe": F_GRUEN},
+	{"punkte": 5000, "kurz": "5K", "rang": "DIAMANT", "farbe": F_LILA},
+	{"punkte": 1000, "kurz": "1K", "rang": "SILBER", "farbe": F_CYAN},
+	{"punkte": 25000, "kurz": "25K", "rang": "CHALLENGER", "farbe": F_ORANGE},
+	{"punkte": 2000, "kurz": "2K", "rang": "GOLD", "farbe": F_ROT},
+	{"punkte": 10000, "kurz": "10K", "rang": "MASTER", "farbe": F_GOLD},
 ]
 
 var _winkel := 0.0

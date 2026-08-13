@@ -76,7 +76,3 @@ Womit soll ich anfangen?
      Submit
 ─────────────────────────────────────────────────────────────────────────────────────
 
-
-Wenn A,S,W,D alle zum leuchten gebracht werden, beginnen ja die gelben Hörner an zu blinken in dieser Blink-Phase sollen alle vier A,S,W,D Elemente an bleiben.
-
-In der oberen Leiste DMG EGO CARRY ICH, ersetze CARRY durch ASWD
