@@ -1,4 +1,4 @@
-﻿class_name Table
+class_name Table
 extends RefCounted
 ## Tisch-Geometrie nach der Weltraum-Vorlage, im Carry-Queen-Neon-Schema:
 ## Mulde mit Hoernern in der Mitte, Bumper-Pad, I-C-H-Bank links,
@@ -240,7 +240,11 @@ static func build(parent: Node2D) -> Dictionary:
 		# Stege enden bei y=248: die Gassen-Ausgaenge links und rechts des
 		# Plug-Stegs haben so gut 34px Abstand zur Bumper-Kuppe (Kugel: 26).
 		# Fuenf schraege Stege, symmetrisch um GGEZ_CENTER
-		var lane_dir := Vector2(0.483, -0.877)
+		# Richtung der Gassen, gemessen an den Stegen selbst: die laufen von
+		# (x,226) nach (x-15,198), also nach oben links.  Vorher stand hier die
+		# gespiegelte Richtung - die Sensoren lagen damit quer zu ihren eigenen
+		# Gassen und ragten in die Nachbargassen hinein.
+		var lane_dir := Vector2(-15.0, -28.0).normalized()
 		for i in 5:
 			_wall(parent, [Vector2(GGEZ_CENTER - 69.0 + i * 38.0, 226),
 					Vector2(GGEZ_CENTER - 84.0 + i * 38.0, 198)],

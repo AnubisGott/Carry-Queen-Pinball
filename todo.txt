@@ -80,4 +80,5 @@ Womit soll ich anfangen?
 ───────────────────────────────────────────────────────────────────────────────────────────────
 
   
-  
+hinzufügen von einem Glückrad-Element. Wenn die Kugel das Glücksrad berührt, beginnt es sich zu drehen und es gibt Punkte wie beim Spinner. Das Glücksrad wird langsamer . Wenn das Glückrad stehen bleibt, bekommt man die Punkte die gerade oben sind. Das Gückrad ist eine Scheibe, die sich drehen kann mit einzelnen Sektoren, jeder Sektor mit einer anderen Zahl.
+Wenn die Kugel auf ein drehendes Glückrad trifft, erhöht sich die Drehgeschwindigkeit wieder auf die Startgeschwindigkeit. Vorschläge wie es zum Thema Carry Queen angepasst werden kann?
