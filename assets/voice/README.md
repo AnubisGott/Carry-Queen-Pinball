@@ -56,14 +56,14 @@ kennt keine. Gesprochen wird natürlich mit.
 | M2 | jeder weitere Ball | „BALL 2" / „BALL 3" | ein Spott-Spruch, siehe Abschnitt 3 | 2× je Spiel | – |  |
 | M3 | vier Bumper getroffen, Hurry-Up startet | „KILL BESTAETIGT (1)" | „EGO x2 - Hurry-Up: ab durch die MITTE!" | oft, mehrmals je Ball | – |  |
 | M4 | vier Bumper getroffen, Hurry-Up läuft schon | „KILL BESTAETIGT (2)" | „EGO x3. +9.000" | oft | – |  |
-| M5 | Hurry-Up am mittleren Durchlauf kassiert | „KILL KASSIERT." | „+25.000" | mehrmals je Spiel | `ich_bin_die_beste` |  |
-| M6 | Glücksrad zahlt 5K, 10K oder 25K | „DIAMANT!" / „MASTER!" / „CHALLENGER!" | „+5.000  Geht doch. Fast wie ich." bzw. „…  CHALLENGER. Also mein Niveau." | mehrmals je Spiel | bei 25K: `ich_bin_die_beste` |  |
+| M5 | Hurry-Up am mittleren Durchlauf kassiert | „KILL KASSIERT." | „+25.000" | mehrmals je Spiel | – nur Text |  |
+| M6 | Glücksrad zahlt 5K, 10K oder 25K | „DIAMANT!" / „MASTER!" / „CHALLENGER!" | „+5.000  Geht doch. Fast wie ich." bzw. „…  CHALLENGER. Also mein Niveau." | mehrmals je Spiel | – nur Text |  |
 | M7 | G-G-E-Z komplett, Multiball läuft schon | „G-G-E-Z." | „Waren ja auch nur vier Gassen." | gelegentlich | – |  |
 | M8 | G-G-E-Z komplett, Multiball startet | „G-G-E-Z: KO-OP-MULTIBALL!" | „Vier Spieler. Ein Carry. Ich." | 0-2× je Spiel | `koop_modus` | „Multiball" |
-| M9 | I-C-H-Bank komplett | „ICH. WER SONST." | „+7.500" | 1× je Ball möglich | `ich_bin_die_beste` |  |
+| M9 | I-C-H-Bank komplett | „ICH. WER SONST." | „+7.500" | 1× je Ball möglich | – nur Text |  |
 | M10 | Jackpot im Multiball | „JACKPOT!" | „+12.000" | nur im Multiball, dann oft | – |  |
 | M11 | Jackpot nach vollem Multiball-Satz | „MEGA-JACKPOT!" | „+50.000" | selten | – |  |
-| M12 | I-C-H-Bank während des Multiballs | „ICH. WER SONST." | „+15.000" | nur im Multiball | `ich_bin_die_beste` |  |
+| M12 | I-C-H-Bank während des Multiballs | „ICH. WER SONST." | „+15.000" | nur im Multiball | – nur Text |  |
 | M13 | Ball im Thron geparkt (1. und 2. Ball) | „BALL GEPARKT (1/3)" | „Der Thron sammelt euch ein." | gelegentlich | – |  |
 | M14 | dritter Ball geparkt, Thron-Multiball startet | „VIER SPIELER. EIN CARRY." | „ICH." | selten | `koop_modus` |  |
 | M15 | Bericht startet, alle vier Disziplinen geschafft | „DER BERICHT." | „40 Sekunden lang zaehlt alles fuenffach." | oft gar nicht | `der_bericht` | „Die Ulti beginnt." |
@@ -105,10 +105,10 @@ zusammen aber sehr oft.
 | S7 | „Uebung. Ganz viel Uebung." | „Uebung. Ganz viel Uebung." |
 | S8 | „War bestimmt der Ping, ne?" | „War bestimmt der Ping, ne?" |
 
-**Diese acht bleiben geschrieben.** Aufnahmen sind dafür nicht vorgesehen -
-der Spott steht auf dem Feld, gesprochen wird er nicht. Die Sprechtexte in der
-Spalte daneben sind nur noch Notiz; sollst du es dir anders überlegen, sag
-Bescheid, dann lege ich die acht Fächer wieder an.
+Jede Zeile hat ein eigenes Fach - sie spricht genau den Spruch, der auch
+dasteht. Der Ordner heißt wie der Spruch („Skill-Issue. Nicht meins.1") oder
+wie das Fach („spott_3_1"), beides findet seinen Platz. Acht Aufnahmen sind
+viel; drei oder vier reichen auch, dann spricht sie nur bei diesen.
 
 ## 4. Die vier Bericht-Zeilen
 
@@ -157,7 +157,7 @@ erwarte - ein anderer Name geht auch, solange er nah genug dran ist.
 
 | Fach | Ordner heißt | Gehört zu | Da liegen |
 |---|---|---|---|
-| `beste` | Ich bin die Beste | M5, M6 (nur 25K), M9, M12 | **3** · 1,6-1,9 s |
+| `beste` | Ich bin die Beste | ~~M5, M6, M9, M12~~ - **wird nicht mehr gesprochen**, die Zeilen stehen nur noch auf dem Feld | 3 liegen bereit, ungenutzt |
 | `koop` | Multiball | M8, M14 | **4** · 1,9-2,2 s |
 | `ball_start` | zeig doch mal was du kannst | M1, erster Ball | **3** · 2,4-2,7 s |
 | `carry_rettet` | Mein Carry rettet | M17 | **4** · 1,8-2,2 s |
@@ -167,10 +167,11 @@ erwarte - ein anderer Name geht auch, solange er nah genug dran ist.
 | `gern` | Gern geschehen | Nachsatz 2,8 s nach M17 | **4** · 1,6-1,8 s |
 | `kein_plan` | Kein Plan | 18 s lang nichts getroffen | **3** · 1,1-1,5 s |
 | `kanal_1` … `kanal_5` | die jeweilige Zeile, siehe Abschnitt 5 | Chat-Antwort | je **1** · 2,5-3,4 s |
+| `spott_1` … `spott_8` | der jeweilige Spruch, siehe Abschnitt 3 | M2, K2 | – |
 | `ohne_mich` | Ohne mich | noch nirgends - Sprechtext eintragen, dann verdrahte ich es | – |
 
-Die acht Spott-Sprüche (S1-S8) haben bewusst kein Fach: sie stehen auf dem
-Feld und werden nicht gesprochen.
+Die drei `beste`-Aufnahmen liegen weiter im Verzeichnis und werden auch
+geladen, nur nicht mehr abgerufen. Sag Bescheid, wenn sie ganz weg sollen.
 
 `kein_skill` hat als einzige Zeile keinen Text auf dem Feld: beim Ballverlust
 steht dort nichts, die nächste Meldung ist erst der neue Ball. Wer sie hört,
@@ -184,8 +185,8 @@ Spruch benennen - „Skill-Issue. Nicht meins.1" landet von selbst in `spott_3`.
 
 | Rang | Fach | Wie oft | Worauf achten |
 |---|---|---|---|
-| 1 | `beste` | mehrmals je Spiel, aus vier Anlässen | muss zu vier verschiedenen Momenten passen - hier lohnen mehrere Fassungen am meisten |
-| 2 | `kein_skill` | bei jedem Ballverlust, mindestens 3× je Spiel | kurz und beiläufig, sonst nervt es beim vierten Mal |
+| 1 | `kein_skill` | bei jedem Ballverlust, mindestens 3× je Spiel | kurz und beiläufig, sonst nervt es beim vierten Mal |
+| 2 | `spott_1` … `spott_8` | zusammen 3-6× je Spiel, einzeln selten | eine Aufnahme je Spruch |
 | 3 | `kanal_1` … `kanal_5` | alle 55-100 s, davon jedes zweite Mal | Werbung, also eher beiläufig als groß |
 | 4 | `carry_rettet` | höchstens 1× je Ball | darf triumphieren, kommt aber regelmäßig |
 | 5 | `gern` | wie `carry_rettet`, 2,8 s danach | ganz kurz, sie hängt es nur an |

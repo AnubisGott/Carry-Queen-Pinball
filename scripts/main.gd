@@ -333,7 +333,9 @@ func _update_timers(delta: float) -> void:
 		hurry_value = maxi(5000, hurry_value - int(1600.0 * delta))
 		if hurry_time <= 0.0:
 			_end_hurry()
-			hud.show_sub("Hurry-Up vorbei. " + spott(), 1.8)
+			var i := spott_index()
+			hud.show_sub("Hurry-Up vorbei. " + QUEEN_SPOTT[i], 1.8)
+			Sfx.say("spott_%d" % (i + 1))
 	if frenzy_time > 0.0:
 		frenzy_time -= delta
 		# Die DAMAGE-Bank blinkt, solange die Frenzy laeuft - und zwar umso
@@ -434,7 +436,6 @@ func _on_event(kind: String, data: Dictionary) -> void:
 				_end_hurry()
 				hud.show_message("KILL KASSIERT.", "+" + Hud.fmt(pts), 2.2)
 				Sfx.play("jackpot")
-				Sfx.say("beste")
 				Game.emit("jackpot")
 
 
@@ -527,7 +528,6 @@ func _gluecksrad_zahlt(data: Dictionary) -> void:
 	if roh >= 25000:
 		spruch = "CHALLENGER. Also mein Niveau."
 		Sfx.play("jackpot", -4.0)
-		Sfx.say("beste")
 		Game.emit("jackpot")
 	elif roh >= 5000:
 		spruch = "Geht doch. Fast wie ich."
@@ -599,7 +599,6 @@ func _check_ich() -> void:
 	var pts := Game.add_score(5000)
 	Game.discipline_done("ICH")
 	Sfx.play("jackpot", -4.0)
-	Sfx.say("beste")
 	hud.show_message("ICH. WER SONST.", "+" + Hud.fmt(pts), 2.2)
 
 
@@ -627,7 +626,6 @@ func _resolve_throne(ball: PinBall) -> void:
 		Game.discipline_done("ICH")
 		hud.show_message("ICH. WER SONST.", "+" + Hud.fmt(pts), 2.2)
 		Sfx.play("jackpot")
-		Sfx.say("beste")
 		Game.emit("jackpot")
 		await _eject_after(ball, 0.8)
 	elif Game.multiball:
@@ -715,10 +713,15 @@ func _end_wizard() -> void:
 	hud.show_message("AM ENDE STEHT MEIN NAME.", "Eure Namen stehen nicht.", 3.0)
 
 
-## Ein zufaelliger Spott-Spruch der Queen.  Der Topf bleibt geschrieben - fuer
-## die acht Sprueche sind keine Aufnahmen vorgesehen.
+## Ein zufaelliger Spott-Spruch der Queen.
 func spott() -> String:
-	return QUEEN_SPOTT[randi() % QUEEN_SPOTT.size()]
+	return QUEEN_SPOTT[spott_index()]
+
+
+## Derselbe Griff in den Topf, aber mit der Nummer: nur so kann sie den Satz
+## auch sprechen, der gerade dasteht (Fach "spott_1" bis "spott_8").
+func spott_index() -> int:
+	return randi() % QUEEN_SPOTT.size()
 
 
 ## Tisch dunkel bzw. wieder hell schalten (Ruhe-Modus).
@@ -928,8 +931,11 @@ func _start_ball(first: bool = false) -> void:
 				"Zeig doch mal, was du kannst.", 2.5)
 		Sfx.say("ball_start")
 	else:
-		# Bei den weiteren Baellen spottet sie - geschrieben, nicht gesprochen.
-		hud.show_message("BALL %d" % Game.ball_number, spott(), 2.5)
+		# Bei den weiteren Baellen spottet sie - und spricht denselben Spruch,
+		# der dasteht, sofern es dafuer eine Aufnahme gibt.
+		var i := spott_index()
+		hud.show_message("BALL %d" % Game.ball_number, QUEEN_SPOTT[i], 2.5)
+		Sfx.say("spott_%d" % (i + 1))
 	_ohne_treffer = 0.0
 	_abgeschossen = false
 
