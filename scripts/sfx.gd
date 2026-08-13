@@ -57,6 +57,11 @@ const KEIN_ZUFALL := ["jackpot", "save", "mode", "over", "ego_up", "count",
 ## ersetzt, muss die Schleife auch dort gesetzt werden.
 const DAUERKLAENGE := ["roll", "rakete"]
 
+## Eigene Dateien ersetzen den erzeugten Klang nicht, sie liegen leise
+## darunter: die echte Mechanik gibt dem synthetischen Klang Koerper, ohne
+## ihn zu verdecken.  Wert ist der Abstand zum jeweiligen Spielpegel.
+const DATEI_DB := -9.0
+
 var _streams: Dictionary = {}
 var _players: Array[AudioStreamPlayer] = []
 var _next := 0
@@ -73,7 +78,7 @@ var _duck: Tween
 ## nicht auf, weil das erste Geraeusch erst mit dem ersten Tastendruck kommt.
 var _bau_task := -1
 var _rng := RandomNumberGenerator.new()
-## Welche Klaenge aus assets/sfx/ kommen statt aus der Synthese
+## Klangname -> Aufnahme aus assets/sfx/, die zusaetzlich mitlaeuft
 var _aus_datei := {}
 
 const VOICE_FILES := {
@@ -92,7 +97,9 @@ const VOICE_FILES := {
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_setup_busse()
-	for i in 12:
+	# Mehr Stimmen als frueher: jeder Klang kann jetzt zwei belegen, den
+	# erzeugten und die Aufnahme darunter.
+	for i in 20:
 		var p := AudioStreamPlayer.new()
 		p.bus = SFX_BUS
 		add_child(p)
@@ -225,15 +232,24 @@ func _neuer_bus(bus_name: String) -> int:
 func play(snd: String, volume_db: float = 0.0) -> void:
 	if not _streams.has(snd):
 		return
+	var tonhoehe := 1.0
+	var pegel := volume_db
+	if not snd in KEIN_ZUFALL:
+		tonhoehe = randf_range(0.97, 1.03)
+		pegel += randf_range(-1.5, 1.5)
+	_spiele(_streams[snd], pegel, tonhoehe)
+	# Die echte Aufnahme laeuft leise darunter mit, mit derselben Streuung -
+	# sonst laufen Klang und Aufnahme in der Tonhoehe auseinander.
+	if _aus_datei.has(snd):
+		_spiele(_aus_datei[snd], pegel + DATEI_DB, tonhoehe)
+
+
+func _spiele(stream: AudioStream, pegel: float, tonhoehe: float) -> void:
 	var p := _players[_next]
 	_next = (_next + 1) % _players.size()
-	p.stream = _streams[snd]
-	if snd in KEIN_ZUFALL:
-		p.pitch_scale = 1.0
-		p.volume_db = volume_db
-	else:
-		p.pitch_scale = randf_range(0.97, 1.03)
-		p.volume_db = volume_db + randf_range(-1.5, 1.5)
+	p.stream = stream
+	p.pitch_scale = tonhoehe
+	p.volume_db = pegel
 	p.play()
 
 
@@ -857,10 +873,13 @@ func _akkord(grundton: float, dur: float, vol: float,
 			drive, 0)
 
 
-## Eigene Aufnahmen haben Vorrang: liegt in assets/sfx/ eine Datei mit dem
-## Namen eines Klangs (.ogg, .wav oder .mp3), ersetzt sie den erzeugten.
-## Alles, wofuer keine Datei da ist, bleibt synthetisch - man kann also
-## einzelne Geraeusche austauschen, ohne den Rest anzufassen.
+## Eigene Aufnahmen laufen zusaetzlich mit: liegt in assets/sfx/ eine Datei
+## mit dem Namen eines Klangs (.ogg, .wav oder .mp3), wird sie bei jedem
+## Abspielen leise unter den erzeugten Klang gelegt.  Der synthetische Klang
+## bleibt also erhalten, die Aufnahme gibt ihm nur Koerper.
+##
+## Ausnahme sind die Dauerklaenge (roll, rakete): die haengen an einem eigenen
+## Spieler mit geregelter Lautstaerke und Tonhoehe.  Dort ersetzt die Datei.
 func _lade_sfx_dateien() -> void:
 	for snd in _streams.keys():
 		var s := _load_stream("res://assets/sfx/" + str(snd))
@@ -868,12 +887,13 @@ func _lade_sfx_dateien() -> void:
 			continue
 		if str(snd) in DAUERKLAENGE:
 			_setze_schleife(s)
-		_streams[snd] = s
-		_aus_datei[snd] = true
+			_streams[snd] = s
+		else:
+			_aus_datei[snd] = s
 	if not _aus_datei.is_empty():
 		var namen := _aus_datei.keys()
 		namen.sort()
-		print("Sfx: eigene Dateien fuer %s" % ", ".join(PackedStringArray(namen)))
+		print("Sfx: Aufnahmen liegen unter %s" % ", ".join(PackedStringArray(namen)))
 
 
 ## Dauerklaenge muessen in Schleife laufen, sonst brechen sie nach einmal ab.

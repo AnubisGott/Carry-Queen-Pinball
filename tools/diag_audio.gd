@@ -35,6 +35,20 @@ func _ready() -> void:
 				AudioServer.get_bus_name(i), AudioServer.get_bus_volume_db(i),
 				AudioServer.get_bus_send(i), str(effekte)])
 
+	print("--- Zwei Ebenen: erzeugt plus Aufnahme ---")
+	for name in ["flip", "bump_w", "drain", "jackpot"]:
+		Sfx.play(name, -6.0)
+		await get_tree().process_frame
+		await get_tree().process_frame
+		var laufen := []
+		for p in Sfx._players:
+			if p.playing:
+				laufen.append("%s %.0f dB" % [
+						"Aufnahme" if p.stream == Sfx._aus_datei.get(name) else "erzeugt",
+						p.volume_db])
+		print("  %-9s -> %d Stimme(n): %s" % [name, laufen.size(), ", ".join(PackedStringArray(laufen))])
+		await get_tree().create_timer(1.2).timeout
+
 	print("--- Klaenge ---")
 	var streams: Dictionary = Sfx._streams
 	var namen := streams.keys()
@@ -62,7 +76,7 @@ func _ready() -> void:
 		var rms := sqrt(summe / maxf(1.0, float(anzahl)))
 		print("  %-10s %5.0f ms  Spitze %.2f  Effektivwert %.3f  %s%s" % [
 				n, 1000.0 * float(anzahl) / float(wav.mix_rate), spitze, rms,
-				"[aus Datei] " if Sfx._aus_datei.has(n) else "",
+				"[+ Aufnahme] " if Sfx._aus_datei.has(n) else "",
 				("ANSCHLAG %d Samples" % voll) if voll > 20 else ""])
 		if _wav_out != "":
 			_schreibe_wav(wav, "%s/%s.wav" % [_wav_out, n])

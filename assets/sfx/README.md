@@ -1,9 +1,16 @@
 # Eigene Klangdateien
 
-Alles in diesem Ordner hat Vorrang vor dem erzeugten Klang. Legt man hier eine
-Datei mit dem Namen eines Klangs ab, wird sie statt der Synthese verwendet -
-alles andere bleibt synthetisch. Man kann also einzelne Geräusche austauschen
-und den Rest lassen.
+Alles in diesem Ordner läuft **zusätzlich** zum erzeugten Klang. Legt man hier
+eine Datei mit dem Namen eines Klangs ab, wird sie bei jedem Abspielen leise
+darunter gelegt - 9 dB unter dem jeweiligen Spielpegel, mit derselben
+Tonhöhen-Streuung, damit beide Ebenen zusammenbleiben. Der synthetische Klang
+bleibt also erhalten, die Aufnahme gibt ihm nur Körper.
+
+Wie leise, steht in `scripts/sfx.gd` als `DATEI_DB`.
+
+**Ausnahme:** die beiden Dauerklänge `roll` und `rakete` hängen an einem
+eigenen Spieler mit geregelter Lautstärke und Tonhöhe - dort *ersetzt* eine
+Datei den erzeugten Klang.
 
 **Formate:** `.ogg`, `.wav` oder `.mp3`, in dieser Reihenfolge gesucht.
 Beispiel: `assets/sfx/flip.ogg` ersetzt das Flipper-Geräusch.
