@@ -23,8 +23,8 @@ const MUSIK_DB := -6.0
 ## Kugel - das ist der Klang, der einem Tisch am meisten Leben gibt.
 const ROLL_MIN := 70.0
 const ROLL_MAX := 1100.0
-const ROLL_DB_LEISE := -54.0
-const ROLL_DB_LAUT := -33.0
+const ROLL_DB_LEISE := -44.0
+const ROLL_DB_LAUT := -23.0
 const ROLL_PITCH_LEISE := 0.70
 const ROLL_PITCH_LAUT := 1.60
 ## Wie schnell Lautstaerke (dB je Sekunde) und Tonhoehe nachgefuehrt werden.
@@ -507,13 +507,17 @@ func _rollen(dur: float) -> PackedFloat32Array:
 		schweb = fmod(schweb + 2.7 / RATE, 1.0)
 		var am := 0.82 + 0.18 * sin(schweb * TAU)
 		roh[i] = clampf(b1 * 1.5 + b2 * 0.10 + t1 * 1.1, -1.0, 1.0) * am
+	# Ueberblendung: der Anfang der Schleife wird mit dem Material direkt
+	# hinter ihrem Ende gemischt.  Damit geht das letzte Sample (roh[n-1])
+	# stetig in das erste ueber (roh[n]) - genau das, was beim Rundlauf
+	# aneinanderstoesst.  Andersherum gemischt klafft dort eine Stufe.
 	var out := PackedFloat32Array()
 	out.resize(n)
 	for i in n:
 		out[i] = roh[i]
 	for j in blende:
 		var w := float(j) / float(blende)
-		out[n - blende + j] = roh[n - blende + j] * (1.0 - w) + roh[j] * w
+		out[j] = roh[n + j] * (1.0 - w) + roh[j] * w
 	return out
 
 
