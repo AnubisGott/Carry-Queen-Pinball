@@ -59,7 +59,7 @@ var _frenzy_frac := 0.0
 var _wizard_bar: ColorRect
 var _wizard_label: Label
 
-var _score_label: Label
+var _score_display: SegmentDisplay
 var _ego_label: Label
 var _ball_label: Label
 var _save_label: Label
@@ -127,9 +127,12 @@ func _build_bar() -> void:
 	bar.size = Vector2(540, 84)
 	add_child(bar)
 	_label("● EMPRESS LIVE!", Vector2(10, 4), 13, PINK, bar)
-	_score_label = _label("0", Vector2(100, 20), 30, Color.WHITE, bar)
-	_score_label.size = Vector2(340, 36)
-	_score_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	# Punktestand als Segmentanzeige wie bei den Flippern der Achtziger.
+	# Sie zeichnet sich um ihren Mittelpunkt, deshalb sitzt sie mittig ueber
+	# der Leiste statt in einem Kasten.
+	_score_display = SegmentDisplay.new()
+	_score_display.position = Vector2(270, 22)
+	bar.add_child(_score_display)
 	_ego_label = _label("EGO x1", Vector2(10, 28), 16, GREEN, bar)
 	_ball_label = _label("BALL 1/3", Vector2(10, 52), 12, Color(0.8, 0.8, 0.9), bar)
 	_save_label = _label("CARRY-SAVE ●", Vector2(10, 68), 10, GREEN, bar)
@@ -463,7 +466,7 @@ func _input(event: InputEvent) -> void:
 
 
 func _update_stats() -> void:
-	_score_label.text = fmt(Game.score)
+	_score_display.text = fmt(Game.score)
 	_ego_label.text = "EGO x%d" % Game.ego_mult
 	_ball_label.text = "BALL %d/%d" % [Game.ball_number, Game.balls_per_game]
 	if Game.ball_save_armed:

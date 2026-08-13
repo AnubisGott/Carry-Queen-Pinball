@@ -16,6 +16,10 @@ func _ready() -> void:
 	add_child(main)
 	main.god_mode = true
 	await get_tree().create_timer(1.0).timeout
+	if "--punkte" in OS.get_cmdline_user_args():
+		# Beispielstand, um die Segmentanzeige mit allen Ziffern zu sehen
+		Game.score = 1809253
+		Game.emit("score", {"points": 0})
 	var nur_frenzy := "--frenzy" in OS.get_cmdline_user_args()
 	if nur_frenzy:
 		# Ueber den echten Weg: alle DAMAGE-Ziele umlegen und die Bank pruefen

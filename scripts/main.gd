@@ -527,13 +527,17 @@ func _check_ggez() -> void:
 	Sfx.play("jackpot", -4.0)
 	Game.emit("ggez")
 	if Game.multiball:
+		# Laeuft schon einer, gibt es nur die Punkte - und die Bank ist danach
+		# wieder frei.
 		hud.show_message("G-G-E-Z.", "Waren ja auch nur vier Gassen.", 2.2)
+		await get_tree().create_timer(1.0, false).timeout
+		for r in ggez:
+			r.set_lit(false)
 	else:
-		# Komplette Bank ersetzt das Thron-Parken: Ko-op-Multiball + CARRY
+		# Komplette Bank ersetzt das Thron-Parken: Ko-op-Multiball + CARRY.
+		# Die vier Lampen bleiben an, solange der Multiball laeuft - sie zeigen
+		# damit, woher er kommt.  Geloescht werden sie in _end_multiball.
 		_start_ggez_multiball()
-	await get_tree().create_timer(1.0, false).timeout
-	for r in ggez:
-		r.set_lit(false)
 
 
 ## Multiball ohne Thron: die komplette G-G-E-Z-Bank ruft das "Team" aufs
@@ -647,6 +651,10 @@ func _end_multiball() -> void:
 	for b in get_tree().get_nodes_in_group("balls"):
 		if b is PinBall:
 			b.set_carry(false)
+	# Erst jetzt ist die G-G-E-Z-Bank wieder frei.  Solange der Multiball lief,
+	# blieb sie an und zeigte, woher er kam.
+	for r in ggez:
+		r.set_lit(false)
 	hud.show_sub("Multiball vorbei. Ihr wart Deko.", 2.0)
 
 

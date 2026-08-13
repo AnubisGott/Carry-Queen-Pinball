@@ -23,3 +23,5 @@ der Ball ist wieder durch die linke Mulde durchgegangen
 Wave Sound lauter wenn der Ball herunterfällt.
 
 zu viele Jubel-Sounds?
+
+oben die zahlenanzeige lass die einzelnen Ziffern aus 8 segmenten zusammen bauen, wie in den 1980er Jahren üblich

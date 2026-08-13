@@ -36,14 +36,16 @@ func _ready() -> void:
 			"OK" if Game.multiball else "FEHLER"])
 	print("  Lampen beim Start des Multiballs: %d" % _multiball_bei)
 
-	print("--- eine Sekunde spaeter ---")
-	await get_tree().create_timer(1.2).timeout
-	# Die Bank wird eine Sekunde nach dem Auszahlen freigegeben.  Dass danach
-	# schon wieder eine Lampe brennt, ist kein Fehler: die beiden neuen Kugeln
-	# des Multiballs erscheinen bei (270,185), also direkt ueber den Gassen,
-	# und fallen als erstes dort hindurch.
+	print("--- waehrend der Multiball laeuft ---")
+	await get_tree().create_timer(2.0).timeout
 	print("  %d von 4 an, Multiball laeuft: %s -> %s" % [_an(), str(Game.multiball),
-			"Bank freigegeben OK" if _an() < 4 and Game.multiball else "ABWEICHUNG"])
+			"Bank bleibt an OK" if _an() == 4 and Game.multiball else "ABWEICHUNG"])
+
+	print("--- nach dem Multiball ---")
+	_main._end_multiball()
+	await get_tree().create_timer(0.3).timeout
+	print("  %d von 4 an, Multiball laeuft: %s -> %s" % [_an(), str(Game.multiball),
+			"Bank wieder frei OK" if _an() == 0 and not Game.multiball else "ABWEICHUNG"])
 	print("ERGEBNIS: Multiball startet nur bei vier Lampen (gemessen: %d)" % _multiball_bei)
 	get_tree().quit()
 
