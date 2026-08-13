@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://i1diagprall01"]
+
+[ext_resource type="Script" path="res://tools/diag_prall.gd" id="1"]
+
+[node name="DiagPrall" type="Node"]
+script = ExtResource("1")
+

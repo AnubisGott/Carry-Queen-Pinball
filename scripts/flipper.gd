@@ -10,7 +10,7 @@ const SPEED := 22.0
 ## Zurueck in die Ruhelage geht es deutlich langsamer - wie bei einer echten
 ## Rueckstellfeder.  Ein schnell wegfallendes Blatt laesst die aufliegende
 ## Kugel sonst kurz in der Luft stehen und sie kommt als Huepfer wieder auf.
-const RETURN_SPEED := 4.0
+const RETURN_SPEED := 8.0
 const METAL := Color(0.78, 0.83, 0.92)
 const TIP_X := 78.0
 ## Schub des "Solenoids": eine aufliegende Kugel bekommt beim Schlag diesen
@@ -170,6 +170,13 @@ func _on_touch(body: Node2D) -> void:
 func _kick_resting_balls() -> bool:
 	if _area == null or _target == rotation:
 		return false
+	# Wie viel Hub steht ueberhaupt noch bevor?  Wer nachdrueckt, waehrend das
+	# Blatt fast am Anschlag steht, bewegt es kaum noch - dann darf es auch
+	# keinen vollen Schuss geben, sondern die Kugel prallt einfach ab.
+	var hub := absf(_target - rotation) / absf(deg_to_rad(pressed_deg - rest_deg))
+	if hub < 0.10:
+		return false
+	var kraft: float = clampf(hub * 1.8, 0.0, 1.0)
 	var hit := false
 	# Die Kugel geht schraeg nach oben zur Tischmitte weg - links nach rechts
 	# oben, rechts nach links oben.  Wie steil, haengt vom Treffpunkt ab.
@@ -187,6 +194,7 @@ func _kick_resting_balls() -> bool:
 			var reach := clampf((dist - ARM_PASS) / (TIP_X - ARM_PASS), 0.0, 1.0)
 			deg = lerpf(FLIP_ANGLE_BASE, FLIP_ANGLE_TIP, reach)
 			power = FLIP_POWER * lerpf(FLIP_BASE, 1.0, reach)
+		power *= kraft
 		var push := Vector2(cos(deg_to_rad(deg)) * side, -sin(deg_to_rad(deg)))
 		# Nur so viel zugeben, dass die Kugel auf Solltempo kommt - eine
 		# schon schnell anfliegende Kugel wird dadurch nicht doppelt beschleunigt
