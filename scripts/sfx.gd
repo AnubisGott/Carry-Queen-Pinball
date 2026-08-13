@@ -23,8 +23,8 @@ const MUSIK_DB := -6.0
 ## Kugel - das ist der Klang, der einem Tisch am meisten Leben gibt.
 const ROLL_MIN := 70.0
 const ROLL_MAX := 1100.0
-const ROLL_DB_LEISE := -45.0
-const ROLL_DB_LAUT := -24.0
+const ROLL_DB_LEISE := -54.0
+const ROLL_DB_LAUT := -33.0
 const ROLL_PITCH_LEISE := 0.70
 const ROLL_PITCH_LAUT := 1.60
 ## Wie schnell Lautstaerke (dB je Sekunde) und Tonhoehe nachgefuehrt werden.
@@ -481,10 +481,11 @@ func _wumms(f0: float, f1: float, dur: float, vol: float) -> PackedFloat32Array:
 	return out
 
 
-## Rollende Kugel als nahtlose Schleife.  Zwei Rauschbaender uebereinander:
-## ein tiefes Poltern des Untergrunds und feiner Grus darueber, dazu eine
-## langsame Schwebung - ohne die klingt gefiltertes Rauschen nur nach Zischen.
-## Das Ende wird in den Anfang ueberblendet, damit die Schleife nicht tickt.
+## Rollende Kugel als nahtlose Schleife.  Traeger ist ein schmalbandiges,
+## tiefes Poltern (hohe Guete, klingt nach Kugel auf Holz statt nach Rauschen);
+## der feine Grus darueber ist nur noch angedeutet, sonst zischt es.  Dazu eine
+## langsame Schwebung.  Das Ende wird in den Anfang ueberblendet, damit die
+## Schleife nicht tickt.
 func _rollen(dur: float) -> PackedFloat32Array:
 	var n := int(dur * RATE)
 	var blende := int(0.06 * RATE)
@@ -494,18 +495,18 @@ func _rollen(dur: float) -> PackedFloat32Array:
 	var b1 := 0.0
 	var t2 := 0.0
 	var b2 := 0.0
-	var f1: float = clampf(2.0 * sin(PI * 190.0 / RATE), 0.0, 1.4)
-	var f2: float = clampf(2.0 * sin(PI * 1500.0 / RATE), 0.0, 1.4)
+	var f1: float = clampf(2.0 * sin(PI * 165.0 / RATE), 0.0, 1.4)
+	var f2: float = clampf(2.0 * sin(PI * 780.0 / RATE), 0.0, 1.4)
 	var schweb := 0.0
 	for i in roh.size():
 		var x := _rng.randf() * 2.0 - 1.0
 		t1 += f1 * b1
-		b1 += f1 * (x - t1 - 0.9 * b1)
+		b1 += f1 * (x - t1 - 0.35 * b1)
 		t2 += f2 * b2
 		b2 += f2 * (x - t2 - 1.5 * b2)
 		schweb = fmod(schweb + 2.7 / RATE, 1.0)
 		var am := 0.82 + 0.18 * sin(schweb * TAU)
-		roh[i] = clampf(b1 * 1.6 + b2 * 0.5 + t1 * 0.8, -1.0, 1.0) * am
+		roh[i] = clampf(b1 * 1.5 + b2 * 0.10 + t1 * 1.1, -1.0, 1.0) * am
 	var out := PackedFloat32Array()
 	out.resize(n)
 	for i in n:

@@ -19,6 +19,7 @@ func _ready() -> void:
 		await get_tree().process_frame
 	await get_tree().create_timer(0.5).timeout
 
+	_klangcheck()
 	print("--- Rollen folgt dem Tempo ---")
 	var ball := PinBall.new()
 	ball.position = Vector2(52, 300)
@@ -48,6 +49,30 @@ func _ready() -> void:
 	await get_tree().create_timer(1.2).timeout
 	print("  ohne Kugel: %.1f dB" % Sfx._roll_player.volume_db)
 	get_tree().quit()
+
+
+## Klangcharakter der Schleife: das Zischmass ist der Anteil hoher Frequenzen
+## (Effektivwert der Sample-Differenzen bezogen auf den des Signals).  Je
+## kleiner, desto dunkler und weniger rauschig.  Der Nahtsprung zeigt, ob die
+## Schleife an der Stossstelle knackt.
+func _klangcheck() -> void:
+	var wav: AudioStreamWAV = Sfx._streams["roll"]
+	var d := wav.data
+	var n := d.size() / 2
+	var summe := 0.0
+	var diff := 0.0
+	var vor := 0.0
+	for i in n:
+		var v := float(d.decode_s16(i * 2)) / 32767.0
+		summe += v * v
+		if i > 0:
+			diff += (v - vor) * (v - vor)
+		vor = v
+	var erstes := float(d.decode_s16(0)) / 32767.0
+	print("--- Klangcharakter der Rollschleife ---")
+	print("  Zischmass %.3f (klein = dunkel), Nahtsprung %.4f" % [
+			sqrt(diff / maxf(1.0, float(n))) / maxf(0.0001, sqrt(summe / float(n))),
+			absf(vor - erstes)])
 
 
 ## Echtes Spiel mit Zufallsflippern: wie oft tickt es pro Sekunde, und wie
