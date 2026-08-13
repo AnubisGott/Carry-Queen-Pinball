@@ -105,11 +105,8 @@ const VOICE_FILES := {
 	"outro": "spiel_vorbei",
 	"bericht": "der_bericht",
 	"ball_start": "zeig_was_du_kannst",
-	# Die acht Spott-Sprueche und die fuenf Kanal-Antworten einzeln, damit sie
-	# genau das sagen kann, was daneben auf dem Feld steht.
-	"spott_1": "spott_1", "spott_2": "spott_2", "spott_3": "spott_3",
-	"spott_4": "spott_4", "spott_5": "spott_5", "spott_6": "spott_6",
-	"spott_7": "spott_7", "spott_8": "spott_8",
+	# Die fuenf Kanal-Antworten einzeln, damit sie genau die Zeile sprechen
+	# kann, die sie daneben in den Chat schreibt.
 	"kanal_1": "kanal_1", "kanal_2": "kanal_2", "kanal_3": "kanal_3",
 	"kanal_4": "kanal_4", "kanal_5": "kanal_5",
 }
@@ -133,14 +130,6 @@ const VOICE_TEXTE := {
 	"ohne_mich": "ohne_mich",
 	"spiel_vorbei": "outro",
 	"du_warst_auch_dabei_das_war_bestimmt_schoen_fuer_dich": "outro",
-	"warst_du_nicht_gut_genug": "spott_1",
-	"einfach_mal_besser_sein": "spott_2",
-	"skill_issue_nicht_meins": "spott_3",
-	"ich_haette_den_gehalten_locker": "spott_4",
-	"reflexe_wie_ein_ladebildschirm": "spott_5",
-	"soll_ich_das_auch_noch_fuer_dich_machen": "spott_6",
-	"uebung_ganz_viel_uebung": "spott_7",
-	"war_bestimmt_der_ping_ne": "spott_8",
 	"oben_ist_der_kanal_klicken_jetzt": "kanal_1",
 	"abonnieren_kostet_nichts_skill_schon": "kanal_2",
 	"im_stream_mache_ich_das_mit_einer_hand": "kanal_3",

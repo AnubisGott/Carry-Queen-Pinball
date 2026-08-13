@@ -105,9 +105,10 @@ zusammen aber sehr oft.
 | S7 | „Uebung. Ganz viel Uebung." | „Uebung. Ganz viel Uebung." |
 | S8 | „War bestimmt der Ping, ne?" | „War bestimmt der Ping, ne?" |
 
-Hier bekommt jede ausgefüllte Zeile ein eigenes Fach - dann spricht sie genau
-den Spruch, der auch dasteht. Acht Aufnahmen sind viel; drei oder vier reichen
-auch, dann spricht sie nur bei diesen und schweigt sonst.
+**Diese acht bleiben geschrieben.** Aufnahmen sind dafür nicht vorgesehen -
+der Spott steht auf dem Feld, gesprochen wird er nicht. Die Sprechtexte in der
+Spalte daneben sind nur noch Notiz; sollst du es dir anders überlegen, sag
+Bescheid, dann lege ich die acht Fächer wieder an.
 
 ## 4. Die vier Bericht-Zeilen
 
@@ -162,12 +163,14 @@ erwarte - ein anderer Name geht auch, solange er nah genug dran ist.
 | `carry_rettet` | Mein Carry rettet | M17 | **4** · 1,8-2,2 s |
 | `kein_skill` | Kein Skill | Ball endgültig verloren (kein Text auf dem Feld) | **4** · 0,8-0,9 s |
 | `bericht` | Die Ulti beginnt | M15 | **4** · 2,3-2,5 s |
-| `outro` | Du warst auch dabei … | E1, Spielende | **4** · 5,5-6,1 s, eine mit 26 s |
+| `outro` | Du warst auch dabei … | E1, Spielende | **3** · 5,5-6,1 s |
 | `gern` | Gern geschehen | Nachsatz 2,8 s nach M17 | **4** · 1,6-1,8 s |
 | `kein_plan` | Kein Plan | 18 s lang nichts getroffen | **3** · 1,1-1,5 s |
 | `kanal_1` … `kanal_5` | die jeweilige Zeile, siehe Abschnitt 5 | Chat-Antwort | je **1** · 2,5-3,4 s |
-| `spott_1` … `spott_8` | der jeweilige Spruch, siehe Abschnitt 3 | M2, K2 | – |
 | `ohne_mich` | Ohne mich | noch nirgends - Sprechtext eintragen, dann verdrahte ich es | – |
+
+Die acht Spott-Sprüche (S1-S8) haben bewusst kein Fach: sie stehen auf dem
+Feld und werden nicht gesprochen.
 
 `kein_skill` hat als einzige Zeile keinen Text auf dem Feld: beim Ballverlust
 steht dort nichts, die nächste Meldung ist erst der neue Ball. Wer sie hört,
@@ -183,15 +186,14 @@ Spruch benennen - „Skill-Issue. Nicht meins.1" landet von selbst in `spott_3`.
 |---|---|---|---|
 | 1 | `beste` | mehrmals je Spiel, aus vier Anlässen | muss zu vier verschiedenen Momenten passen - hier lohnen mehrere Fassungen am meisten |
 | 2 | `kein_skill` | bei jedem Ballverlust, mindestens 3× je Spiel | kurz und beiläufig, sonst nervt es beim vierten Mal |
-| 3 | `spott_1` … `spott_8` | zusammen 3-6× je Spiel, einzeln selten | eine Aufnahme je Spruch; drei oder vier reichen auch |
-| 4 | `kanal_1` … `kanal_5` | alle 55-100 s, davon jedes zweite Mal | Werbung, also eher beiläufig als groß |
-| 5 | `carry_rettet` | höchstens 1× je Ball | darf triumphieren, kommt aber regelmäßig |
-| 6 | `gern` | wie `carry_rettet`, 2,8 s danach | ganz kurz, sie hängt es nur an |
-| 7 | `ball_start` | 1× je Spiel | die Begrüßung, darf Zeit lassen |
-| 7 | `outro` | 1× je Spiel | letzter Eindruck, ruhig etwas länger |
-| 8 | `koop` | oft gar nicht | Höhepunkt, darf groß klingen |
-| 8 | `bericht` | oft gar nicht | Höhepunkt, darf groß klingen |
-| 9 | `kein_plan` | nur wenn 18 s nichts getroffen wird | trockene Nachfrage |
+| 3 | `kanal_1` … `kanal_5` | alle 55-100 s, davon jedes zweite Mal | Werbung, also eher beiläufig als groß |
+| 4 | `carry_rettet` | höchstens 1× je Ball | darf triumphieren, kommt aber regelmäßig |
+| 5 | `gern` | wie `carry_rettet`, 2,8 s danach | ganz kurz, sie hängt es nur an |
+| 6 | `ball_start` | 1× je Spiel | die Begrüßung, darf Zeit lassen |
+| 6 | `outro` | 1× je Spiel | letzter Eindruck, ruhig etwas länger |
+| 7 | `koop` | oft gar nicht | Höhepunkt, darf groß klingen |
+| 7 | `bericht` | oft gar nicht | Höhepunkt, darf groß klingen |
+| 8 | `kein_plan` | nur wenn 18 s nichts getroffen wird | trockene Nachfrage |
 
 Die Textspalten der Meldungs-Tabellen sind so wichtig wie dein Sprechtext:
 Steht der Satz schon auf dem Feld, sollte sie etwas anderes sagen - sonst

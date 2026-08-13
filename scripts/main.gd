@@ -333,9 +333,7 @@ func _update_timers(delta: float) -> void:
 		hurry_value = maxi(5000, hurry_value - int(1600.0 * delta))
 		if hurry_time <= 0.0:
 			_end_hurry()
-			var i := spott_index()
-			hud.show_sub("Hurry-Up vorbei. " + QUEEN_SPOTT[i], 1.8)
-			Sfx.say("spott_%d" % (i + 1))
+			hud.show_sub("Hurry-Up vorbei. " + spott(), 1.8)
 	if frenzy_time > 0.0:
 		frenzy_time -= delta
 		# Die DAMAGE-Bank blinkt, solange die Frenzy laeuft - und zwar umso
@@ -717,15 +715,10 @@ func _end_wizard() -> void:
 	hud.show_message("AM ENDE STEHT MEIN NAME.", "Eure Namen stehen nicht.", 3.0)
 
 
-## Ein zufaelliger Spott-Spruch der Queen.
+## Ein zufaelliger Spott-Spruch der Queen.  Der Topf bleibt geschrieben - fuer
+## die acht Sprueche sind keine Aufnahmen vorgesehen.
 func spott() -> String:
-	return QUEEN_SPOTT[spott_index()]
-
-
-## Derselbe Griff in den Topf, aber mit der Nummer: nur so kann sie den Satz
-## auch sprechen, der gerade dasteht (Fach "spott_1" bis "spott_8").
-func spott_index() -> int:
-	return randi() % QUEEN_SPOTT.size()
+	return QUEEN_SPOTT[randi() % QUEEN_SPOTT.size()]
 
 
 ## Tisch dunkel bzw. wieder hell schalten (Ruhe-Modus).
@@ -935,11 +928,8 @@ func _start_ball(first: bool = false) -> void:
 				"Zeig doch mal, was du kannst.", 2.5)
 		Sfx.say("ball_start")
 	else:
-		# Bei den weiteren Baellen spottet sie - und spricht denselben Spruch,
-		# der dasteht, sofern es dafuer eine Aufnahme gibt.
-		var i := spott_index()
-		hud.show_message("BALL %d" % Game.ball_number, QUEEN_SPOTT[i], 2.5)
-		Sfx.say("spott_%d" % (i + 1))
+		# Bei den weiteren Baellen spottet sie - geschrieben, nicht gesprochen.
+		hud.show_message("BALL %d" % Game.ball_number, spott(), 2.5)
 	_ohne_treffer = 0.0
 	_abgeschossen = false
 
