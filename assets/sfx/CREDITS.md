@@ -4,9 +4,18 @@ Dieses Repo ist öffentlich. Jede Datei in diesem Ordner braucht deshalb einen
 Eintrag hier - Quelle, Autor und Lizenz. Ohne Eintrag gehört die Datei nicht
 ins Repo.
 
-| Datei | Quelle (Link) | Autor | Lizenz |
-|---|---|---|---|
-| _(noch keine)_ | | | |
+| Datei | Herkunft | Quelle | Autor | Lizenz |
+|---|---|---|---|---|
+| `rail.ogg` | `impactMetal_medium_004.ogg` (109 ms) | [Kenney Impact Sounds](https://kenney.nl/assets/impact-sounds) | Kenney | CC0 |
+| `target.ogg` | `impactMetal_heavy_004.ogg` (134 ms) | [Kenney Impact Sounds](https://kenney.nl/assets/impact-sounds) | Kenney | CC0 |
+| `standup.ogg` | `impactTin_medium_002.ogg` (134 ms) | [Kenney Impact Sounds](https://kenney.nl/assets/impact-sounds) | Kenney | CC0 |
+
+Die Datei-Namen im Paket sind absichtlich mit vermerkt: so lässt sich jede
+Datei ohne Neu-Download wiederfinden, und man sieht auf einen Blick, welche
+Alternative aus derselben Reihe man ausprobieren kann.
+
+CC0 heißt: keine Namensnennung nötig, keine Auflagen. Der Eintrag hier steht
+trotzdem, damit die Herkunft nachvollziehbar bleibt.
 
 ## Was hier hinein darf
 
