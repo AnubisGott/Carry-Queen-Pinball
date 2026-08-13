@@ -43,11 +43,11 @@ const CHAT := {
 	"ego_level": ["ihr EGO skaliert besser als wir", "x-fach?? okay"],
 	# Der Kanal wird im Chat beworben - von "Zuschauern", versteht sich.
 	"kanal": [
-		"youtube.com/@carryqueen - LIVE",
-		"Link ist oben, drueckt einfach drauf",
+		"youtube.com/@djanubis5223 - LIVE",
+		"@djanubis5223, Link ist oben in der Leiste",
 		"abonniert oder heult",
 		"sie streamt das grad, oben der Knopf",
-		"YT-Kanal in der Leiste, nicht so schwer",
+		"DJ Anubis hat den Sound gemacht, YT-Knopf oben",
 		"ich guck das lieber im Stream als hier",
 	],
 	"wheel_hit": ["RAD DREHT", "ranked roulette lol", "sie spinnt es an"],

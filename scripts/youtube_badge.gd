@@ -22,7 +22,7 @@ func _init() -> void:
 	# Nicht fokussierbar: sonst faengt die Leertaste den Knopf statt den
 	# Abschuss.
 	focus_mode = Control.FOCUS_NONE
-	tooltip_text = "Zum YouTube-Kanal der Carry Queen"
+	tooltip_text = "DJ Anubis auf YouTube (@djanubis5223)"
 	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 
 
