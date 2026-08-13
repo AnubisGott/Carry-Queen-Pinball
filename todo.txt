@@ -18,9 +18,6 @@ e:\multimed\Musikideen\work\SunoAI\Der Beste\game
 Resume this session with:
 claude --resume 94101305-1426-4398-8d2f-8ad07fde1b03
 
-Karteileichen im Code (stören nichts, laufen nur ins Leere): Seit dem Thron-Abriss sind rund 60 Zeilen Thron-Logik in main.gd unerreichbar (_resolve_throne, _start_multiball, _eject_after, locked_balls, Game.locks) samt der Klasse Throne in kicker.gd. Außerdem füllt table.gd das Array ego_bank nicht mehr, weshalb die Reset-Schleife darüber leer läuft – der EGO-Knopf braucht sie ohnehin nicht. Aufräumen kann ich das jederzeit, wenn du willst.
-
-
 Sound:
 
 A. Ohne ein einziges Sample: die Synthese aufbohren
@@ -80,5 +77,4 @@ Womit soll ich anfangen?
 ───────────────────────────────────────────────────────────────────────────────────────────────
 
   
-hinzufügen von einem Glückrad-Element. Wenn die Kugel das Glücksrad berührt, beginnt es sich zu drehen und es gibt Punkte wie beim Spinner. Das Glücksrad wird langsamer . Wenn das Glückrad stehen bleibt, bekommt man die Punkte die gerade oben sind. Das Gückrad ist eine Scheibe, die sich drehen kann mit einzelnen Sektoren, jeder Sektor mit einer anderen Zahl.
-Wenn die Kugel auf ein drehendes Glückrad trifft, erhöht sich die Drehgeschwindigkeit wieder auf die Startgeschwindigkeit. Vorschläge wie es zum Thema Carry Queen angepasst werden kann?
+hinzufügen von einem Glückrad-Element. Wenn die Kugel das Glücksrad berührt, beginnt es sich zu drehen und es gibt Punkte wie beim Spinner. Das Glücksrad wird langsamer . Wenn das Glückrad stehen bleibt, bekommt man die Punkte die gerade oben sind. Das Gückrad ist eine Scheibe, die sich drehen kann mit einzelnen Sektoren, jeder Sektor mit einer anderen Zahl. Wenn die Kugel auf ein drehendes Glückrad trifft, erhöht sich die Drehgeschwindigkeit wieder auf die Startgeschwindigkeit. Vorschläge wie es zum Thema Carry Queen angepasst werden kann?

@@ -3,21 +3,23 @@ extends Node2D
 ## Rollover-Gasse: die Kugel rollt durch, der Buchstabe leuchtet auf.
 ## Ob die ganze Bank komplett ist, prueft main.gd (Event "rollover").
 ##
-## Erkannt wird der Durchgang an der Flugbahn, nicht ueber ein Sensorfeld:
-## jedes Physikbild wird die Lage der Kugel in Gassenkoordinaten festgehalten
-## (laengs u, quer w).  Wechselt u das Vorzeichen, hat sie die Gassenmitte
-## ueberquert; der Kreuzungspunkt wird zwischen den beiden Bildern
-## interpoliert und muss quer innerhalb der Gasse liegen.
+## Erkannt wird an der Flugbahn, nicht ueber ein Sensorfeld: jedes Physikbild
+## wird geprueft, wie nah die Strecke zwischen der letzten und der jetzigen
+## Position dem Buchstaben kommt.  Es reicht, den Buchstaben zu erreichen -
+## die Kugel muss die Gasse nicht ganz durchrollen, sie darf also auch wieder
+## zurueckfallen.
 ##
 ## Ein Sensorfeld waere hier zu grob: bei Flippertempo legt die Kugel 13
 ## Einheiten je Bild zurueck und springt ueber ein schmales Feld hinweg, ohne
 ## dass eine Beruehrung gemeldet wird - schraege Treffer zaehlten dann nicht.
 ## Breiter darf das Feld aber nicht sein, sonst liegt die Kugel gleichzeitig
-## in zwei Gassen (Abstand 38, Kugeldurchmesser 26).
+## in zwei Gassen (Abstand 38, Kugeldurchmesser 26).  Der Streckenabstand hat
+## das Problem nicht: er ist vom Tempo unabhaengig, weil zwischen den Bildern
+## gerechnet statt abgetastet wird.
 
-## Halbe Gassenbreite: der Kreuzungspunkt muss so nah an der Gassenmitte
-## liegen.  15+15 = 30 < 38, zwei Gassen koennen also nie gleichzeitig passen.
-const HALB_BREITE := 15.0
+## So nah muss die Bahn dem Buchstaben kommen.  16+16 = 32 < 38, es kann also
+## nie zu zwei Gassen gleichzeitig reichen.
+const TREFFER := 16.0
 ## Nur Kugeln in diesem Umkreis werden verfolgt.
 const NAEHE := 52.0
 ## Ein Anlauf, ein Buchstabe: prallt die Kugel oben am Bogen ab und faellt
@@ -82,23 +84,29 @@ func _physics_process(_delta: float) -> void:
 		if rel.length() > NAEHE:
 			continue
 		var id := ball.get_instance_id()
-		var jetzt := Vector2(rel.dot(_dir), rel.dot(_quer))
 		gesehen[id] = true
 		if _spur.has(id):
-			var vor: Vector2 = _spur[id]
-			# Vorzeichenwechsel laengs = die Kugel hat die Mitte ueberquert
-			if vor.x != 0.0 and signf(vor.x) != signf(jetzt.x):
-				var t: float = vor.x / (vor.x - jetzt.x)
-				var quer_kreuz := absf(lerpf(vor.y, jetzt.y, t))
-				if debug:
-					print("    [%s] Ueberquerung bei quer=%.1f (Grenze %.0f), laengs %.1f -> %.1f" % [
-							letter, quer_kreuz, HALB_BREITE, vor.x, jetzt.x])
-				if quer_kreuz <= HALB_BREITE:
-					_durchgang(ball)
-		_spur[id] = jetzt
+			var naehe := _bahn_abstand(_spur[id], rel)
+			if debug and naehe < NAEHE:
+				print("    [%s] Bahn kommt auf %.1f heran (Grenze %.0f)" % [
+						letter, naehe, TREFFER])
+			if naehe <= TREFFER:
+				_durchgang(ball)
+		_spur[id] = rel
 	for id in _spur.keys():
 		if not gesehen.has(id):
 			_spur.erase(id)
+
+
+## Kuerzester Abstand des Buchstabens (Ursprung) zur Strecke von -> nach.
+## Beide Punkte liegen relativ zur Gassenmitte.
+func _bahn_abstand(von: Vector2, nach: Vector2) -> float:
+	var d := nach - von
+	var l2 := d.length_squared()
+	if l2 < 0.0001:
+		return von.length()
+	var t: float = clampf(-von.dot(d) / l2, 0.0, 1.0)
+	return (von + d * t).length()
 
 
 func _durchgang(ball: PinBall) -> void:
