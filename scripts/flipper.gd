@@ -20,41 +20,21 @@ const TIP_X := 78.0
 const FLIP_POWER := 2150.0
 ## Anteil, den die Kugel am Blattansatz mindestens abbekommt (an der Spitze
 ## wirkt der volle Schub - so bleibt die Stelle des Treffers spuerbar).
-const FLIP_BASE := 0.74
+const FLIP_BASE := 0.66
 ## Abschusswinkel ueber der Waagerechten, zur Tischmitte hin.  Am Blattansatz
 ## steil (geht aufs Oberfeld zu den G-G-E-Z-Gassen), an der Spitze flach
 ## (der klassische Querschuss auf die gegenueberliegende Seite).
-const FLIP_ANGLE_BASE := 78.0
+const FLIP_ANGLE_BASE := 82.0
 const FLIP_ANGLE_TIP := 60.0
 ## Bis hierhin liegt die Kugel praktisch auf dem Lager.  Dort hat auch ein
 ## echter Flipper keine Hebelwirkung: es gibt keinen Schuss, sondern einen
 ## flachen Pass hinueber aufs Blatt des anderen Hebels.  Ab dieser Entfernung
 ## faechert der Treffpunkt zum Schuss auf.
-##
-## Die Grenze liegt unter der Stelle, an der eine gefangene Kugel zur Ruhe
-## kommt (28 bis 29 px vom Drehpunkt) - aus dem Cradle heraus muss ein
-## richtiger Schuss moeglich sein, sonst kommt man nie ins Oberfeld.
-##
-## Der Pass wird darum bewusst angefordert: haelt man den anderen Hebel oben
-## (man will die Kugel dort auffangen), geht sie als flacher Pass hinueber
-## statt aufs Oberfeld.  Liegt sie wirklich auf dem Lager, passt sie immer -
-## dort gibt es ohnehin keine Hebelwirkung.
-const ARM_PASS := 20.0
-## Bis hier heraus laesst sich passen.  Weiter aussen auf dem Blatt ist es
-## immer ein Schuss, egal was der andere Hebel macht.
-const ARM_PASS_MAX := 46.0
-## Ab dieser Zeit auf dem Blatt gilt eine Kugel als liegend: sie wird bewusst
-## abgeschossen und bekommt den vollen Schub.  Eine gerade erst aufgeprallte
-## Kugel ist zwar auch kurz langsam, aber eben nicht lange genug.
-const RUHE_ZEIT := 0.08
-const RUHE_TEMPO := 250.0
+const ARM_PASS := 34.0
 const PASS_SPEED := 420.0
 const PASS_ANGLE := 40.0
 
 var is_left := true
-## Der Hebel auf der anderen Seite - wird er gehalten, wandert die Kugel als
-## Pass zu ihm hinueber (siehe ARM_PASS).
-var partner: Flipper
 var rest_deg := 28.0
 var pressed_deg := -32.0
 var _target := 0.0
@@ -65,12 +45,6 @@ var _area: Area2D
 ## Wie lange der Stoss nach dem Druecken noch bereitsteht.  Eine Kugel, die
 ## beim Nachdruecken kurz keinen Blattkontakt hat, bekommt ihn so trotzdem.
 var _boost_left := 0.0
-## Kugel-Kennung -> wie lange sie schon ruhig beim Hebel liegt
-var _ruhe := {}
-## Welche Kugeln im Moment des Druckens dort lagen.  Nur die gelten als
-## bewusst abgeschossen; was danach angeflogen kommt, richtet sich nach der
-## tatsaechlichen Blattbewegung.
-var _liegend := {}
 
 
 func _init(left: bool, pivot: Vector2) -> void:
@@ -179,17 +153,8 @@ func set_pressed(on: bool) -> void:
 	if on and new_target != _target:
 		Sfx.play("flip", -8.0)
 		_boost_left = 0.16
-		_liegend.clear()
-		for id in _ruhe:
-			if float(_ruhe[id]) >= RUHE_ZEIT:
-				_liegend[id] = true
 	_target = new_target
 	_held = on
-
-
-## Ob die Taste dieses Hebels gerade gedrueckt gehalten wird.
-func haelt() -> bool:
-	return _held
 
 
 func _on_touch(body: Node2D) -> void:
@@ -209,6 +174,8 @@ func _kick_resting_balls() -> bool:
 	# Blatt fast am Anschlag steht, bewegt es kaum noch - dann darf es auch
 	# keinen vollen Schuss geben, sondern die Kugel prallt einfach ab.
 	var hub := absf(_target - rotation) / absf(deg_to_rad(pressed_deg - rest_deg))
+	if hub < 0.10:
+		return false
 	var kraft: float = clampf(hub * 1.8, 0.0, 1.0)
 	var hit := false
 	# Die Kugel geht schraeg nach oben zur Tischmitte weg - links nach rechts
@@ -221,25 +188,13 @@ func _kick_resting_balls() -> bool:
 		if ball == null or ball.freeze:
 			continue
 		var dist := (ball.global_position - global_position).length()
-		# Pass statt Schuss: wenn die Kugel auf dem Lager liegt, oder wenn der
-		# andere Hebel oben steht und sie noch im inneren Teil des Blattes ist -
-		# dann will man sie offensichtlich drueben auffangen.
-		var passen := dist < ARM_PASS or (dist < ARM_PASS_MAX
-				and partner != null and partner.haelt())
 		var deg := PASS_ANGLE
 		var power := PASS_SPEED
-		if not passen:
-			var reach: float = clampf((dist - ARM_PASS) / (TIP_X - ARM_PASS), 0.0, 1.0)
+		if dist >= ARM_PASS:
+			var reach := clampf((dist - ARM_PASS) / (TIP_X - ARM_PASS), 0.0, 1.0)
 			deg = lerpf(FLIP_ANGLE_BASE, FLIP_ANGLE_TIP, reach)
 			power = FLIP_POWER * lerpf(FLIP_BASE, 1.0, reach)
-		# Eine liegende Kugel wird bewusst abgeschossen - die bekommt den vollen
-		# Schub, egal wie viel Hub noch bevorsteht.  Nur eine anfliegende Kugel
-		# richtet sich nach der tatsaechlichen Blattbewegung, sonst wuerde sie
-		# am Anschlag weggeschleudert, als wuerde sich der Hebel bewegen.
-		if not _liegend.has(ball.get_instance_id()):
-			if kraft < 0.18:
-				continue
-			power *= kraft
+		power *= kraft
 		var push := Vector2(cos(deg_to_rad(deg)) * side, -sin(deg_to_rad(deg)))
 		# Nur so viel zugeben, dass die Kugel auf Solltempo kommt - eine
 		# schon schnell anfliegende Kugel wird dadurch nicht doppelt beschleunigt
@@ -252,47 +207,13 @@ func _kick_resting_balls() -> bool:
 	return hit
 
 
-## Buchfuehrung, welche Kugel wie lange ruhig beim Hebel liegt.  Gemessen wird
-## ueber die Naehe zum Drehpunkt, nicht ueber die Blattberuehrung: eine
-## gefangene Kugel liegt oft in der Kerbe neben der Blattwurzel und wuerde
-## sonst nicht als liegend zaehlen.
-func _pflege_ruhe(delta: float) -> void:
-	var gesehen := {}
-	for b in get_tree().get_nodes_in_group("balls"):
-		var ball := b as PinBall
-		if ball == null or ball.freeze:
-			continue
-		if ball.global_position.distance_to(global_position) > TIP_X + 26.0:
-			continue
-		var id := ball.get_instance_id()
-		gesehen[id] = true
-		if ball.linear_velocity.length() < RUHE_TEMPO:
-			_ruhe[id] = minf(float(_ruhe.get(id, 0.0)) + delta, RUHE_ZEIT * 4.0)
-		else:
-			_ruhe[id] = 0.0
-	# Beim Loslassen sackt das Blatt unter der Kugel weg, der Kontakt reisst
-	# kurz ab.  Die Ruhezeit darf davon nicht sofort verschwinden, sonst gilt
-	# die eigene Cradle-Kugel beim Nachdruecken als Fremdkoerper.  Nach rund
-	# einer Zehntelsekunde ohne Blatt ist sie aber weg.
-	for id in _ruhe.keys():
-		if not gesehen.has(id):
-			_ruhe[id] = float(_ruhe[id]) - delta * 3.0
-			if float(_ruhe[id]) <= 0.0:
-				_ruhe.erase(id)
-
-
 func _physics_process(delta: float) -> void:
-	_pflege_ruhe(delta)
 	if _boost_left > 0.0:
 		_boost_left = 0.0 if _kick_resting_balls() else _boost_left - delta
 	rotation = move_toward(rotation, _target, (SPEED if _held else RETURN_SPEED) * delta)
 	if _flash > 0.0:
 		_flash = maxf(0.0, _flash - delta * 3.0)
 		_art.queue_redraw()
-
-
-
-
 
 
 

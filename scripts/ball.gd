@@ -20,7 +20,7 @@ func _ready() -> void:
 	continuous_cd = RigidBody2D.CCD_MODE_CAST_SHAPE
 	# Rollreibung wie auf echtem Holz: die Kugel verliert unterwegs Tempo,
 	# im Oberfeld laeuft sie dadurch ruhiger als direkt nach dem Schlag.
-	linear_damp = 0.10
+	linear_damp = 0.16
 	var pm := PhysicsMaterial.new()
 	pm.bounce = 0.32
 	pm.friction = 0.08
