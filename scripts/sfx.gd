@@ -496,17 +496,22 @@ func _rollen(dur: float) -> PackedFloat32Array:
 	var t2 := 0.0
 	var b2 := 0.0
 	var f1: float = clampf(2.0 * sin(PI * 165.0 / RATE), 0.0, 1.4)
-	var f2: float = clampf(2.0 * sin(PI * 780.0 / RATE), 0.0, 1.4)
+	var f2: float = clampf(2.0 * sin(PI * 620.0 / RATE), 0.0, 1.4)
+	# Zum Schluss noch ein einfacher Tiefpass bei 380 Hz ueber die Summe -
+	# er nimmt den Rest des Zischens heraus und laesst das Poltern stehen.
+	var tp := 0.0
+	var tp_a := 1.0 - exp(-TAU * 380.0 / RATE)
 	var schweb := 0.0
 	for i in roh.size():
 		var x := _rng.randf() * 2.0 - 1.0
 		t1 += f1 * b1
-		b1 += f1 * (x - t1 - 0.35 * b1)
+		b1 += f1 * (x - t1 - 0.22 * b1)
 		t2 += f2 * b2
 		b2 += f2 * (x - t2 - 1.5 * b2)
 		schweb = fmod(schweb + 2.7 / RATE, 1.0)
 		var am := 0.82 + 0.18 * sin(schweb * TAU)
-		roh[i] = clampf(b1 * 1.5 + b2 * 0.10 + t1 * 1.1, -1.0, 1.0) * am
+		tp += tp_a * (b1 * 1.5 + b2 * 0.035 + t1 * 1.2 - tp)
+		roh[i] = clampf(tp, -1.0, 1.0) * am
 	# Ueberblendung: der Anfang der Schleife wird mit dem Material direkt
 	# hinter ihrem Ende gemischt.  Damit geht das letzte Sample (roh[n-1])
 	# stetig in das erste ueber (roh[n]) - genau das, was beim Rundlauf
