@@ -767,6 +767,9 @@ func _after_drain() -> void:
 func _save_return() -> void:
 	var b := _spawn_ball(Vector2(247, 946))
 	b.freeze = true
+	# Hoerbar machen, dass die Kugel festgehalten wird - vorher lag sie eine
+	# halbe Sekunde stumm da, bevor das Grollen einsetzte.
+	Sfx.play("klack", -4.0)
 	var home := b.position
 	await get_tree().create_timer(0.55, false).timeout
 	if not is_instance_valid(b):

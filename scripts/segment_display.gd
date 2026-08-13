@@ -31,8 +31,10 @@ var staerke := 4.0
 ## Abstand zwischen zwei Stellen und Breite eines Tausenderpunkts
 var luecke := 4.0
 var punkt_breite := 7.0
-var an := Color(1.6, 0.35, 0.15)
-var aus := Color(0.28, 0.10, 0.06, 0.55)
+## Weiss statt der roten Plasma-Roehren: passt besser zum Neon des Tisches.
+## Genau 1.0 und nicht darueber, damit die Anzeige nicht ueberstrahlt.
+var an := Color(1.0, 1.0, 1.0)
+var aus := Color(0.30, 0.30, 0.36, 0.5)
 
 
 func _setze_text(t: String) -> void:
