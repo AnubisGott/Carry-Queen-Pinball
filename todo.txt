@@ -1,13 +1,7 @@
 - sound dateien
 - Punkte aufsteigen lassen, damit man Ursache wirkung bessert sieht
-- Kugel größer machen
-- Wenn bestimmte Modi aktiv sind leuchten lassen. 
-- In manchen Fällen die Leuchtkraft verstärken, wenn man einem Ziel näher kommt.
 - Sonderfunktionen justieren
-- in der Mitte soll nichts mehr eingesaugt werden.
 - Flipper Sound Samples (free usage) downloaden oder in Suno generieren (cyberspace/cyberpunk sounds)
-- Wenn ein Bumper getroffen wird soll das Spielfeld um ein Pixel in die entsprechende Richtung verschoben werden und wieder zurück in kurzer Zeit.
-- Kugelsave nur in den ersten 20 Sekunden
 - Spinner mit Sound hinzufügen
 - wozu ist der cyan farbene Pfeil
 
@@ -22,28 +16,64 @@ e:\multimed\Musikideen\work\SunoAI\Der Beste\game
 Resume this session with:
 claude --resume 94101305-1426-4398-8d2f-8ad07fde1b03
 
-Hier alle Sondermechaniken im aktuellen Stand:
-
-Der Multiplikator-Stapel (alles multipliziert sich): EGO ×1…×10 · Frenzy ×2 · Wizard ×5 · pinke Carry-Kugel im Multiball ×10. Blackout überschreibt alles auf ×1.
-
-EGO – Der einzelne Knopf oben links ist die einzige Quelle: ein Treffer = genau eine Stufe rauf (Fanfare, +1.000 Punkte), maximal ×10. Bei Ballverlust fällt er auf ×1 zurück – jeder Ball beginnt also von vorn.
-
-Carry-Save – Einmal pro Ball scharf (grüner Punkt „CARRY-SAVE ●" oben links). Geht der Ball verloren, liegt er sichtbar in der Drain-Öffnung, zittert mit Grollen, zählt 3-2-1 herunter und wird zwischen den Flippern wieder hochgeschossen.
-
-Die vier Disziplinen – jede einmal geschafft, dann zündet der Wizard:
-- DMG: Alle sechs D-A-M-A-G-E-Targets (je 500) abräumen → +3.000 und Damage-Frenzy: 20 Sekunden alles doppelt. Die Bank bleibt bis zum Ballverlust leuchten.
-- KILLS: Alle vier Bumper W-A-S-D treffen (je 150). Getroffene bleiben golden markiert bis zum Ballverlust → +3.000, „KILL BESTÄTIGT".
-- ICH: I-C-H-Bank links komplett (je 300) → +2.000 und ein Hurry-Up: 25.000 Punkte, 12 Sekunden, der Wert tickt rapide runter (Minimum 5.000). Abgeholt wird er an der Mittel-Mulde – „ICH. WER SONST."
-- CARRY: Alle vier G-G-E-Z-Gassen durchrollen (je 500) → +5.000 und Ko-op-Multiball: Deine Kugel wird zur pinken Carry-Kugel (alles ×10), zwei Team-Kugeln kommen oben dazu. Der Multiball endet, wenn nur noch eine Kugel lebt.
-
-Wizard „Der Bericht" – Sind alle vier Lam dazu die vier Sprüche („Wer macht denSchaden? Ich."), und die Mulde zahlt pro Treffer einen Mega-Jackpot von 20.000. Danach werden die Disziplinen zurückgesetzt.
-
-
-
-Drei Beobachtungen
-
-Der Hurry-Up ist der Flaschenhals für den Wizard. Die ICH-Belohnung muss an der Mittel-Mulde abgeholt werden, und deren Fangfenster ist seit der Seitentreffer-Korrektur nur noch 16 px breit und nimmt Kugeln ausschließlich von oben. Im Test kam die Mulde auf 6 Treffer in 15 Bällen – die Chance, einen davon in die 12-Sekunden-Frist zu legen, ist gering. Damit ist der Wizard-Modus praktisch schwer erreichbar. Falls du das ändern willst: Frist verlängern, Fangfenster etwas verbreitern oder das Abholen zusätzlich an einer Seiten-Mulde erlauben.
-
-Der linke Orbit wird kaum befahren – nur 2 Spinner-Durchgänge in 5 Minuten. Der Spinner ist damit fast Deko. Die Seiten-Mulden dominieren das Geschehen deutlich (32 Treffer).
-
 Karteileichen im Code (stören nichts, laufen nur ins Leere): Seit dem Thron-Abriss sind rund 60 Zeilen Thron-Logik in main.gd unerreichbar (_resolve_throne, _start_multiball, _eject_after, locked_balls, Game.locks) samt der Klasse Throne in kicker.gd. Außerdem füllt table.gd das Array ego_bank nicht mehr, weshalb die Reset-Schleife darüber leer läuft – der EGO-Knopf braucht sie ohnehin nicht. Aufräumen kann ich das jederzeit, wenn du willst.
+
+
+Sound:
+
+A. Ohne ein einziges Sample: die Synthese aufbohren
+
+Das sind die vier Hebel mit dem besten Verhältnis von Aufwand zu Wirkung:
+
+1. 44.100 statt 22.050 Hz und bandbegrenzte Wellenformen. Deine Square-/Saw-Töne aliasen bei 22 kHz hörbar – daher der schrille, billige Beiklang. PolyBLEP kostet ein paar Zeilen und läuft nur beim Erzeugen, nicht im Spiel.
+2. Schichten statt Einzelton. Ein Pinball-Geräusch besteht aus Klack (gefiltertes Rauschen, 3–8 ms) plus Resonanzkörper (abklingender Zweiklang). Betrifft Flipper, Bumper, Slingshot, Standups – da fehlt heute der ganze mechanische Anteil.
+3. Zufall pro Treffer: Tonhöhe ±3 %, Lautstärke ±1,5 dB. Ohne das klingt eine Bumper-Serie wie ein Maschinengewehr, weil jedes Mal exakt dieselbe Wellenform abgespielt wird.
+4. Kurze Attack-/Release-Rampe (2 ms / 10 ms) gegen die Knackser am Anfang und Ende jedes Samples.
+
+B. Bus-Effekte – der größte Sprung, ganz ohne Addon
+
+Godot bringt Reverb, Compressor, Limiter, EQ, Delay mit. Ein SFX-Bus mit kleinem Raum-Reverb (Gehäuse-Klang), sanfter Kompression und Limiter davor, Musik und Sprache auf eigene Busse, dazu Ducking (Musik −6 dB, solange die Queen spricht). Etwa 40 Zeilen, und der Tisch klingt plötzlich nach einem Gerät in einem Raum statt nach Piepsern.
+
+C. Der Sound, der komplett fehlt: die rollende Kugel
+
+Echte Tische haben ein Dauerrollen, dessen Lautstärke und Tonhöhe vom Tempo abhängt – dazu Ticks beim Bandenkontakt. Wir haben jetzt linear_velocity sauber im Griff, das lässt sich direkt draufmappen. Das macht für die Atmosphäre mehr als jedes einzelne Trefferzeugnis.
+
+D. Samples aus dem Netz – Lizenzlage
+
+Da dein Repo öffentlich ist, ist das nicht egal:
+
+- Sonniss GDC Bundle – royalty-free, kommerziell erlaubt, keine Namensnennung nötig, unbegrenzt viele Projekte. Bester Startpunkt. (Einzige Einschränkung: kein KI-Training – für uns irrelevant.)
+- Freesound.org, Filter auf CC0 (keinerlei Pflichten) oder CC-BY (Namensnennung). Dort gibt es echte Solenoid-, Relais- und Glocken-Aufnahmen – genau die Bauteile eines Flippers.
+- OpenGameArt / Kenney – CC0, aber eher generisch.
+- Finger weg: BBC Sound Effects (nur persönlich/nicht-kommerziell), Zapsplat-Gratiskonto (Namensnennungspflicht plus Auflagen), YouTube-Rips.
+
+Egal was: pro Datei Quelle und Lizenz in assets/sfx/CREDITS.md.
+
+E. Einbau ohne Umbau
+
+sfx.gd lädt Sprache und Musik schon optional aus Dateien. Ich erweitere das auf assets/sfx/<name>.ogg: Liegt eine Datei da, ersetzt sie den generierten Sound, sonst bleibt alles wie es ist. Dann legst du Suno- oder Freesound-Dateien einfach rein – drain.ogg, flip.ogg, bump_w.ogg, jackpot.ogg … Die Namen stehen alle in _build_all().
+
+Deine Suno-Samples passen am besten als Stinger, nicht als Klack: Ballverlust, Modus-Start (Wizard/Frenzy), Jackpot, Game Over. Für Musik kann Godot 4 seit 4.3 adaptiv: AudioStreamInteractive (Clips mit Übergängen) und AudioStreamSynchronized (Stems übereinanderlegen) – im Wizard-Modus schaltest du damit eine Ebene dazu, statt hart umzuschneiden. Für Stems aus deinem Song ist das genau das richtige Werkzeug.
+
+F. Bibliotheken
+
+Bordeigen deckt fast alles ab: AudioStreamGenerator (Echtzeit-Synthese), AudioStreamPolyphonic (besser als unser 10-Player-Pool), die AudioStream-Interactive-Familie, die komplette Effektkette. An Addons wären relevant: GodotSfxr (Retro-Generator im Editor), FluidSynthGodot (SoundFonts/MIDI – damit könnten die vier Bumper echte Instrumente statt Rechteckwellen spielen). Wwise/FMOD gibt es als Integration, ist hier aber Overkill: eigene Lizenz, Build-Komplexität, und der Web-Export für itch.io wird deutlich aufwendiger.
+
+Meine Reihenfolge: erst B und A (kostet nichts, wirkt sofort und überall), dann E, damit du deine Suno-Samples reinlegen kannst, dann C, und Samples aus dem Netz zuletzt – dann hörst du auch, wo sie überhaupt noch nötig sind.
+───────────────────────────────────────────────────────────────────────────────────────────────
+←  [ ] Sound-Ausbau  √ Submit  →
+
+Womit soll ich anfangen?
+
+> 1. [ ] Busse + Synthese aufbohren (Empfohlen)
+  SFX/Musik/Sprache auf eigene Busse mit Reverb, Kompressor, Limiter und Ducking; dazu 44 kHz, geschichtete Klaenge (Klack + Koerper), Zufallsvariation pro Treffer. Kein einziges Sample noetig.
+  2. [ ] Datei-Override fuer eigene Samples
+  assets/sfx/<name>.ogg ersetzt automatisch den generierten Sound. Ich lege die Ordnerstruktur, eine Namensliste und CREDITS.md an, damit du Suno- und Freesound-Dateien nur noch reinkopierst.
+  3. [ ] Rollgeraeusch der Kugel
+  Dauerrollen, dessen Lautstaerke und Tonhoehe vom Tempo abhaengt, plus Ticks bei Bandenkontakt. Der Sound, der einem Flipper am meisten Atmosphaere gibt.
+  4. [ ] Adaptive Musik aus deinen Stems
+  AudioStreamSynchronized/Interactive einbauen: Grundloop laeuft immer, im Wizard- oder Frenzy-Modus kommt eine Stem-Ebene dazu. Braucht von dir die Stems als getrennte Dateien.
+  5. [ ] Type something
+     Submit
+───────────────────────────────────────────────────────────────────────────────────────────────
+  6. Chat about this
