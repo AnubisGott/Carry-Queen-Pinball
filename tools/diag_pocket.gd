@@ -14,9 +14,18 @@ const LAEUFE := [
 	["links, von oben", Vector2(52, 380), Vector2.ZERO],
 	["links, hoch oben", Vector2(52, 250), Vector2.ZERO],
 	["links, mit Schwung", Vector2(52, 420), Vector2(0, 700)],
+	# Volles Tempo: nach einem Schuss die Bahn hinauf faellt die Kugel mit
+	# Hoechstgeschwindigkeit wieder herunter.
+	["links, volles Tempo", Vector2(52, 420), Vector2(0, 1400)],
+	# Schraeg herunter statt senkrecht.  Der Anlauf zeigt zur Mulde hin -
+	# schraeg von ihr weg gestartet, kommt die Kugel gar nicht erst an ihr
+	# vorbei, dann misst man nichts.
+	["links, schraeg von innen", Vector2(76, 470), Vector2(-300, 760)],
 	["rechts, von oben", Vector2(438, 380), Vector2.ZERO],
 	["rechts, hoch oben", Vector2(438, 250), Vector2.ZERO],
 	["rechts, mit Schwung", Vector2(438, 420), Vector2(0, 700)],
+	["rechts, volles Tempo", Vector2(438, 420), Vector2(0, 1400)],
+	["rechts, schraeg von innen", Vector2(414, 470), Vector2(300, 760)],
 ]
 
 var _gefangen := false

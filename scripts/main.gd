@@ -726,7 +726,8 @@ func _after_drain() -> void:
 		_end_hurry()
 	if Game.ball_save_armed:
 		Game.ball_save_armed = false
-		Sfx.play("save", -2.0)
+		# Kein Jubel-Jingle beim Carry-Save: die Rettung kuendigt sich ohnehin
+		# mit Grollen und Countdown an, der Jubel davor war zu viel.
 		Sfx.say("carry_rettet")
 		hud.show_message("MEIN CARRY RETTET.", "Gern geschehen.", 2.5)
 		Game.emit("save")

@@ -36,11 +36,16 @@ func _draw() -> void:
 func _on_enter(body: Node2D) -> void:
 	if _busy or not body is PinBall or body.freeze:
 		return
-	# Nur eine gemaechlich herabrollende Kugel bleibt haengen: sie muss
-	# abwaerts (nicht quer) unterwegs sein und darf nicht rasen.  Sonst
-	# schluckt die Mulde auch Kugeln, die gerade erst vom Flipper kommen.
+	# Gefangen wird, wer von oben kommt: abwaerts unterwegs und nicht quer
+	# vorbeischiessend.  Aufwaerts fliegende Kugeln - etwa frisch vom Flipper -
+	# fallen damit heraus.
+	#
+	# Eine Tempogrenze gab es hier auch einmal; die war falsch.  Nach einem
+	# Schuss die Bahn hinauf faellt die Kugel mit bis zu 1500 px/s wieder
+	# herunter und rutschte dann durch die Mulde hindurch.  Wie schnell sie
+	# ankommt, sagt nichts darueber, ob sie hineingehoert.
 	var v: Vector2 = body.linear_velocity
-	if v.y < 30.0 or v.y < absf(v.x) * 0.8 or v.length() > 1250.0:
+	if v.y < 30.0 or v.y < absf(v.x) * 0.8:
 		return
 	_busy = true
 	queue_redraw()
