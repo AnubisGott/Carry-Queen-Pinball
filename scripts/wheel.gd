@@ -110,7 +110,7 @@ func _process(delta: float) -> void:
 	var sekt := _sektor_oben()
 	if sekt != _letzter_sektor:
 		_letzter_sektor = sekt
-		Sfx.play("tick", -18.0)
+		Sfx.play("tick", -26.0)
 		Game.add_score(PER_TICK, _ball if is_instance_valid(_ball) else null)
 	_speed = maxf(0.0, _speed - REIBUNG * delta)
 	if _speed <= 0.0:
@@ -136,7 +136,7 @@ func _on_hit(body: Node2D) -> void:
 	# Jeder Treffer setzt wieder aufs Anfangstempo - auch mitten im Auslauf
 	_speed = START_SPEED
 	_gewinn_sektor = -1
-	Sfx.play("spin", -6.0)
+	Sfx.play("spin", -14.0)
 	Game.add_score(ANSTOSS, _ball)
 	Game.emit("wheel_hit")
 	queue_redraw()

@@ -54,6 +54,7 @@ var popup_kind := ""
 var _wizard := false
 var _wizard_t := 0.0
 var _wizard_bar: ColorRect
+var _wizard_label: Label
 
 var _score_label: Label
 var _ego_label: Label
@@ -137,6 +138,11 @@ func _build_bar() -> void:
 	var xs := {"DAMAGE": 285, "EGO": 330, "CARRY": 375, "ICH": 432}
 	for k in disc_names:
 		_disc_labels[k] = _label(disc_names[k], Vector2(xs[k], 62), 11, DIM, bar)
+	# Titel des Wizard-Modus, rechtsbuendig direkt links neben dem Zeitbalken
+	_wizard_label = _label("", Vector2(110, 64), 12, GOLD, bar)
+	_wizard_label.size = Vector2(168, 16)
+	_wizard_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_wizard_label.visible = false
 	# Zeitbalken des Wizard-Modus, direkt unter der Disziplinen-Reihe
 	_wizard_bar = ColorRect.new()
 	_wizard_bar.position = Vector2(285, 78)
@@ -160,8 +166,10 @@ func set_wizard(on: bool, frac: float = 0.0) -> void:
 		if not on:
 			_update_disciplines()
 	_wizard_bar.visible = on
+	_wizard_label.visible = on
 	if on:
 		_wizard_bar.size = Vector2(167.0 * clampf(frac, 0.0, 1.0), 3)
+		_wizard_label.text = "DER BERICHT x%d" % Game.WIZARD_MULT
 
 
 func _process(delta: float) -> void:
@@ -171,6 +179,7 @@ func _process(delta: float) -> void:
 	var col := GOLD.lerp(Color(1.0, 1.0, 1.0), 0.5 + 0.5 * sin(_wizard_t))
 	for k in _disc_labels:
 		_disc_labels[k].add_theme_color_override("font_color", col)
+	_wizard_label.add_theme_color_override("font_color", col)
 
 
 func _try_avatar(bar: Panel) -> void:

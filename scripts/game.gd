@@ -17,6 +17,11 @@ var wizard: bool = false
 var locks: int = 0
 var kills: int = 0
 var damage_points: int = 0
+## Was Bericht und Frenzy auf jeden Punkt draufschlagen.  Als Konstante,
+## damit Wertung und Anzeige nicht auseinanderlaufen koennen.
+const WIZARD_MULT := 5
+const FRENZY_MULT := 2
+
 var disciplines := {"DAMAGE": false, "EGO": false, "CARRY": false, "ICH": false}
 var best_score: int = 0
 var game_over: bool = false
@@ -57,9 +62,9 @@ func add_score(base: int, source_ball: Node = null) -> int:
 		return 0
 	var mult := ego_mult
 	if frenzy:
-		mult *= 2
+		mult *= FRENZY_MULT
 	if wizard:
-		mult *= 5
+		mult *= WIZARD_MULT
 	if multiball and source_ball != null and source_ball.get("is_carry") == true:
 		mult *= 10
 	var pts := base * mult
