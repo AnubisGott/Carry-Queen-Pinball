@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://i1diagmeldung"]
+
+[ext_resource type="Script" path="res://tools/diag_meldungen.gd" id="1"]
+
+[node name="DiagMeldungen" type="Node"]
+script = ExtResource("1")
+

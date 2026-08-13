@@ -319,7 +319,8 @@ func _update_timers(delta: float) -> void:
 		if save_time <= 0.0:
 			Game.ball_save_armed = false
 			Game.emit("save_armed")
-			hud.show_sub("Carry-Save vorbei. " + spott(), 2.2)
+			# Keine Meldung dazu: dass der Carry-Save abgelaufen ist, sieht man
+			# oben links an der erloschenen Anzeige.
 	if hurry_active:
 		hurry_time -= delta
 		hurry_value = maxi(5000, hurry_value - int(1600.0 * delta))
@@ -340,7 +341,8 @@ func _update_timers(delta: float) -> void:
 			# Bank wieder aufstellen: dunkel und damit erneut abraeumbar
 			for d in drops:
 				d.reset()
-			hud.show_sub("Frenzy vorbei. " + spott(), 1.8)
+			# Auch hier keine Meldung: der Zeitbalken oben ist weg, die
+			# DAMAGE-Bank steht wieder dunkel.  Das reicht.
 	if Game.wizard:
 		wizard_time -= delta
 		hud.set_wizard(true, wizard_time / WIZARD_TIME)
@@ -469,7 +471,9 @@ func _check_bank() -> void:
 	Game.frenzy = true
 	frenzy_time = FRENZY_TIME
 	Sfx.play("mode", -3.0)
-	hud.show_message("DAMAGE-FRENZY!", "Alles zaehlt doppelt. +" + Hud.fmt(pts), 2.5)
+	# Nur die kleine Zeile: dass die Frenzy laeuft und was sie bringt, steht
+	# oben in der Leiste mit Zeitbalken.
+	hud.show_sub("DAMAGE-FRENZY: alles x2. +" + Hud.fmt(pts), 2.0)
 	Game.emit("frenzy")
 	# Die volle Bank bleibt bis zum Ballverlust an (Reset in _start_ball)
 
@@ -486,7 +490,8 @@ func _check_ego_bank() -> void:
 	var pts := Game.add_score(5000)
 	Game.discipline_done("EGO")
 	Sfx.play("jackpot", -6.0)
-	hud.show_message("E-G-O KOMPLETT.", "+" + Hud.fmt(pts), 2.0)
+	# Kleine Zeile statt grosser Meldung: die Lampe oben zeigt es ohnehin an.
+	hud.show_sub("E-G-O komplett. +" + Hud.fmt(pts), 2.0)
 
 
 ## Das Gluecksrad ist ausgedreht und hat einen Rang ausgezahlt.  Die Queen
@@ -513,8 +518,13 @@ func _gluecksrad_zahlt(data: Dictionary) -> void:
 	else:
 		spruch = "Hardstuck. Wer haette das gedacht."
 		Sfx.play("rad_zahlt", -12.0)
-	# Die Chat-Zeile holt sich der HUD selbst aus dem Ereignis
-	hud.show_message(rang + "!", "+" + Hud.fmt(pts) + "  " + spruch, 2.4)
+	# Die Chat-Zeile holt sich der HUD selbst aus dem Ereignis.  Gross
+	# eingeblendet wird nur ein grosser Gewinn - fuer Bronze und Silber
+	# genuegt die kleine Zeile, sonst steht staendig etwas auf dem Feld.
+	if roh >= 5000:
+		hud.show_message(rang + "!", "+" + Hud.fmt(pts) + "  " + spruch, 2.4)
+	else:
+		hud.show_sub("%s: +%s  %s" % [rang, Hud.fmt(pts), spruch], 2.0)
 
 
 func _check_ggez() -> void:

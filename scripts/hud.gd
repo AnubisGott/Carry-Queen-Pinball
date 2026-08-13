@@ -239,10 +239,10 @@ func _kanal_werbung(delta: float) -> void:
 	_kanal_t = randf_range(55.0, 100.0)
 	var zeilen: Array = CHAT["kanal"]
 	chat(zeilen[randi() % zeilen.size()])
-	# Nur bei jeder zweiten Erwaehnung meldet sich die Queen dazu - sonst
-	# wird aus dem Gag eine Dauerwerbesendung.
+	# Die Queen antwortet im Chat, nicht mitten auf dem Spielfeld - dort ist
+	# Platz fuer Spielereignisse, nicht fuer Werbung.
 	if randf() < 0.5:
-		show_sub(KANAL_QUEEN[randi() % KANAL_QUEEN.size()], 2.4)
+		chat(KANAL_QUEEN[randi() % KANAL_QUEEN.size()], "CarryQueen")
 
 
 func _process(delta: float) -> void:
