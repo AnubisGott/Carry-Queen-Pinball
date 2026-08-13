@@ -3,11 +3,16 @@ extends Node2D
 ## Dekorative Elemente im Stil der Vorlage, gezeichnet in unserem Neon-Schema:
 ## spiral (rotierende Galaxie), comet, saturn, chevron, pad, rays, bolt, arrow.
 
+## Bild auf der drehenden Scheibe.  Fehlt die Datei, bleibt die Scheibe so,
+## wie sie war.
+const QUEEN_BILD := "res://assets/face02.jpg"
+
 var kind := "comet"
 var deco_size := 1.0
 var col := Color(1.22, 0.9, 0.2)
 var _blink := false
 var _blink_t := 0.0
+var _queen: Texture2D
 
 
 ## Blinken ein-/ausschalten (z.B. Lane-Pfeile bei abschussbereitem Ball)
@@ -27,6 +32,12 @@ func _init(k: String, pos: Vector2, c: Color = Color(1.22, 0.9, 0.2), s: float =
 	deco_size = s
 	rotation_degrees = rot_deg
 	z_index = -4
+
+
+func _ready() -> void:
+	if kind == "spiral" and ResourceLoader.exists(QUEEN_BILD):
+		_queen = load(QUEEN_BILD)
+		queue_redraw()
 
 
 func _process(delta: float) -> void:
@@ -49,6 +60,22 @@ func _draw() -> void:
 					var th := arm * TAU / 3.0 + rr * 0.055
 					pts.append(Vector2(cos(th), sin(th)) * rr * deco_size)
 				draw_polyline(pts, arm_cols[arm], 3.0)
+			# Bild der Queen auf der Scheibe: rund ausgeschnitten und halb
+			# durchsichtig.  Der Ausschnitt entsteht ueber ein Vieleck mit
+			# Bildkoordinaten - das Bild selbst bleibt unveraendert.  Weil es
+			# im drehenden Knoten gezeichnet wird, dreht es sich mit.
+			if _queen != null:
+				var gr := Vector2(_queen.get_size())
+				var kante := minf(gr.x, gr.y)
+				var r := 68.0 * deco_size
+				var ecken := PackedVector2Array()
+				var bild_uv := PackedVector2Array()
+				for i in 48:
+					var w := TAU * float(i) / 48.0
+					var d := Vector2(cos(w), sin(w))
+					ecken.append(d * r)
+					bild_uv.append((gr * 0.5 + d * kante * 0.5) / gr)
+				draw_colored_polygon(ecken, Color(1, 1, 1, 0.5), bild_uv, _queen)
 			draw_arc(Vector2.ZERO, 74.0 * deco_size, 0, TAU, 48, Color(1.15, 0.8, 0.2, 0.5), 2.0)
 			draw_circle(Vector2.ZERO, 10.0 * deco_size, Color(1.15, 0.8, 0.2, 0.8))
 		"comet":
