@@ -19,6 +19,8 @@ const DROPS := [
 
 var _cradle := false
 var _right := false
+## Anderen Hebel oben halten - damit wird der Pass angefordert
+var _pass := false
 
 
 func _ready() -> void:
@@ -27,6 +29,8 @@ func _ready() -> void:
 			_cradle = true
 		elif a == "--right":
 			_right = true
+		elif a == "--pass":
+			_pass = true
 	var main: Node2D = MAIN.instantiate()
 	add_child(main)
 	main.god_mode = true
@@ -68,6 +72,8 @@ func _one_flip(main: Node2D, name: String, drop: Vector2, settle: bool) -> void:
 	var rest := ball.global_position
 	var arm := rest - (PIVOT if not _right else Vector2(490.0 - PIVOT.x, PIVOT.y))
 	Input.action_release(_key())
+	if _pass:
+		Input.action_press("flip_left" if _right else "flip_right")
 	await get_tree().create_timer(0.05).timeout
 	Input.action_press(_key())
 	var vmax := 0.0
@@ -86,6 +92,8 @@ func _one_flip(main: Node2D, name: String, drop: Vector2, settle: bool) -> void:
 		if i == 108:
 			landung = ball.global_position
 	Input.action_release(_key())
+	if _pass:
+		Input.action_release("flip_left" if _right else "flip_right")
 	print("%-12s: Ablage (%.0f,%.0f) Arm %.0f px -> Tempo %.0f px/s, hoechster Punkt (%.0f,%.0f), nach 0.5s (%.0f,%.0f), nach 0.9s (%.0f,%.0f)" % [
 			name, rest.x, rest.y, arm.length(), vmax, top.x, top.y, after.x, after.y,
 			landung.x, landung.y])

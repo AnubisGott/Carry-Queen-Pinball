@@ -164,6 +164,10 @@ static func build(parent: Node2D) -> Dictionary:
 	# Luecke klafft, durch die die Kugel verschwinden koennte.
 	var fl := Flipper.new(true, Vector2(156, 866))
 	var fr := Flipper.new(false, Vector2(334, 866))
+	# Gegenseitig bekannt machen: haelt man den anderen Hebel oben, wandert
+	# eine liegende Kugel als Pass zu ihm hinueber statt aufs Oberfeld.
+	fl.partner = fr
+	fr.partner = fl
 	parent.add_child(fl)
 	parent.add_child(fr)
 	refs["flipper_l"] = fl

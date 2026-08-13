@@ -20,7 +20,7 @@ const TIP_X := 78.0
 const FLIP_POWER := 2150.0
 ## Anteil, den die Kugel am Blattansatz mindestens abbekommt (an der Spitze
 ## wirkt der volle Schub - so bleibt die Stelle des Treffers spuerbar).
-const FLIP_BASE := 0.66
+const FLIP_BASE := 0.74
 ## Abschusswinkel ueber der Waagerechten, zur Tischmitte hin.  Am Blattansatz
 ## steil (geht aufs Oberfeld zu den G-G-E-Z-Gassen), an der Spitze flach
 ## (der klassische Querschuss auf die gegenueberliegende Seite).
@@ -33,9 +33,16 @@ const FLIP_ANGLE_TIP := 60.0
 ##
 ## Die Grenze liegt unter der Stelle, an der eine gefangene Kugel zur Ruhe
 ## kommt (28 bis 29 px vom Drehpunkt) - aus dem Cradle heraus muss ein
-## richtiger Schuss moeglich sein, sonst kommt man nie ins Oberfeld.  Den
-## Pass gibt es damit nur noch, wenn die Kugel wirklich auf dem Lager liegt.
+## richtiger Schuss moeglich sein, sonst kommt man nie ins Oberfeld.
+##
+## Der Pass wird darum bewusst angefordert: haelt man den anderen Hebel oben
+## (man will die Kugel dort auffangen), geht sie als flacher Pass hinueber
+## statt aufs Oberfeld.  Liegt sie wirklich auf dem Lager, passt sie immer -
+## dort gibt es ohnehin keine Hebelwirkung.
 const ARM_PASS := 20.0
+## Bis hier heraus laesst sich passen.  Weiter aussen auf dem Blatt ist es
+## immer ein Schuss, egal was der andere Hebel macht.
+const ARM_PASS_MAX := 46.0
 ## Ab dieser Zeit auf dem Blatt gilt eine Kugel als liegend: sie wird bewusst
 ## abgeschossen und bekommt den vollen Schub.  Eine gerade erst aufgeprallte
 ## Kugel ist zwar auch kurz langsam, aber eben nicht lange genug.
@@ -45,6 +52,9 @@ const PASS_SPEED := 420.0
 const PASS_ANGLE := 40.0
 
 var is_left := true
+## Der Hebel auf der anderen Seite - wird er gehalten, wandert die Kugel als
+## Pass zu ihm hinueber (siehe ARM_PASS).
+var partner: Flipper
 var rest_deg := 28.0
 var pressed_deg := -32.0
 var _target := 0.0
@@ -177,6 +187,11 @@ func set_pressed(on: bool) -> void:
 	_held = on
 
 
+## Ob die Taste dieses Hebels gerade gedrueckt gehalten wird.
+func haelt() -> bool:
+	return _held
+
+
 func _on_touch(body: Node2D) -> void:
 	if body is PinBall:
 		_flash = 1.0
@@ -206,10 +221,15 @@ func _kick_resting_balls() -> bool:
 		if ball == null or ball.freeze:
 			continue
 		var dist := (ball.global_position - global_position).length()
+		# Pass statt Schuss: wenn die Kugel auf dem Lager liegt, oder wenn der
+		# andere Hebel oben steht und sie noch im inneren Teil des Blattes ist -
+		# dann will man sie offensichtlich drueben auffangen.
+		var passen := dist < ARM_PASS or (dist < ARM_PASS_MAX
+				and partner != null and partner.haelt())
 		var deg := PASS_ANGLE
 		var power := PASS_SPEED
-		if dist >= ARM_PASS:
-			var reach := clampf((dist - ARM_PASS) / (TIP_X - ARM_PASS), 0.0, 1.0)
+		if not passen:
+			var reach: float = clampf((dist - ARM_PASS) / (TIP_X - ARM_PASS), 0.0, 1.0)
 			deg = lerpf(FLIP_ANGLE_BASE, FLIP_ANGLE_TIP, reach)
 			power = FLIP_POWER * lerpf(FLIP_BASE, 1.0, reach)
 		# Eine liegende Kugel wird bewusst abgeschossen - die bekommt den vollen
