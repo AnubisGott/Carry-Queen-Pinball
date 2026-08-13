@@ -932,10 +932,12 @@ func _start_ball(first: bool = false) -> void:
 		Sfx.say("ball_start")
 	else:
 		# Bei den weiteren Baellen spottet sie - und spricht denselben Spruch,
-		# der dasteht, sofern es dafuer eine Aufnahme gibt.
+		# der dasteht, sofern es dafuer eine Aufnahme gibt.  Der neue Ball
+		# folgt dem Ballverlust ohne Pause, "Kein Skill." laeuft also noch;
+		# ohne den Abstand fiele der Spott jedes Mal aus.
 		var i := spott_index()
 		hud.show_message("BALL %d" % Game.ball_number, QUEEN_SPOTT[i], 2.5)
-		Sfx.say("spott_%d" % (i + 1))
+		_nachsatz("spott_%d" % (i + 1), 1.2)
 	_ohne_treffer = 0.0
 	_abgeschossen = false
 

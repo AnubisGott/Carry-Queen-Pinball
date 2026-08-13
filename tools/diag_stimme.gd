@@ -40,6 +40,10 @@ func _ready() -> void:
 		"du_warst_auch_dabei_das_bestimmt_schoen_fuer_dich": "outro",
 		"zuschauen_kannst_du_ja_wenigstens": "kanal_4",
 		"zeig_doch_mal_was_du_kannst": "ball_start",
+		# Kuerzel vorneweg, mit Tippfehler im Satz ("ch" statt "ich")
+		"s4_ch_haette_den_gehalten_locker": "spott_4",
+		"s1_warst_du_nicht_gut_genug": "spott_1",
+		"c2_abonnieren_kostet_nichts_skill_schon": "kanal_2",
 		# nichts, was passt: darf zu keinem Fach fuehren
 		"vocals_carry_queen_lead_vocal": "",
 	}
@@ -63,6 +67,29 @@ func _ready() -> void:
 		if fach != "":
 			zugeordnet += 1
 		print("  %-42s -> %s" % [pfad.get_file(), fach if fach != "" else "(kein Fach)"])
+
+	print("--- Kuerzel und Satz muessen dasselbe Fach ergeben ---")
+	# Ordner wie "s4-ich haette den gehalten" tragen die Aussage doppelt: im
+	# Kuerzel und im Wortlaut.  Widersprechen die beiden sich, spraeche sie an
+	# der falschen Stelle - das faellt hier auf, bevor man es hoert.
+	var gesehen := {}
+	for pfad in dateien:
+		var ordner: String = Sfx._texthaken(pfad.get_base_dir().get_file())
+		var ab: int = ordner.find("_")
+		if ab <= 0 or ab > 4 or gesehen.has(ordner):
+			continue
+		gesehen[ordner] = true
+		var ueber_kuerzel: String = Sfx._fach_zu(ordner.substr(0, ab))
+		var ueber_satz: String = Sfx._fach_zu(ordner.substr(ab + 1))
+		if ueber_kuerzel == "" or ueber_satz == "":
+			continue
+		var einig := ueber_kuerzel == ueber_satz
+		if not einig:
+			fehler += 1
+			print("  FEHL %s: Kuerzel sagt %s, Satz sagt %s"
+					% [ordner, ueber_kuerzel, ueber_satz])
+		else:
+			print("  ok   %-40s beide -> %s" % [ordner, ueber_kuerzel])
 
 	print("--- Was das Spiel geladen hat ---")
 	var faecher: Array = Sfx._voice.keys()
@@ -120,6 +147,30 @@ func _ready() -> void:
 				% ["ok  " if ok else "FEHL", fach,
 				"unterbricht" if kam_durch else "faellt aus",
 				"unterbricht" if darf else "faellt aus"])
+
+	print("--- Ballwechsel: kommt der Spott hinter \"Kein Skill.\" durch? ---")
+	# Der neue Ball folgt dem Ballverlust ohne Pause.  Deshalb wartet der
+	# Spott 1,2 s - laenger als die laengste Kein-Skill-Aufnahme.  Hier wird
+	# genau diese Abfolge in echter Zeit nachgestellt.
+	if Sfx.hat_stimme("kein_skill") and Sfx.hat_stimme("spott_1"):
+		var laengste := 0.0
+		for s in Sfx._voice["kein_skill"] as Array:
+			laengste = maxf(laengste, s.get_length())
+		Sfx._voice_player.stop()
+		Sfx.say("kein_skill")
+		Sfx.say("spott_1")
+		var sofort := Sfx._voice_player.stream in (Sfx._voice["spott_1"] as Array)
+		await get_tree().create_timer(1.2).timeout
+		Sfx.say("spott_1")
+		var spaeter := Sfx._voice_player.stream in (Sfx._voice["spott_1"] as Array)
+		var ok3 := not sofort and spaeter
+		if not ok3:
+			fehler += 1
+		print("  %s laengstes \"Kein Skill.\" %.2f s, Wartezeit 1,20 s"
+				% ["ok  " if ok3 else "FEHL", laengste])
+		print("       sofort: %s   nach 1,2 s: %s"
+				% ["kommt durch" if sofort else "faellt aus",
+				"kommt durch" if spaeter else "faellt aus"])
 
 	print("--- Faecher, Verdrahtung, Aufnahmen ---")
 	# Jedes Sfx.say() im Code muss ein Fach treffen; jedes Fach, das nirgends

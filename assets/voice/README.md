@@ -106,9 +106,12 @@ zusammen aber sehr oft.
 | S8 | „War bestimmt der Ping, ne?" | „War bestimmt der Ping, ne?" |
 
 Jede Zeile hat ein eigenes Fach - sie spricht genau den Spruch, der auch
-dasteht. Der Ordner heißt wie der Spruch („Skill-Issue. Nicht meins.1") oder
-wie das Fach („spott_3_1"), beides findet seinen Platz. Acht Aufnahmen sind
-viel; drei oder vier reichen auch, dann spricht sie nur bei diesen.
+dasteht. Beim Ballwechsel kommt er 1,2 Sekunden versetzt, weil davor noch
+„Kein Skill." vom Ballverlust läuft.
+
+**Das Kürzel darf vorne stehen.** „s1-warst du nicht gut genug1" landet in
+`spott_1`, „c4-…" in `kanal_4`. Dabei zählt die Nummer, nicht der Wortlaut -
+ein Tippfehler im Satz schadet dann nichts.
 
 ## 4. Die vier Bericht-Zeilen
 
@@ -167,7 +170,7 @@ erwarte - ein anderer Name geht auch, solange er nah genug dran ist.
 | `gern` | Gern geschehen | Nachsatz 2,8 s nach M17 | **4** · 1,6-1,8 s |
 | `kein_plan` | Kein Plan | 18 s lang nichts getroffen | **3** · 1,1-1,5 s |
 | `kanal_1` … `kanal_5` | die jeweilige Zeile, siehe Abschnitt 5 | Chat-Antwort | je **1** · 2,5-3,4 s |
-| `spott_1` … `spott_8` | der jeweilige Spruch, siehe Abschnitt 3 | M2, K2 | – |
+| `spott_1` … `spott_8` | `s1-` … `s8-` plus der Spruch, siehe Abschnitt 3 | M2, K2 | **3-5** je Fach · 1,5-3,0 s |
 | `ohne_mich` | Ohne mich | noch nirgends - Sprechtext eintragen, dann verdrahte ich es | – |
 
 Die drei `beste`-Aufnahmen liegen weiter im Verzeichnis und werden auch

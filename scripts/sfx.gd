@@ -1130,6 +1130,15 @@ func _fach_zu(haken: String) -> String:
 	for key in VOICE_FILES:
 		if haken == key or haken == VOICE_FILES[key]:
 			return key
+	# Das Kuerzel aus der README vorneweg: "s1-warst du nicht gut genug" ist
+	# der erste Spott-Spruch, "c4-..." die vierte Kanal-Antwort.  Damit zaehlt
+	# die Nummer und nicht der Wortlaut - ein Tippfehler im Satz schadet nicht.
+	if haken.length() > 1 and haken[1] >= "1" and haken[1] <= "9" \
+			and (haken.length() == 2 or haken[2] == "_"):
+		if haken[0] == "s" and haken[1] <= "8":
+			return "spott_" + haken[1]
+		if haken[0] == "c" and haken[1] <= "5":
+			return "kanal_" + haken[1]
 	# Nachsichtig ueber den gemeinsamen Anfang: wer beim Tippen ein Wort
 	# auslaesst ("das bestimmt schoen" statt "das war bestimmt schoen"), landet
 	# trotzdem richtig.  14 Zeichen sind genug, um Verwechslungen zu
@@ -1145,7 +1154,14 @@ func _fach_zu(haken: String) -> String:
 		if i > laenge:
 			treffer = VOICE_TEXTE[k]
 			laenge = i
-	return treffer
+	if treffer != "":
+		return treffer
+	# Zuletzt ohne das erste Wort noch einmal: wer seinem Ordner irgendein
+	# Kuerzel voranstellt, wird trotzdem am Satz erkannt.
+	var ab := haken.find("_")
+	if ab > 0 and ab <= 4:
+		return _fach_zu(haken.substr(ab + 1))
+	return ""
 
 
 ## Was gefunden wurde, steht beim Start in der Ausgabe - und ebenso, was
