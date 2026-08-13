@@ -18,61 +18,9 @@ e:\multimed\Musikideen\work\SunoAI\Der Beste\game
 Resume this session with:
 claude --resume 94101305-1426-4398-8d2f-8ad07fde1b03
 
-Sound:
+  > [Image #88] Damage blinkt aber oben ist kein Count Down Balken zu sehen. Und auch das Damage xZahl fehlt, analog zu Bericht.
+  
+der Ball ist wieder durch die linke Mulde durchgegangen
 
-A. Ohne ein einziges Sample: die Synthese aufbohren
-
-Das sind die vier Hebel mit dem besten Verhältnis von Aufwand zu Wirkung:
-
-1. 44.100 statt 22.050 Hz und bandbegrenzte Wellenformen. Deine Square-/Saw-Töne aliasen bei 22 kHz hörbar – daher der schrille, billige Beiklang. PolyBLEP kostet ein paar Zeilen und läuft nur beim Erzeugen, nicht im Spiel.
-2. Schichten statt Einzelton. Ein Pinball-Geräusch besteht aus Klack (gefiltertes Rauschen, 3–8 ms) plus Resonanzkörper (abklingender Zweiklang). Betrifft Flipper, Bumper, Slingshot, Standups – da fehlt heute der ganze mechanische Anteil.
-3. Zufall pro Treffer: Tonhöhe ±3 %, Lautstärke ±1,5 dB. Ohne das klingt eine Bumper-Serie wie ein Maschinengewehr, weil jedes Mal exakt dieselbe Wellenform abgespielt wird.
-4. Kurze Attack-/Release-Rampe (2 ms / 10 ms) gegen die Knackser am Anfang und Ende jedes Samples.
-
-B. Bus-Effekte – der größte Sprung, ganz ohne Addon
-
-Godot bringt Reverb, Compressor, Limiter, EQ, Delay mit. Ein SFX-Bus mit kleinem Raum-Reverb (Gehäuse-Klang), sanfter Kompression und Limiter davor, Musik und Sprache auf eigene Busse, dazu Ducking (Musik −6 dB, solange die Queen spricht). Etwa 40 Zeilen, und der Tisch klingt plötzlich nach einem Gerät in einem Raum statt nach Piepsern.
-
-C. Der Sound, der komplett fehlt: die rollende Kugel
-
-Echte Tische haben ein Dauerrollen, dessen Lautstärke und Tonhöhe vom Tempo abhängt – dazu Ticks beim Bandenkontakt. Wir haben jetzt linear_velocity sauber im Griff, das lässt sich direkt draufmappen. Das macht für die Atmosphäre mehr als jedes einzelne Trefferzeugnis.
-
-D. Samples aus dem Netz – Lizenzlage
-
-Da dein Repo öffentlich ist, ist das nicht egal:
-
-- Sonniss GDC Bundle – royalty-free, kommerziell erlaubt, keine Namensnennung nötig, unbegrenzt viele Projekte. Bester Startpunkt. (Einzige Einschränkung: kein KI-Training – für uns irrelevant.)
-- Freesound.org, Filter auf CC0 (keinerlei Pflichten) oder CC-BY (Namensnennung). Dort gibt es echte Solenoid-, Relais- und Glocken-Aufnahmen – genau die Bauteile eines Flippers.
-- OpenGameArt / Kenney – CC0, aber eher generisch.
-- Finger weg: BBC Sound Effects (nur persönlich/nicht-kommerziell), Zapsplat-Gratiskonto (Namensnennungspflicht plus Auflagen), YouTube-Rips.
-
-Egal was: pro Datei Quelle und Lizenz in assets/sfx/CREDITS.md.
-
-E. Einbau ohne Umbau
-
-sfx.gd lädt Sprache und Musik schon optional aus Dateien. Ich erweitere das auf assets/sfx/<name>.ogg: Liegt eine Datei da, ersetzt sie den generierten Sound, sonst bleibt alles wie es ist. Dann legst du Suno- oder Freesound-Dateien einfach rein – drain.ogg, flip.ogg, bump_w.ogg, jackpot.ogg … Die Namen stehen alle in _build_all().
-
-Deine Suno-Samples passen am besten als Stinger, nicht als Klack: Ballverlust, Modus-Start (Wizard/Frenzy), Jackpot, Game Over. Für Musik kann Godot 4 seit 4.3 adaptiv: AudioStreamInteractive (Clips mit Übergängen) und AudioStreamSynchronized (Stems übereinanderlegen) – im Wizard-Modus schaltest du damit eine Ebene dazu, statt hart umzuschneiden. Für Stems aus deinem Song ist das genau das richtige Werkzeug.
-
-F. Bibliotheken
-
-Bordeigen deckt fast alles ab: AudioStreamGenerator (Echtzeit-Synthese), AudioStreamPolyphonic (besser als unser 10-Player-Pool), die AudioStream-Interactive-Familie, die komplette Effektkette. An Addons wären relevant: GodotSfxr (Retro-Generator im Editor), FluidSynthGodot (SoundFonts/MIDI – damit könnten die vier Bumper echte Instrumente statt Rechteckwellen spielen). Wwise/FMOD gibt es als Integration, ist hier aber Overkill: eigene Lizenz, Build-Komplexität, und der Web-Export für itch.io wird deutlich aufwendiger.
-
-Meine Reihenfolge: erst B und A (kostet nichts, wirkt sofort und überall), dann E, damit du deine Suno-Samples reinlegen kannst, dann C, und Samples aus dem Netz zuletzt – dann hörst du auch, wo sie überhaupt noch nötig sind.
-───────────────────────────────────────────────────────────────────────────────────────────────
-←  [ ] Sound-Ausbau  √ Submit  →
-
-Womit soll ich anfangen?
-
-> 1. [ ] Busse + Synthese aufbohren (Empfohlen)
-  SFX/Musik/Sprache auf eigene Busse mit Reverb, Kompressor, Limiter und Ducking; dazu 44 kHz, geschichtete Klaenge (Klack + Koerper), Zufallsvariation pro Treffer. Kein einziges Sample noetig.
-  2. [ ] Datei-Override fuer eigene Samples
-  assets/sfx/<name>.ogg ersetzt automatisch den generierten Sound. Ich lege die Ordnerstruktur, eine Namensliste und CREDITS.md an, damit du Suno- und Freesound-Dateien nur noch reinkopierst.
-  3. [ ] Rollgeraeusch der Kugel
-  Dauerrollen, dessen Lautstaerke und Tonhoehe vom Tempo abhaengt, plus Ticks bei Bandenkontakt. Der Sound, der einem Flipper am meisten Atmosphaere gibt.
-  4. [ ] Adaptive Musik aus deinen Stems
-  AudioStreamSynchronized/Interactive einbauen: Grundloop laeuft immer, im Wizard- oder Frenzy-Modus kommt eine Stem-Ebene dazu. Braucht von dir die Stems als getrennte Dateien.
-  5. [ ] Type something
-     Submit
-─────────────────────────────────────────────────────────────────────────────────────
+Wave Sound lauter wenn der Ball herunterfällt.
 

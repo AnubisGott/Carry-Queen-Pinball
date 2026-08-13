@@ -18,9 +18,15 @@ func _ready() -> void:
 	await get_tree().create_timer(1.0).timeout
 	var nur_frenzy := "--frenzy" in OS.get_cmdline_user_args()
 	if nur_frenzy:
-		# Nur die Damage-Frenzy laufen lassen
-		Game.frenzy = true
-		main.frenzy_time = main.FRENZY_TIME * 0.7
+		# Ueber den echten Weg: alle DAMAGE-Ziele umlegen und die Bank pruefen
+		# lassen.  Den Zustand direkt zu setzen wuerde genau den Teil
+		# ueberspringen, um den es geht.
+		for d in main.drops:
+			d.dropped = true
+			d.queue_redraw()
+		main._check_bank()
+		print("Bank umgelegt -> Frenzy %s, Restzeit %.1f s" % [str(Game.frenzy),
+				main.frenzy_time])
 	else:
 		# Alle vier Disziplinen abhaken - das startet den Bericht
 		for d in ["DAMAGE", "EGO", "CARRY", "ICH"]:
