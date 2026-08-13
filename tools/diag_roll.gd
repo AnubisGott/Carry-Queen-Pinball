@@ -19,6 +19,11 @@ func _ready() -> void:
 		await get_tree().process_frame
 	await get_tree().create_timer(0.5).timeout
 
+	if "--feder" in OS.get_cmdline_user_args():
+		await _feder_test()
+		get_tree().quit()
+		return
+
 	_klangcheck()
 	print("--- Rollen folgt dem Tempo ---")
 	var ball := PinBall.new()
@@ -49,6 +54,30 @@ func _ready() -> void:
 	await get_tree().create_timer(1.2).timeout
 	print("  ohne Kugel: %.1f dB" % Sfx._roll_player.volume_db)
 	get_tree().quit()
+
+
+## Feder spannen und loslassen: faehrt das Raketenbrausen mit der Ladung hoch,
+## kommt beim Loslassen der Wisch, und wird das Brausen danach wieder still?
+func _feder_test() -> void:
+	print("--- Feder spannen ---")
+	Input.action_press("launch")
+	for i in 6:
+		await get_tree().create_timer(0.25).timeout
+		print("  Ladung %.2f -> %6.1f dB, Tonhoehe %.2f" % [
+				_main.charge, Sfx._rakete_player.volume_db,
+				Sfx._rakete_player.pitch_scale])
+	var wisch: AudioStream = Sfx._streams["wisch"]
+	Input.action_release("launch")
+	var gewischt := false
+	for i in 40:
+		await get_tree().physics_frame
+		for p in Sfx._players:
+			if p.stream == wisch and p.playing:
+				gewischt = true
+	print("  Loslassen: Wisch gespielt: %s, Brausen nach 0.33 s bei %.1f dB" % [
+			str(gewischt), Sfx._rakete_player.volume_db])
+	await get_tree().create_timer(1.0).timeout
+	print("  eine Sekunde danach: Brausen %.1f dB" % Sfx._rakete_player.volume_db)
 
 
 ## Klangcharakter der Schleife: das Zischmass ist der Anteil hoher Frequenzen

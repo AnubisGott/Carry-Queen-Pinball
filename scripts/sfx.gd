@@ -32,6 +32,18 @@ const ROLL_PITCH_LAUT := 1.60
 const ROLL_DB_TEMPO := 95.0
 const ROLL_PITCH_TEMPO := 2.4
 
+## Raketenbrausen beim Spannen der Feder: Lautstaerke und Tonhoehe haengen an
+## der Spannung (0 bis 1).  Bei voller Ladung steht das Ding kurz vorm Abheben.
+const RAKETE_DB_START := -30.0
+const RAKETE_DB_VOLL := -7.0
+const RAKETE_PITCH_START := 0.70
+const RAKETE_PITCH_VOLL := 1.50
+## Hochfahren traege (das Triebwerk braucht seine Zeit), Abschalten schnell -
+## beim Abschuss soll das Brausen mit der Kugel weg sein, nicht nachhaengen.
+const RAKETE_DB_AUF := 60.0
+const RAKETE_DB_AB := 220.0
+const RAKETE_PITCH_TEMPO := 1.6
+
 ## Melodische Klaenge bekommen keine Tonhoehen-Streuung - sonst klingen die
 ## Jingles jedes Mal verstimmt.  Alles andere wird pro Treffer leicht
 ## variiert, damit eine Bumper-Serie nicht wie ein Maschinengewehr klingt.
@@ -44,6 +56,9 @@ var _next := 0
 var _voice_player: AudioStreamPlayer
 var _music_player: AudioStreamPlayer
 var _roll_player: AudioStreamPlayer
+var _rakete_player: AudioStreamPlayer
+var _rakete_db := -60.0
+var _rakete_pitch := RAKETE_PITCH_START
 var _voice: Dictionary = {}
 var _duck: Tween
 ## Die Klaenge entstehen in einem Nebenlaeufer, damit der Start nicht
@@ -85,6 +100,10 @@ func _ready() -> void:
 	_roll_player.bus = SFX_BUS
 	_roll_player.volume_db = -60.0
 	add_child(_roll_player)
+	_rakete_player = AudioStreamPlayer.new()
+	_rakete_player.bus = SFX_BUS
+	_rakete_player.volume_db = -60.0
+	add_child(_rakete_player)
 	_rng.randomize()
 	_bau_task = WorkerThreadPool.add_task(_baue_im_hintergrund)
 	_load_optional_audio()
@@ -102,6 +121,7 @@ func _process(delta: float) -> void:
 		WorkerThreadPool.wait_for_task_completion(_bau_task)
 		_bau_task = -1
 	_rollen_regeln(delta)
+	_rakete_regeln(delta)
 
 
 ## Rollgeraeusch am Tempo der schnellsten Kugel ausrichten.  Eine ruhende,
@@ -203,6 +223,33 @@ func play(snd: String, volume_db: float = 0.0) -> void:
 		p.pitch_scale = randf_range(0.97, 1.03)
 		p.volume_db = volume_db + randf_range(-1.5, 1.5)
 	p.play()
+
+
+## Federspannung 0 bis 1 - danach richten sich Lautstaerke und Tonhoehe des
+## Raketenbrausens.  0 schaltet es aus.
+func rakete(spannung: float) -> void:
+	if spannung <= 0.0:
+		_rakete_db = -60.0
+		_rakete_pitch = RAKETE_PITCH_START
+		return
+	var s: float = clampf(spannung, 0.0, 1.0)
+	_rakete_db = lerpf(RAKETE_DB_START, RAKETE_DB_VOLL, s)
+	_rakete_pitch = lerpf(RAKETE_PITCH_START, RAKETE_PITCH_VOLL, s)
+
+
+func _rakete_regeln(delta: float) -> void:
+	if _rakete_player == null:
+		return
+	if _rakete_player.stream == null:
+		if not _streams.has("rakete"):
+			return
+		_rakete_player.stream = _streams["rakete"]
+		_rakete_player.play()
+	var tempo := RAKETE_DB_AUF if _rakete_db > _rakete_player.volume_db else RAKETE_DB_AB
+	_rakete_player.volume_db = move_toward(
+			_rakete_player.volume_db, _rakete_db, tempo * delta)
+	_rakete_player.pitch_scale = move_toward(
+			_rakete_player.pitch_scale, _rakete_pitch, RAKETE_PITCH_TEMPO * delta)
 
 
 func say(line: String) -> void:
@@ -526,6 +573,80 @@ func _rollen(dur: float) -> PackedFloat32Array:
 	return out
 
 
+## Raketenbrausen als nahtlose Schleife: unten ein Grollen (60 Hz, hohe Guete),
+## darueber das Roehren der Duese (450 Hz, breiter) und obendrauf ein Zischen,
+## das erst die Wucht macht.  Leichte Saettigung gibt Schub statt Rauschen.
+## Ueber die Tonhoehe des Players wird daraus beim Spannen ein Hochfahren.
+func _rakete_schleife(dur: float) -> PackedFloat32Array:
+	var n := int(dur * RATE)
+	var blende := int(0.08 * RATE)
+	var roh := PackedFloat32Array()
+	roh.resize(n + blende)
+	var t1 := 0.0
+	var b1 := 0.0
+	var t2 := 0.0
+	var b2 := 0.0
+	var t3 := 0.0
+	var b3 := 0.0
+	var f1: float = clampf(2.0 * sin(PI * 60.0 / RATE), 0.0, 1.4)
+	var f2: float = clampf(2.0 * sin(PI * 450.0 / RATE), 0.0, 1.4)
+	var f3: float = clampf(2.0 * sin(PI * 2600.0 / RATE), 0.0, 1.4)
+	var schweb := 0.0
+	for i in roh.size():
+		var x := _rng.randf() * 2.0 - 1.0
+		t1 += f1 * b1
+		b1 += f1 * (x - t1 - 0.25 * b1)
+		t2 += f2 * b2
+		b2 += f2 * (x - t2 - 0.9 * b2)
+		t3 += f3 * b3
+		b3 += f3 * (x - t3 - 1.6 * b3)
+		# Langsames Wummern, wie es ein Triebwerk im Standlauf hat
+		schweb = fmod(schweb + 5.5 / RATE, 1.0)
+		var am := 0.85 + 0.15 * sin(schweb * TAU)
+		var mix := b1 * 1.5 + t1 * 1.2 + b2 * 0.9 + b3 * 0.35
+		# weiche Saettigung: druckvoll statt spitz
+		mix = mix * (27.0 + mix * mix) / (27.0 + 9.0 * mix * mix)
+		roh[i] = clampf(mix, -1.0, 1.0) * am
+	var out := PackedFloat32Array()
+	out.resize(n)
+	for i in n:
+		out[i] = roh[i]
+	for j in blende:
+		var w := float(j) / float(blende)
+		out[j] = roh[n + j] * (1.0 - w) + roh[j] * w
+	return out
+
+
+## Wisch: etwas faehrt schnell vorbei.  Ein Rauschband, dessen Mitte erst
+## steil hochzieht und danach abfaellt - dieser Knick ist der Doppler-Effekt,
+## der einen vorbeifahrenden Zug oder Jet ausmacht.  Die Lautstaerke folgt
+## einer Glocke: von fern heran, laut vorbei, wieder weg.
+func _wisch(dur: float, vol: float, f_start: float, f_scheitel: float,
+		f_ende: float, res: float = 2.2, scheitel: float = 0.42) -> PackedFloat32Array:
+	var n := int(dur * RATE)
+	var out := PackedFloat32Array()
+	out.resize(n)
+	var tief := 0.0
+	var band := 0.0
+	var q: float = clampf(1.0 / maxf(0.05, res), 0.0, 1.9)
+	for i in n:
+		var t := float(i) / n
+		var fc: float
+		if t < scheitel:
+			fc = f_start * pow(f_scheitel / f_start, t / scheitel)
+		else:
+			fc = f_scheitel * pow(f_ende / f_scheitel, (t - scheitel) / (1.0 - scheitel))
+		var f: float = clampf(2.0 * sin(PI * clampf(fc, 60.0, RATE * 0.45) / RATE), 0.0, 1.4)
+		var x := _rng.randf() * 2.0 - 1.0
+		tief += f * band
+		var hoch := x - tief - q * band
+		band += f * hoch
+		# Glockenkurve, hinten laenger als vorne - so klingt Vorbeifahren
+		var huelle := pow(sin(PI * pow(t, 0.8)), 1.4)
+		out[i] = clampf(band * 1.2 + tief * 0.5, -1.5, 1.5) * vol * huelle
+	return out
+
+
 ## Auf einen Zielpegel bringen - nach Verzerrung sonst kaum vorhersehbar.
 func _norm(s: PackedFloat32Array, ziel: float = 0.8) -> PackedFloat32Array:
 	var spitze := 0.0
@@ -674,6 +795,14 @@ func _build_all() -> Dictionary:
 			_koerper([840.0, 1930.0], 0.05, 0.3, 5.0)]), 0.7))
 	# Rollende Kugel, laeuft als Schleife durch (siehe _rollen_regeln)
 	s["roll"] = _wav_schleife(_norm(_rollen(1.2), 0.75))
+	# Raketenbrausen beim Spannen der Feder (siehe _rakete_regeln)
+	s["rakete"] = _wav_schleife(_norm(_rakete_schleife(1.4), 0.8))
+	# Abschuss-Wisch: der vorbeischiessende Jet.  Zwei Baender uebereinander,
+	# das zweite etwas spaeter und tiefer - das gibt Breite.
+	s["wisch"] = _wav(_norm(_stack([
+			_wisch(0.55, 0.7, 260.0, 3400.0, 420.0, 2.4),
+			_wisch(0.62, 0.45, 180.0, 1500.0, 240.0, 3.2, 0.5),
+			_wumms(220.0, 70.0, 0.16, 0.5)]), 0.88))
 	s["count"] = _wav(_norm(_stack([
 			_verzerre(_supersaw(560.0, 480.0, 0.12, 0.5, 3, 0.03, 3.6), 3.0, 1),
 			_wumms(200.0, 70.0, 0.09, 0.5)]), 0.8))

@@ -272,13 +272,17 @@ func _update_plunger(delta: float) -> void:
 			charging = true
 			charge = minf(1.0, charge + delta * 0.8)
 			plunger.compress(charge)
+			# Die Feder faehrt hoch wie ein Triebwerk: das Brausen wird lauter
+			# und hoeher, je weiter gespannt ist.
+			Sfx.rakete(0.06 + 0.94 * charge)
 			# Ratschen-Klicks, waehrend sich die Feder spannt
 			var step := int(charge * 12.0)
 			if step != _crank_step:
 				_crank_step = step
-				Sfx.play("crank", -9.0)
+				Sfx.play("crank", -15.0)
 		elif charging:
 			_crank_step = 0
+			Sfx.rakete(0.0)
 			plunger.release()
 			# Volle Ladung landet im Streu-Fenster des Bogens: mal haelt der
 			# Ball den Scheitel bis zum Trichter links, mal reisst er ab und
@@ -289,12 +293,15 @@ func _update_plunger(delta: float) -> void:
 			# wechselnde Einwurfwege.
 			var power := (700.0 + 1119.0 * charge) * randf_range(0.95, 1.05)
 			lane_ball.apply_central_impulse(Vector2(0, -power))
-			Sfx.play("launch", -4.0)
+			Sfx.play("launch", -7.0)
+			# Dazu der Wisch eines vorbeischiessenden Jets, nach Ladung dosiert
+			Sfx.play("wisch", lerpf(-17.0, -3.0, charge))
 			Game.emit("launch")
 			charging = false
 			charge = 0.0
 	else:
 		if charging:
+			Sfx.rakete(0.0)
 			plunger.release()
 		charging = false
 		charge = 0.0
