@@ -46,9 +46,19 @@ func _ready() -> void:
 	main.god_mode = true
 	Game.event.connect(_on_event)
 	await get_tree().create_timer(1.0).timeout
+	var durch := []
 	for l in LAEUFE:
-		await _lauf(main, l[0], l[1], l[2])
-	get_tree().quit()
+		if not await _lauf(main, l[0], l[1], l[2]):
+			durch.append(l[0])
+	print("--- Ergebnis ---")
+	# Jede Kugel, die von oben in die Schale kommt, gehoert hinein - egal wie
+	# schnell.  Eine Tempogrenze gab es hier zweimal, beide Male falsch.
+	print("  %d von %d Anfahrten gefangen" % [LAEUFE.size() - durch.size(), LAEUFE.size()])
+	if durch.is_empty():
+		print("  ok - keine rollt durch")
+	else:
+		print("  FEHL durchgerollt: %s" % ", ".join(PackedStringArray(durch)))
+	get_tree().quit(0 if durch.is_empty() else 1)
 
 
 func _on_event(kind: String, _data: Dictionary) -> void:
@@ -56,7 +66,7 @@ func _on_event(kind: String, _data: Dictionary) -> void:
 		_gefangen = true
 
 
-func _lauf(main: Node2D, name: String, start: Vector2, v0: Vector2) -> void:
+func _lauf(main: Node2D, name: String, start: Vector2, v0: Vector2) -> bool:
 	_gefangen = false
 	var ball := PinBall.new()
 	ball.position = start
@@ -73,11 +83,12 @@ func _lauf(main: Node2D, name: String, start: Vector2, v0: Vector2) -> void:
 			pos_an_mulde = ball.global_position
 		if _gefangen:
 			break
-	print("%-18s: an der Mulde x=%.0f v=(%.0f,%.0f) Betrag %.0f px/s -> %s" % [
-			name, pos_an_mulde.x, v_an_mulde.x, v_an_mulde.y, v_an_mulde.length(),
-			"GEFANGEN" if _gefangen else "durchgerollt"])
+	print("  %-24s an der Mulde x=%.0f v=(%.0f,%.0f) Betrag %4.0f px/s -> %s" % [
+			name + ":", pos_an_mulde.x, v_an_mulde.x, v_an_mulde.y, v_an_mulde.length(),
+			"GEFANGEN" if _gefangen else "DURCHGEROLLT"])
 	if is_instance_valid(ball):
 		ball.queue_free()
 	# Die Mulde ist nach einem Fang 1.3 s gesperrt - so lange warten, sonst
 	# misst der naechste Lauf nur die Sperre statt der Fangbedingung.
 	await get_tree().create_timer(2.2).timeout
+	return _gefangen

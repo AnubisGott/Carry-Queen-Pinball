@@ -37,14 +37,18 @@ func _ready() -> void:
 	# waere die Bank nie zu schaffen.  Und wenn alle drei stehen, muss die
 	# Lampe oben in der Leiste angehen.
 	var fehler := 0
+	# Einmal sauber aufraeumen, danach beide Baenke nacheinander.  Nicht je
+	# Bank zuruecksetzen: sonst stuende die eine Bank beim naechsten Abschnitt
+	# wieder auf Anfang und der Fehler nach dem Neustart faellt nur bei der
+	# anderen auf.
+	Game.reset_disciplines()
+	for s in _main.standups:
+		s.reset()
+	for s in _main.ego_bank:
+		s.reset()
+	_main._ich_done = false
+	_main._ego_done = false
 	for bank in [["I-C-H", 31.0, "ICH"], ["E-G-O", 459.0, "EGO"]]:
-		Game.reset_disciplines()
-		for s in _main.standups:
-			s.reset()
-		for s in _main.ego_bank:
-			s.reset()
-		_main._ich_done = false
-		_main._ego_done = false
 		var folge := []
 		for durchgang in 3:
 			# Ohne Zuruecksetzen: die Bank behaelt, was schon leuchtet
@@ -52,11 +56,16 @@ func _ready() -> void:
 			folge.append_array(_treffer)
 		var lampe: bool = Game.disciplines.get(str(bank[2]), false)
 		var voll: bool = folge.size() == 3
-		if not voll or not lampe:
+		# Der Zustand allein genuegt nicht: die Beschriftung oben wird ueber
+		# Ereignisse umgefaerbt.  Deshalb wird hier die wirkliche Schriftfarbe
+		# abgelesen, und zwar sofort - die naechste Bank setzt sie zurueck.
+		var farbe: Color = _main.hud._disc_labels[str(bank[2])].get_theme_color("font_color")
+		var hell: bool = farbe.is_equal_approx(Hud.PINK)
+		if not voll or not lampe or not hell:
 			fehler += 1
-		print("  %s %s  Buchstaben %s, Lampe %s in der Leiste: %s"
-				% ["ok  " if voll and lampe else "FEHL", bank[0], str(folge),
-				str(bank[2]), "an" if lampe else "AUS"])
+		print("  %s %s  Buchstaben %s, Lampe %s: %s, Beschriftung: %s"
+				% ["ok  " if voll and lampe and hell else "FEHL", bank[0], str(folge),
+				str(bank[2]), "an" if lampe else "AUS", "hell" if hell else "grau"])
 
 	print("--- und nach einem neuen Spiel noch einmal ---")
 	# Der Screenshot aus dem Spiel zeigte alle sechs Targets durchgestrichen,
@@ -64,6 +73,15 @@ func _ready() -> void:
 	# fertig, neues Spiel, Bank wieder fertig.
 	_main._restart()
 	await get_tree().create_timer(0.5).timeout
+	# Das neue Spiel loescht die Disziplinen - die Beschriftung muss das
+	# sofort zeigen und nicht die Farbe des alten Spiels behalten.
+	for name in ["ICH", "EGO"]:
+		var farbe: Color = _main.hud._disc_labels[name].get_theme_color("font_color")
+		var grau: bool = farbe.is_equal_approx(Hud.DIM)
+		if not grau:
+			fehler += 1
+		print("  %s neues Spiel -> %s wieder grau: %s" % ["ok  " if grau else "FEHL",
+				name, str(grau)])
 	for bank in [["I-C-H", 31.0, "ICH"], ["E-G-O", 459.0, "EGO"]]:
 		var folge := []
 		for durchgang in 3:
@@ -80,14 +98,34 @@ func _ready() -> void:
 				% ["ok  " if alle_an and lampe else "FEHL", bank[0], str(alle_an),
 				str(bank[2]), "an" if lampe else "AUS"])
 
+	print("--- die Sperre ueberlebt den Ballwechsel nicht ---")
+	# Beim Messen aufgefallen: die Sperre stand noch, wenn die Bank neu
+	# aufgestellt wurde, und schluckte den ersten Treffer der neuen Runde.
+	# Alles in einem Bild, damit sie nicht schon von selbst faellt.
+	var kugel: PinBall = _main._spawn_ball(Vector2(270, 700))
+	kugel.freeze = true
+	for s in _main.standups:
+		s.reset()
+	_main.standups[0]._on_hit(kugel)
+	var sperre_stand: bool = _main.standups[1]._gesperrt
+	for s in _main.standups:
+		s.reset()
+	_main.standups[1]._on_hit(kugel)
+	var kam_durch: bool = _main.standups[1].lit
+	if not sperre_stand or not kam_durch:
+		fehler += 1
+	print("  %s nach dem Treffer gesperrt: %s, nach reset() zaehlt der naechste: %s"
+			% ["ok  " if sperre_stand and kam_durch else "FEHL",
+			str(sperre_stand), str(kam_durch)])
+	kugel.queue_free()
+
 	print("--- Ergebnis ---")
-	print("  hoechstens %d Buchstaben in einem Durchgang" % schlimmster)
-	if fehler > 0:
-		print("  FEHL: %d Bank(e) wurden nicht fertig oder die Lampe blieb aus" % fehler)
-		schlimmster = 99
-	print("  %s" % ["ok - eine Kugel raeumt hoechstens einen ab" if schlimmster <= 1
-			else "zu einfach: eine Kugel raeumt bis zu %d ab" % schlimmster])
-	get_tree().quit(0 if schlimmster <= 1 else 1)
+	print("  hoechstens %d Buchstaben in einem Durchgang: %s" % [schlimmster,
+			"ok" if schlimmster <= 1 else "zu einfach"])
+	if schlimmster > 1:
+		fehler += 1
+	print("  %s" % ["alles in Ordnung" if fehler == 0 else "%d Fehler" % fehler])
+	get_tree().quit(0 if fehler == 0 else 1)
 
 
 ## Eine Kugel von oben an der Bank vorbeirollen lassen und zaehlen, welche
