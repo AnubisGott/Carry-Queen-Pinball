@@ -7,6 +7,19 @@ godot-engine/
 # Referenzbilder (Stock-Material, nicht veroeffentlichen)
 Flipper-Design/
 
+# Bauergebnisse.  Die Skripte in build/ und die Export-Vorgaben
+# (export_presets.cfg) bleiben versioniert, die fertigen Pakete nicht -
+# der Windows-Build allein waere 110 MB.
+/build/*
+!/build/.gdignore
+!/build/godot-suchen.bat
+!/build/build-all.bat
+!/build/build-windows.bat
+!/build/build-linux.bat
+!/build/build-web.bat
+!/build/build-itch.bat
+!/build/test-web.bat
+
 # Rohspuren aus dem Gesangs-Export (je rund 33 MB).  Das Spiel liest sie
 # ohnehin nicht - es nimmt nur, was sich einem Satz zuordnen laesst.  Die
 # geschnittenen Faecher darunter (assets/voice/<satz><nr>/) bleiben drin.
