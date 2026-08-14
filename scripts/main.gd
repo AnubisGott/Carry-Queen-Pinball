@@ -361,11 +361,13 @@ func _update_timers(delta: float) -> void:
 		if frenzy_time <= 0.0:
 			Game.frenzy = false
 			hud.set_frenzy(false)
-			# Bank wieder aufstellen: dunkel und damit erneut abraeumbar
+			# Die Bank bleibt liegen.  Zurueckgestellt wird sie erst zusammen
+			# mit I-C-H und E-G-O, wenn der Bericht durch ist - eine geschaffte
+			# Disziplin soll auf dem Feld stehen bleiben und nicht von selbst
+			# wieder aufgehen.  Nur das Blinken hoert auf.
 			for d in drops:
-				d.reset()
-			# Auch hier keine Meldung: der Zeitbalken oben ist weg, die
-			# DAMAGE-Bank steht wieder dunkel.  Das reicht.
+				d.set_pulsing(false)
+			# Auch hier keine Meldung: der Zeitbalken oben ist weg.
 	if Game.wizard:
 		wizard_time -= delta
 		hud.set_wizard(true, wizard_time / WIZARD_TIME)

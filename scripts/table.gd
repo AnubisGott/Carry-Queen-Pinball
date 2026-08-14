@@ -270,6 +270,12 @@ static func build(parent: Node2D) -> Dictionary:
 	gate.watch_horn(horn_l)
 	gate.watch_horn(horn_r)
 	parent.add_child(gate)
+	# Wegweiser in dem freien Band zwischen Bumper-Feld und DAMAGE-Bank: zeigt
+	# schraeg nach oben auf die Luecke zwischen den Hoernern und blinkt mit
+	# ihnen mit, damit man beim Hurry-Up sieht, wohin.
+	var pfeil := TableDeco.new("arrow", Vector2(196, 528), NEON_GOLD, 0.9, 48.0)
+	parent.add_child(pfeil)
+	gate.watch_pfeil(pfeil)
 	refs["gate"] = gate
 
 	# Gluecksrad oben links, wo bisher nichts passierte: die Kugel kommt vom
