@@ -27,7 +27,6 @@ const CHAT := {
 	"drop_target": ["DAMAGE geht hoch", "tank diff", "98% dmg incoming"],
 	"standup": ["I-C-H, wer wohl", "sie meint sich selbst lol"],
 	"kill": ["KILL BESTAETIGT", "gg ez", "REPORTED lol", "adc diff"],
-	"lock": ["Ball im Thron geparkt", "sie sammelt uns ein..."],
 	"multiball": ["VIER BAELLE WTF", "wir sind nur Deko", "der pinke macht eh alles"],
 	"jackpot": ["JACKPOT POGGERS", "Clip. Es. Jetzt.", "unfassbar (sie halt)"],
 	"drain": ["F", "ball diff", "mein Ping war schuld", "classic Team-Moment"],

@@ -40,7 +40,6 @@ const WIZARD_LINES := [
 var hud: Hud
 var flipper_l: Flipper
 var flipper_r: Flipper
-var throne: Throne
 var plunger: Plunger
 var gate: PassGate
 var drops: Array = []
@@ -49,7 +48,6 @@ var ggez: Array = []
 var ego_bank: Array = []
 var lane_chevrons: Array = []
 var bumpers: Dictionary = {}
-var locked_balls: Array = []
 var dim: CanvasModulate
 
 var charge := 0.0
@@ -119,11 +117,8 @@ func _ready() -> void:
 	ego_bank = refs.get("ego_bank", [])
 	lane_chevrons = refs.get("lane_chevrons", [])
 	bumpers = refs.get("bumpers", {})
-	throne = refs.get("throne", null)
 	plunger = refs["plunger"]
 	gate = refs.get("gate", null)
-	if throne:
-		throne.captured.connect(_on_throne_captured)
 	_make_drain()
 	hud = Hud.new()
 	add_child(hud)
@@ -664,71 +659,6 @@ func _end_hurry() -> void:
 	_update_bumper_marks()
 
 
-func _on_throne_captured(ball: PinBall) -> void:
-	_resolve_throne.call_deferred(ball)
-
-
-func _resolve_throne(ball: PinBall) -> void:
-	if Game.wizard:
-		var pts := Game.add_score(20000)
-		hud.show_message("MEGA-JACKPOT!", "+" + Hud.fmt(pts), 2.0)
-		Sfx.play("jackpot")
-		Game.emit("jackpot")
-		await _eject_after(ball, 0.7)
-	elif hurry_active:
-		var pts := Game.add_score(hurry_value)
-		_end_hurry()
-		Game.discipline_done("ICH")
-		hud.show_message("ICH. WER SONST.", "+" + Hud.fmt(pts), 2.2)
-		Sfx.play("jackpot")
-		Game.emit("jackpot")
-		await _eject_after(ball, 0.8)
-	elif Game.multiball:
-		var pts := Game.add_score(10000, ball)
-		hud.show_message("JACKPOT!", "+" + Hud.fmt(pts), 2.0)
-		Sfx.play("jackpot")
-		Game.emit("jackpot")
-		await _eject_after(ball, 0.6)
-	else:
-		Game.locks += 1
-		if Game.locks >= 3:
-			await _start_multiball(ball)
-		else:
-			locked_balls.append(ball)
-			Game.add_score(2500)
-			hud.show_message("BALL GEPARKT (%d/3)" % Game.locks, "Der Thron sammelt euch ein.", 2.0)
-			Game.emit("lock")
-			await get_tree().create_timer(0.8, false).timeout
-			_spawn_ball(SPAWN)
-			throne.release_ready()
-
-
-func _eject_after(ball: PinBall, t: float) -> void:
-	await get_tree().create_timer(t, false).timeout
-	throne.eject(ball)
-	await get_tree().create_timer(0.4, false).timeout
-	throne.release_ready()
-
-
-func _start_multiball(ball: PinBall) -> void:
-	Game.multiball = true
-	Game.locks = 0
-	Sfx.play("mode")
-	Sfx.say("koop")
-	hud.show_message("VIER SPIELER. EIN CARRY.", "ICH.", 3.0)
-	Game.emit("multiball")
-	ball.set_carry(true)
-	await get_tree().create_timer(0.9, false).timeout
-	throne.eject(ball)
-	for lb in locked_balls:
-		await get_tree().create_timer(0.5, false).timeout
-		throne.eject(lb)
-	locked_balls.clear()
-	await get_tree().create_timer(0.5, false).timeout
-	_spawn_ball(Vector2(270, 185), false, Vector2(randf_range(-60, 60), 300))
-	throne.release_ready()
-
-
 func _end_multiball() -> void:
 	Game.multiball = false
 	for b in get_tree().get_nodes_in_group("balls"):
@@ -977,7 +907,6 @@ func _restart() -> void:
 	Sfx.stille()
 	for b in get_tree().get_nodes_in_group("balls"):
 		b.queue_free()
-	locked_balls.clear()
 	for d in drops:
 		d.reset()
 	for s in standups:
@@ -986,8 +915,6 @@ func _restart() -> void:
 		r.set_lit(false)
 	for s in ego_bank:
 		s.reset()
-	if throne:
-		throne.release_ready()
 	streak_letters.clear()
 	_update_bumper_marks()
 	hurry_active = false

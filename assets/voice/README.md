@@ -72,15 +72,14 @@ kennt keine. Gesprochen wird natürlich mit.
 | M7  | G-G-E-Z komplett, Multiball läuft schon          | „G-G-E-Z."                             | „Waren ja auch nur vier Gassen."                                         | gelegentlich               | –                   |                                 |
 | M8  | G-G-E-Z komplett, Multiball startet              | „G-G-E-Z: KO-OP-MULTIBALL!"            | „Vier Spieler. Ein Carry. Ich."                                          | 0-2× je Spiel              | `koop_modus`        | „Multiball"                     |
 | M9  | I-C-H-Bank komplett                              | „ICH. WER SONST."                      | „+7.500"                                                                 | 1× je Ball möglich         | – nur Text          |                                 |
-| M10 | Jackpot im Multiball                             | „JACKPOT!"                             | „+12.000"                                                                | nur im Multiball, dann oft | –                   |                                 |
-| M11 | Jackpot nach vollem Multiball-Satz               | „MEGA-JACKPOT!"                        | „+50.000"                                                                | selten                     | –                   |                                 |
-| M12 | I-C-H-Bank während des Multiballs                | „ICH. WER SONST."                      | „+15.000"                                                                | nur im Multiball           | – nur Text          |                                 |
-| M13 | Ball im Thron geparkt (1. und 2. Ball)           | „BALL GEPARKT (1/3)"                   | „Der Thron sammelt euch ein."                                            | gelegentlich               | –                   |                                 |
-| M14 | dritter Ball geparkt, Thron-Multiball startet    | „VIER SPIELER. EIN CARRY."             | „ICH."                                                                   | selten                     | `koop_modus`        |                                 |
 | M15 | Bericht startet, alle vier Disziplinen geschafft | „DER BERICHT."                         | „40 Sekunden lang zaehlt alles fuenffach."                               | oft gar nicht              | `der_bericht`       | „Die Ulti beginnt."             |
 | M16 | Bericht ist vorbei                               | „AM ENDE STEHT MEIN NAME."             | „Eure Namen stehen nicht."                                               | so oft wie M15             | –                   |                                 |
 | M17 | Carry-Save fängt den verlorenen Ball             | „MEIN CARRY RETTET."                   | „Gern geschehen."                                                        | höchstens 1× je Ball       | `mein_carry_rettet` | „MEIN CARRY RETTET."            |
 | M18 | Tisch zu oft gerüttelt, Tilt                     | „RAGEQUIT!"                            | „Tilt. Flipper tot, Punkte tot. Wie dein Team."                          | nur wenn man rüttelt       | –                   |                                 |
+
+Die Nummern M10 bis M14 fehlen: das waren Meldungen rund um den Thron, den es  
+auf dem Spielfeld nicht mehr gibt (Jackpot, Mega-Jackpot, Ball geparkt). Die  
+Nummern der übrigen Zeilen bleiben, damit sich Verweise nicht verschieben.
 
 M19 wäre der God-Modus („GOD-MODUS AN"), der ist aber nur zum Testen da und  
 kommt im Spiel nicht vor.
@@ -97,7 +96,7 @@ Stimme darauf wirkt schnell zu wuchtig, außer du willst genau das.
 | K3  | DAMAGE-Bank abgeräumt, Frenzy startet     | „DAMAGE-FRENZY: alles x2. +6.000"                 | mehrmals je Spiel    | –    |            |
 | K4  | E-G-O-Bank komplett                       | „E-G-O komplett. +5.000"                          | 1× je Ball möglich   | –    |            |
 | K5  | Glücksrad zahlt 500, 1K oder 2K           | „BRONZE: +500 Hardstuck. Wer haette das gedacht." | häufig               | –    |            |
-| K6  | Multiball vorbei, nur noch ein Ball       | „Multiball vorbei. Ihr wart Deko."                | so oft wie M8/M14    | –    |            |
+| K6  | Multiball vorbei, nur noch ein Ball       | „Multiball vorbei. Ihr wart Deko."                | so oft wie M8           | –    |            |
 
 ## 3. Die Spott-Sprüche
 
@@ -175,7 +174,7 @@ erwarte - ein anderer Name geht auch, solange er nah genug dran ist.
 | Fach                  | Ordner heißt                                     | Gehört zu                                                                                     | Da liegen                   |
 | --------------------- | ------------------------------------------------ | --------------------------------------------------------------------------------------------- | --------------------------- |
 | `beste`               | Ich bin die Beste                                | ~~M5, M6, M9, M12~~ - **wird nicht mehr gesprochen**, die Zeilen stehen nur noch auf dem Feld | 3 liegen bereit, ungenutzt  |
-| `koop`                | Multiball                                        | M8, M14                                                                                       | **4** · 1,9-2,2 s           |
+| `koop`                | Multiball                                        | M8                                                                                            | **4** · 1,9-2,2 s           |
 | `ball_start`          | zeig doch mal was du kannst                      | M1, erster Ball                                                                               | **3** · 2,4-2,7 s           |
 | `carry_rettet`        | Mein Carry rettet                                | M17                                                                                           | **4** · 1,8-2,2 s           |
 | `kein_skill`          | Kein Skill                                       | Ball endgültig verloren (kein Text auf dem Feld)                                              | **4** · 0,8-0,9 s           |
@@ -262,7 +261,6 @@ eigenen Chat-Antworten sind C1 bis C5.
 | DAMAGE-Bank    | „DAMAGE geht hoch" · „tank diff" · „98% dmg incoming"                                                                                                                                                                                             |
 | I-C-H-Ziele    | „I-C-H, wer wohl" · „sie meint sich selbst lol"                                                                                                                                                                                                   |
 | Kill           | „KILL BESTAETIGT" · „gg ez" · „REPORTED lol" · „adc diff"                                                                                                                                                                                         |
-| Ball geparkt   | „Ball im Thron geparkt" · „sie sammelt uns ein…"                                                                                                                                                                                                  |
 | Multiball      | „VIER BAELLE WTF" · „wir sind nur Deko" · „der pinke macht eh alles"                                                                                                                                                                              |
 | Jackpot        | „JACKPOT POGGERS" · „Clip. Es. Jetzt." · „unfassbar (sie halt)"                                                                                                                                                                                   |
 | Ballverlust    | „F" · „ball diff" · „mein Ping war schuld" · „classic Team-Moment"                                                                                                                                                                                |
