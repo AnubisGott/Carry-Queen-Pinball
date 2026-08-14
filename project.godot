@@ -26,6 +26,9 @@ window/size/viewport_width=660
 window/size/viewport_height=960
 window/stretch/mode="canvas_items"
 window/stretch/aspect="keep"
+; Auf dem Telefon hochkant - der Tisch ist 660 mal 960 und laege quer auf
+; der Seite.  Ohne diese Zeile startet Godot dort im Querformat.
+window/handheld/orientation=1
 
 [physics]
 
@@ -36,3 +39,10 @@ common/physics_ticks_per_second=120
 
 viewport/hdr_2d=true
 environment/defaults/default_clear_color=Color(0.02, 0.01, 0.04, 1)
+; Ohne ETC2/ASTC verweigert Godot den Android-Export.  Der Tisch ist ohnehin
+; gezeichnet, betroffen sind nur das Symbol und das Bild der Queen.
+textures/vram_compression/import_etc2_astc=true
+; Auf Android ueber OpenGL statt Vulkan.  Mit Vulkan blieb das Bild im
+; Emulator schwarz, bei jedem Bild "Couldn't present to Vulkan queue" - auch
+; mit Software-Grafik.  Der Browser-Build laeuft ohnehin schon so.
+renderer/rendering_method.mobile="gl_compatibility"

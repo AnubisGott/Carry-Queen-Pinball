@@ -18,7 +18,9 @@ Flipper-Design/
 !/build/build-linux.bat
 !/build/build-web.bat
 !/build/build-itch.bat
+!/build/build-android.bat
 !/build/test-web.bat
+!/build/test-android.bat
 
 # Rohspuren aus dem Gesangs-Export (je rund 33 MB).  Das Spiel liest sie
 # ohnehin nicht - es nimmt nur, was sich einem Satz zuordnen laesst.  Die
