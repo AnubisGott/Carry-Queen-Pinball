@@ -9,9 +9,9 @@ signal continue_pressed
 const FIELD_W := 540
 const CHAT_W := 120
 const TOTAL_W := FIELD_W + CHAT_W
-const CHAT_LINES := 15
-## Hoehe des Musikvideo-Kastens am unteren Ende der Chat-Spalte.  Der Chat
-## wird dafuer entsprechend kuerzer.
+const CHAT_LINES := 19
+## Hoehe des Musikvideo-Kastens.  Er sitzt oben rechts, wo bis vor kurzem die
+## Tastenhilfe stand; darunter laeuft der Chat bis ans untere Ende.
 const VIDEO_H := 76
 
 const PINK := Color(1.0, 0.24, 0.62)
@@ -97,7 +97,7 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	layer = 10
 	_build_bar()
-	_build_controls()
+	_build_video()
 	_build_chat()
 	_build_messages()
 	# Was sie nicht sprechen kann, weil sie schon spricht, schreibt sie.
@@ -289,25 +289,12 @@ func _try_avatar(bar: Panel) -> void:
 
 
 ## Tasten-Legende in der Ecke oben rechts, ueber der Chat-Spalte.
-func _build_controls() -> void:
-	var panel := Panel.new()
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color(0.028, 0.012, 0.050, 0.94)
-	sb.border_color = Color(0.72, 0.20, 0.95, 0.85)
-	sb.set_border_width_all(2)
-	sb.set_corner_radius_all(6)
-	panel.add_theme_stylebox_override("panel", sb)
-	panel.position = Vector2(FIELD_W + 6, 4)
-	panel.size = Vector2(CHAT_W - 12, 80)
-	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(panel)
-	var head := _label("TASTEN", Vector2(0, 4), 11, GREEN, panel)
-	head.size = Vector2(CHAT_W - 12, 14)
-	head.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	var rows := [["A/D", "Flipper"], ["Q/E", "Stupsen"], ["LEER", "Abschuss"]]
-	for i in rows.size():
-		_label(rows[i][0], Vector2(8, 24 + i * 18), 10, GOLD, panel)
-		_label(rows[i][1], Vector2(44, 24 + i * 18), 10, Color(0.8, 0.78, 0.9), panel)
+## Der Kasten zum Musikvideo sitzt oben rechts, wo bis eben die Tastenhilfe
+## stand.  Der Chat reicht dafuer jetzt bis ganz nach unten.
+func _build_video() -> void:
+	var box := YoutubeBox.new(Vector2(CHAT_W - 12, VIDEO_H))
+	box.position = Vector2(FIELD_W + 6, 4)
+	add_child(box)
 
 
 ## Chat als eigene Spalte rechts neben dem Spielfeld - der Stream-Look.
@@ -319,16 +306,11 @@ func _build_chat() -> void:
 	sb.set_border_width_all(2)
 	sb.set_corner_radius_all(6)
 	panel.add_theme_stylebox_override("panel", sb)
-	panel.position = Vector2(FIELD_W + 6, 88)
-	panel.size = Vector2(CHAT_W - 12, 868 - VIDEO_H - 8)
+	# Von unterhalb des Video-Kastens bis ans untere Ende der Spalte
+	panel.position = Vector2(FIELD_W + 6, 4 + VIDEO_H + 8)
+	panel.size = Vector2(CHAT_W - 12, 956 - (4 + VIDEO_H + 8))
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(panel)
-
-	# Darunter der Kasten zum Musikvideo - er nimmt das untere Ende der Spalte
-	# fuer sich, damit er nicht im Chat untergeht.
-	var box := YoutubeBox.new(Vector2(CHAT_W - 12, VIDEO_H))
-	box.position = Vector2(FIELD_W + 6, 88 + panel.size.y + 8)
-	add_child(box)
 
 	var head := _label("LIVE CHAT", Vector2(0, 6), 12, GREEN, panel)
 	head.size = Vector2(CHAT_W - 12, 16)

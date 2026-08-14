@@ -30,6 +30,13 @@ window/stretch/aspect="keep"
 ; der Seite.  Ohne diese Zeile startet Godot dort im Querformat.
 window/handheld/orientation=1
 
+[input_devices]
+
+; Gestupst wird auf dem Telefon durch Kippen des Geraets.  Godot laesst den
+; Beschleunigungsmesser sonst aus (er kostet Strom) und liefert dann einen
+; Nullvektor - genau daran passierte beim ersten Versuch im Emulator nichts.
+sensors/enable_accelerometer=true
+
 [physics]
 
 common/physics_ticks_per_second=120

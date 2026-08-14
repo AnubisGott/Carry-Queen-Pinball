@@ -99,6 +99,13 @@ var _touch_launch := {}
 var nudge_heat := 0.0
 var _shake_tween: Tween
 
+## Kippen als Stupser (nur auf Geraeten mit Sensor).  Die Schwelle entspricht
+## rund 15 Grad Neigung, zurueckgesetzt wird unter etwa 7 Grad - so gibt ein
+## Kippen genau einen Stupser und nicht einen je Bild.
+const KIPP_SCHWELLE := 2.5
+const KIPP_ZURUECK := 1.2
+var _kipp_bereit := true
+
 # Nur fuer automatisierte Tests (Start mit "-- --autotest")
 var autotest := false
 var _at_l := false
@@ -239,6 +246,8 @@ func _update_nudge(delta: float) -> void:
 		dir = 1.0
 	elif Input.is_action_just_pressed("nudge_right"):
 		dir = -1.0
+	else:
+		dir = _kippen()
 	if dir == 0.0:
 		return
 	for b in get_tree().get_nodes_in_group("balls"):
@@ -251,6 +260,30 @@ func _update_nudge(delta: float) -> void:
 		_tilt()
 	elif nudge_heat > 2.0:
 		hud.show_sub("Vorsicht. Gleich gibt's einen RAGEQUIT.", 1.2)
+
+
+## Stupsen auf dem Telefon: statt einer Taste kippt man das Geraet.  Der
+## Beschleunigungsmesser liefert die Neigung zur Seite; ueberschreitet sie die
+## Schwelle, gibt es genau einen Stupser in diese Richtung.  Der naechste
+## kommt erst, wenn das Geraet wieder halbwegs gerade liegt - sonst wuerde ein
+## schraeg gehaltenes Telefon dauernd stupsen und sofort einen Tilt ausloesen.
+##
+## Am Rechner gibt es keinen Sensor; dort liefert Godot einen Nullvektor und
+## die Abfrage faellt von selbst weg.
+func _kippen() -> float:
+	var b := Input.get_accelerometer()
+	if b == Vector3.ZERO:
+		return 0.0
+	var seite := b.x
+	if absf(seite) < KIPP_ZURUECK:
+		_kipp_bereit = true
+		return 0.0
+	if _kipp_bereit and absf(seite) >= KIPP_SCHWELLE:
+		_kipp_bereit = false
+		# Rechte Kante nach unten heisst: der Tisch neigt sich nach rechts,
+		# die Kugel laeuft nach rechts.  Dasselbe wie die Taste Q.
+		return signf(seite)
+	return 0.0
 
 
 func _shake(dir: float) -> void:
