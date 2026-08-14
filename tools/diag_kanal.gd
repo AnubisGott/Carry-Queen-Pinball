@@ -54,6 +54,11 @@ func _ready() -> void:
 		print("  Chat endet bei %.0f, Kasten faengt bei %.0f an -> %s" % [
 				chat_unten, kasten.position.y,
 				"OK" if kasten.position.y >= chat_unten else "UEBERDECKT"])
+		# Beide Knoepfe muessen dasselbe Ziel haben - sonst landet einer von
+		# beiden irgendwann woanders.
+		print("  gleiches Ziel wie das Abzeichen: %s -> %s" % [
+				str(YoutubeBadge.URL == YoutubeBox.URL),
+				"OK" if YoutubeBadge.URL == YoutubeBox.URL else "ABWEICHUNG"])
 
 	print("--- Kanal im Chat ---")
 	# Die Wartezeit abkuerzen, statt zwei Minuten zuzusehen

@@ -7,11 +7,11 @@ extends Button
 ## Grundsatz, ohne fremde Grafiken auszukommen, und es gibt keine Frage nach
 ## Markenrechten an einer mitgelieferten Datei.
 
-## Das Abzeichen sagt "LIVE" und fuehrt deshalb auch dorthin: die Live-Seite
-## des Kanals.  Laeuft gerade nichts, landet man auf dem Kanal - dieselbe
-## Adresse in ihrer heutigen Form mit Handle statt Kanal-Kennung.  Das
-## Musikvideo hat seinen eigenen Kasten unten in der Chat-Spalte.
-const URL := "https://www.youtube.com/@djanubis5223/live"
+## Dasselbe Ziel wie der Kasten unten in der Chat-Spalte: das Musikvideo der
+## Carry Queen.  Beide Knoepfe fuehren an dieselbe Stelle, damit niemand auf
+## einem toten Kanal landet - deshalb steht die Adresse in YoutubeBox und
+## wird hier nur uebernommen.
+const URL := YoutubeBox.URL
 const ROT := Color(0.95, 0.15, 0.15)
 const ROT_HELL := Color(1.0, 0.35, 0.3)
 
@@ -26,7 +26,7 @@ func _init() -> void:
 	# Nicht fokussierbar: sonst faengt die Leertaste den Knopf statt den
 	# Abschuss.
 	focus_mode = Control.FOCUS_NONE
-	tooltip_text = "DJ Anubis auf YouTube (@djanubis5223)"
+	tooltip_text = "Musikvideo: Ich bin die Beste (gern geschehen)"
 	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 
 
