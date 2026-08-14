@@ -74,6 +74,11 @@ func _ready() -> void:
 		_zaehlen_an()
 		for s in fall[1]:
 			s._on_hit(kugel)
+			# Zwischen zwei Buchstaben muss ein Bild vergehen: nur einer je
+			# Vorbeirollen geht an, und die Sperre faellt erst, wenn keine
+			# Kugel mehr bei der Bank ist (siehe standup.gd).  Die Testkugel
+			# liegt weit weg, es fehlt also nur der Zeitschritt.
+			await get_tree().process_frame
 			await get_tree().physics_frame
 		await get_tree().create_timer(0.4).timeout
 		var d3: bool = _eigene.has("ich-oder-ego-complete")

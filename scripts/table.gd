@@ -204,6 +204,10 @@ static func build(parent: Node2D) -> Dictionary:
 		var s := Standup.new(Vector2(31, 370 + i * 60), ich[i])
 		parent.add_child(s)
 		standups.append(s)
+	# Jedes Target kennt seine Bank - daran haengt die Regel, dass eine
+	# vorbeirollende Kugel nur einen Buchstaben anmacht (siehe standup.gd).
+	for s in standups:
+		s.bank = standups
 	refs["standups"] = standups
 
 	# Einzelner EGO-Knopf (FEATURE_EGO): jeder Treffer = Ego-Stufe rauf
@@ -217,6 +221,8 @@ static func build(parent: Node2D) -> Dictionary:
 			var e := Standup.new(Vector2(459, 370 + i * 60), ego_letters[i], 180.0)
 			parent.add_child(e)
 			ego_bank.append(e)
+		for e in ego_bank:
+			e.bank = ego_bank
 	refs["ego_bank"] = ego_bank
 
 	# OP-Spinner quer im Ausgang der Abschussbahn: jede abgeschossene Kugel
