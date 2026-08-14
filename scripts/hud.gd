@@ -9,9 +9,9 @@ signal continue_pressed
 const FIELD_W := 540
 const CHAT_W := 120
 const TOTAL_W := FIELD_W + CHAT_W
-const CHAT_LINES := 19
-## Hoehe des Musikvideo-Kastens.  Er sitzt oben rechts, wo bis vor kurzem die
-## Tastenhilfe stand; darunter laeuft der Chat bis ans untere Ende.
+## Hoehe des Musikvideo-Kastens.  Wo er sitzt, entscheidet die Plattform:
+## am Rechner unten in der Spalte, auf dem Telefon oben anstelle der
+## Tastenhilfe (siehe _ready).
 const VIDEO_H := 76
 
 const PINK := Color(1.0, 0.24, 0.62)
@@ -58,6 +58,10 @@ const CHAT := {
 }
 const CHAT_PROB := {"bumper": 0.06, "sling": 0.15, "spinner": 0.3, "drop_target": 0.25, "standup": 0.4, "ego_level": 0.5, "wheel_hit": 0.35}
 
+## Wie viele Chat-Zeilen stehen bleiben - haengt an der Anordnung der Spalte
+## und wird deshalb erst beim Aufbau gesetzt.
+var _chat_lines := 15
+
 var popup_kind := ""
 
 ## Wizard-Anzeige: die vier Disziplinen pulsieren, darunter laeuft ein
@@ -97,8 +101,20 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	layer = 10
 	_build_bar()
-	_build_video()
-	_build_chat()
+	# Zwei Anordnungen der rechten Spalte.  Auf dem Telefon gibt es keine
+	# Tastatur, also auch keine Tastenhilfe: dort sitzt der Musikvideo-Kasten
+	# oben und der Chat laeuft bis ans untere Ende.  Am Rechner bleibt es beim
+	# gewohnten Bild - Tastenhilfe oben, Chat in der Mitte, Video unten.
+	if OS.has_feature("mobile"):
+		_chat_lines = 19
+		_build_video(4.0)
+		_build_chat(4.0 + VIDEO_H + 8.0, 956.0 - (4.0 + VIDEO_H + 8.0))
+	else:
+		_chat_lines = 15
+		_build_controls()
+		var hoehe := 868.0 - VIDEO_H - 8.0
+		_build_chat(88.0, hoehe)
+		_build_video(88.0 + hoehe + 8.0)
 	_build_messages()
 	# Was sie nicht sprechen kann, weil sie schon spricht, schreibt sie.
 	Sfx.stimme_geschrieben.connect(_auf_geschrieben)
@@ -289,26 +305,46 @@ func _try_avatar(bar: Panel) -> void:
 
 
 ## Tasten-Legende in der Ecke oben rechts, ueber der Chat-Spalte.
-## Der Kasten zum Musikvideo sitzt oben rechts, wo bis eben die Tastenhilfe
-## stand.  Der Chat reicht dafuer jetzt bis ganz nach unten.
-func _build_video() -> void:
+## Tastenhilfe - nur am Rechner, wo es eine Tastatur gibt.
+func _build_controls() -> void:
+	var panel := Panel.new()
+	panel.add_theme_stylebox_override("panel", _spalten_rahmen())
+	panel.position = Vector2(FIELD_W + 6, 4)
+	panel.size = Vector2(CHAT_W - 12, 80)
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(panel)
+	var head := _label("TASTEN", Vector2(0, 4), 11, GREEN, panel)
+	head.size = Vector2(CHAT_W - 12, 14)
+	head.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	var rows := [["A/D", "Flipper"], ["Q/E", "Stupsen"], ["LEER", "Abschuss"]]
+	for i in rows.size():
+		_label(rows[i][0], Vector2(8, 24 + i * 18), 10, GOLD, panel)
+		_label(rows[i][1], Vector2(44, 24 + i * 18), 10, Color(0.8, 0.78, 0.9), panel)
+
+
+## Kasten zum Musikvideo an der uebergebenen Hoehe der rechten Spalte.
+func _build_video(oben: float) -> void:
 	var box := YoutubeBox.new(Vector2(CHAT_W - 12, VIDEO_H))
-	box.position = Vector2(FIELD_W + 6, 4)
+	box.position = Vector2(FIELD_W + 6, oben)
 	add_child(box)
 
 
-## Chat als eigene Spalte rechts neben dem Spielfeld - der Stream-Look.
-func _build_chat() -> void:
-	var panel := Panel.new()
+## Der Rahmen, den alle Kaesten der rechten Spalte tragen.
+func _spalten_rahmen() -> StyleBoxFlat:
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = Color(0.028, 0.012, 0.050, 0.94)
 	sb.border_color = Color(0.72, 0.20, 0.95, 0.85)
 	sb.set_border_width_all(2)
 	sb.set_corner_radius_all(6)
-	panel.add_theme_stylebox_override("panel", sb)
-	# Von unterhalb des Video-Kastens bis ans untere Ende der Spalte
-	panel.position = Vector2(FIELD_W + 6, 4 + VIDEO_H + 8)
-	panel.size = Vector2(CHAT_W - 12, 956 - (4 + VIDEO_H + 8))
+	return sb
+
+
+## Chat als eigene Spalte rechts neben dem Spielfeld - der Stream-Look.
+func _build_chat(oben: float, hoehe: float) -> void:
+	var panel := Panel.new()
+	panel.add_theme_stylebox_override("panel", _spalten_rahmen())
+	panel.position = Vector2(FIELD_W + 6, oben)
+	panel.size = Vector2(CHAT_W - 12, hoehe)
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(panel)
 
@@ -349,7 +385,7 @@ func chat(msg: String, user: String = "") -> void:
 	l.custom_minimum_size = Vector2(CHAT_W - 26, 0)
 	_chat_vbox.add_child(l)
 	# Die Spalte laeuft von oben nach unten voll; oben faellt das Aelteste raus.
-	while _chat_vbox.get_child_count() > CHAT_LINES:
+	while _chat_vbox.get_child_count() > _chat_lines:
 		var first := _chat_vbox.get_child(0)
 		_chat_vbox.remove_child(first)
 		first.queue_free()
