@@ -19,8 +19,21 @@ func _ready() -> void:
 	cs.shape = sh
 	cs.position = Vector2(0, 4)
 	add_child(cs)
-	body_entered.connect(_on_enter)
 	z_index = 4
+
+
+## Geprueft wird in jedem Bild, nicht nur beim Eintritt.  Eine langsam
+## herabrollende Kugel kommt oben in die Schale hinein, waehrend sie noch fast
+## steht - beim Eintritt sagt die Fangbedingung also "nein", und ein zweites
+## Ereignis gibt es nicht.  Gemessen: bei 154 px/s an der Muldenmitte rollte
+## sie auf beiden Seiten durch.
+func _physics_process(_delta: float) -> void:
+	if _busy:
+		return
+	for b in get_overlapping_bodies():
+		_pruefen(b)
+		if _busy:
+			return
 
 
 func _draw() -> void:
@@ -33,7 +46,7 @@ func _draw() -> void:
 	draw_arc(Vector2(0, 2), 16.0, 0.15 * PI, 0.85 * PI, 16, inner, 2.0)
 
 
-func _on_enter(body: Node2D) -> void:
+func _pruefen(body: Node2D) -> void:
 	if _busy or not body is PinBall or body.freeze:
 		return
 	# Gefangen wird, wer von oben kommt: abwaerts unterwegs und nicht quer

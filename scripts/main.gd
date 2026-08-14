@@ -915,6 +915,11 @@ func _restart() -> void:
 		r.set_lit(false)
 	for s in ego_bank:
 		s.reset()
+	# Ohne das bleiben die beiden Baenke fuer den Rest der Sitzung wirkungslos:
+	# die Targets gehen zwar wieder an, aber _check_ich/_check_ego_bank steigen
+	# vorne aus und die Lampe oben bleibt grau.
+	_ich_done = false
+	_ego_done = false
 	streak_letters.clear()
 	_update_bumper_marks()
 	hurry_active = false

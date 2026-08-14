@@ -539,6 +539,9 @@ func _on_game_event(kind: String, _data: Dictionary) -> void:
 		"score", "ego", "ego_level", "save", "save_armed", "reset", "drain", "launch":
 			_update_stats()
 			if kind == "reset":
+				# Das neue Spiel loescht auch die Disziplinen - ohne diese
+				# Zeile behielten die vier Lampen die Farbe des alten Spiels.
+				_update_disciplines()
 				_go_label.visible = false
 				_go_label.position = Vector2(0, 360)
 		"discipline", "disciplines_reset", "all_disciplines":

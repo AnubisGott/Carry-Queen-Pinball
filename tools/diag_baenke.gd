@@ -32,8 +32,59 @@ func _ready() -> void:
 			for tempo in [200.0, 450.0, 800.0]:
 				var n := await _durchgang(float(bank[1]), abstand, tempo)
 				schlimmster = maxi(schlimmster, n)
+	print("--- drei Durchgaenge hintereinander: wird die Bank fertig? ---")
+	# Ein bereits leuchtendes Target darf die Nachbarn nicht sperren, sonst
+	# waere die Bank nie zu schaffen.  Und wenn alle drei stehen, muss die
+	# Lampe oben in der Leiste angehen.
+	var fehler := 0
+	for bank in [["I-C-H", 31.0, "ICH"], ["E-G-O", 459.0, "EGO"]]:
+		Game.reset_disciplines()
+		for s in _main.standups:
+			s.reset()
+		for s in _main.ego_bank:
+			s.reset()
+		_main._ich_done = false
+		_main._ego_done = false
+		var folge := []
+		for durchgang in 3:
+			# Ohne Zuruecksetzen: die Bank behaelt, was schon leuchtet
+			await _durchgang(float(bank[1]), 18.0, 200.0, false)
+			folge.append_array(_treffer)
+		var lampe: bool = Game.disciplines.get(str(bank[2]), false)
+		var voll: bool = folge.size() == 3
+		if not voll or not lampe:
+			fehler += 1
+		print("  %s %s  Buchstaben %s, Lampe %s in der Leiste: %s"
+				% ["ok  " if voll and lampe else "FEHL", bank[0], str(folge),
+				str(bank[2]), "an" if lampe else "AUS"])
+
+	print("--- und nach einem neuen Spiel noch einmal ---")
+	# Der Screenshot aus dem Spiel zeigte alle sechs Targets durchgestrichen,
+	# aber die Lampen oben grau.  Genau das wird hier nachgestellt: Bank
+	# fertig, neues Spiel, Bank wieder fertig.
+	_main._restart()
+	await get_tree().create_timer(0.5).timeout
+	for bank in [["I-C-H", 31.0, "ICH"], ["E-G-O", 459.0, "EGO"]]:
+		var folge := []
+		for durchgang in 3:
+			await _durchgang(float(bank[1]), 18.0, 200.0, false)
+			folge.append_array(_treffer)
+		var alle_an := true
+		for s in (_main.standups if bank[2] == "ICH" else _main.ego_bank):
+			if not s.lit:
+				alle_an = false
+		var lampe: bool = Game.disciplines.get(str(bank[2]), false)
+		if not alle_an or not lampe:
+			fehler += 1
+		print("  %s %s  alle drei leuchten: %s, Lampe %s: %s"
+				% ["ok  " if alle_an and lampe else "FEHL", bank[0], str(alle_an),
+				str(bank[2]), "an" if lampe else "AUS"])
+
 	print("--- Ergebnis ---")
 	print("  hoechstens %d Buchstaben in einem Durchgang" % schlimmster)
+	if fehler > 0:
+		print("  FEHL: %d Bank(e) wurden nicht fertig oder die Lampe blieb aus" % fehler)
+		schlimmster = 99
 	print("  %s" % ["ok - eine Kugel raeumt hoechstens einen ab" if schlimmster <= 1
 			else "zu einfach: eine Kugel raeumt bis zu %d ab" % schlimmster])
 	get_tree().quit(0 if schlimmster <= 1 else 1)
@@ -41,17 +92,18 @@ func _ready() -> void:
 
 ## Eine Kugel von oben an der Bank vorbeirollen lassen und zaehlen, welche
 ## Buchstaben dabei angehen.
-func _durchgang(x: float, abstand: float, tempo: float) -> int:
+func _durchgang(x: float, abstand: float, tempo: float, neu: bool = true) -> int:
 	# Die Kugel des vorigen Durchgangs muss wirklich weg sein, sonst haelt sie
 	# die Sperre der Bank noch am Leben.
 	await get_tree().physics_frame
 	await get_tree().physics_frame
-	for s in _main.standups:
-		s.reset()
-	for s in _main.ego_bank:
-		s.reset()
-	_main._ich_done = false
-	_main._ego_done = false
+	if neu:
+		for s in _main.standups:
+			s.reset()
+		for s in _main.ego_bank:
+			s.reset()
+		_main._ich_done = false
+		_main._ego_done = false
 	_treffer.clear()
 	# Oberhalb des ersten Targets starten und senkrecht daran vorbeirollen
 	var richtung := 1.0 if x < 245.0 else -1.0

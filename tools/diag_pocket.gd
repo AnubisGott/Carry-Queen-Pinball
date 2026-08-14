@@ -26,6 +26,15 @@ const LAEUFE := [
 	["rechts, mit Schwung", Vector2(438, 420), Vector2(0, 700)],
 	["rechts, volles Tempo", Vector2(438, 420), Vector2(0, 1400)],
 	["rechts, schraeg von innen", Vector2(414, 470), Vector2(300, 760)],
+	# Langsam ankommend: kurz oberhalb der Mulde losgelassen, damit die Kugel
+	# gar nicht erst Tempo aufnimmt.  Genau das wurde beim Spielen gemeldet -
+	# eine gemaechlich herunterrollende Kugel rollte durch.
+	["links, langsam", Vector2(52, 560), Vector2.ZERO],
+	["links, sehr langsam", Vector2(52, 592), Vector2.ZERO],
+	["links, kriechend", Vector2(52, 604), Vector2(0, 20)],
+	["rechts, langsam", Vector2(438, 560), Vector2.ZERO],
+	["rechts, sehr langsam", Vector2(438, 592), Vector2.ZERO],
+	["rechts, kriechend", Vector2(438, 604), Vector2(0, 20)],
 ]
 
 var _gefangen := false

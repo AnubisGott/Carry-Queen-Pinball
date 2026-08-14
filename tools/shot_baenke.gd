@@ -13,6 +13,10 @@ func _ready() -> void:
 	var main: Node2D = MAIN.instantiate()
 	add_child(main)
 	await get_tree().create_timer(1.2).timeout
+	# Erst der unberuehrte Zustand zum Vergleich - nur so laesst sich auf
+	# einem Spiel-Screenshot entscheiden, ob ein Target leuchtet oder nicht.
+	await RenderingServer.frame_post_draw
+	_ausschnitte("dunkel")
 	# Je Bank die ersten beiden getroffen, der dritte noch offen - so steht
 	# beides nebeneinander im Bild.
 	for i in main.standups.size():
@@ -26,6 +30,11 @@ func _ready() -> void:
 	await get_tree().create_timer(0.6).timeout
 	await RenderingServer.frame_post_draw
 
+	_ausschnitte("getroffen")
+	get_tree().quit()
+
+
+func _ausschnitte(stand: String) -> void:
 	var ordner: String = OS.get_cmdline_user_args()[0] if not OS.get_cmdline_user_args().is_empty() else "user://"
 	var voll := get_viewport().get_texture().get_image()
 	# Beide Baenke liegen auf derselben Hoehe, nur an den Aussenraendern
@@ -34,7 +43,6 @@ func _ready() -> void:
 		r = r.intersection(Rect2i(Vector2i.ZERO, voll.get_size()))
 		var teil := voll.get_region(r)
 		teil.resize(r.size.x * ZOOM, r.size.y * ZOOM, Image.INTERPOLATE_NEAREST)
-		var pfad: String = ordner.path_join("bank_%s.png" % fall[0])
+		var pfad: String = ordner.path_join("bank_%s_%s.png" % [stand, fall[0]])
 		teil.save_png(pfad)
 		print("SHOT ", pfad)
-	get_tree().quit()
