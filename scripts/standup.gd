@@ -31,6 +31,10 @@ var bank: Array = []
 ## So weit muss die Kugel von jedem Target der Bank weg sein, damit die
 ## Sperre faellt.  Der Abstand der Targets untereinander ist 60.
 const BANK_WEG := 75.0
+## So schnell muss die Kugel quer auf das Target zulaufen, damit der Treffer
+## zaehlt.  Eine vorbeirollende Kugel bekommt beim Streifen nur ein paar
+## Dutzend px/s zur Seite ab; ein Schuss vom Spielfeld bringt Hunderte mit.
+const ANFAHRT := 120.0
 var _gesperrt := false
 
 
@@ -110,6 +114,19 @@ func _draw() -> void:
 
 func _on_hit(body: Node2D) -> void:
 	if _cool > 0.0 or not body is PinBall:
+		return
+	# Gezaehlt wird nur ein Treffer auf die Vorderseite.  Eine Kugel, die
+	# senkrecht an der Wand herunterfaellt, kommt oben ueber die Kante herein
+	# und liesse den Buchstaben sonst angehen, ohne dass jemand darauf
+	# gezielt haette - egal wie schnell sie ist.
+	#
+	# Massgeblich ist deshalb die Stelle, nicht der Winkel: die Kugel muss
+	# neben dem Target sein, nicht darueber oder darunter.  Ein steiler Schuss
+	# vom Spielfeld her zaehlt damit weiter, ein Fall auf die Oberkante nicht.
+	# Dazu muss sie sich ueberhaupt auf das Target zu bewegen.
+	var d: Vector2 = (body.global_position - global_position).rotated(-rotation)
+	var v: Vector2 = (body as PinBall).linear_velocity.rotated(-rotation)
+	if absf(d.y) > H / 2.0 + 4.0 or v.x > -ANFAHRT:
 		return
 	_cool = 0.4
 	# Der Treffer klingt und zaehlt immer - nur der Buchstabe geht nicht an,

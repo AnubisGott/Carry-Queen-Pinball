@@ -7,7 +7,11 @@ extends Button
 ## Grundsatz, ohne fremde Grafiken auszukommen, und es gibt keine Frage nach
 ## Markenrechten an einer mitgelieferten Datei.
 
-const URL := "https://www.youtube.com/channel/UCmM0Oqhg9PuJ1iuoL78dWTQ"
+## Das Abzeichen sagt "LIVE" und fuehrt deshalb auch dorthin: die Live-Seite
+## des Kanals.  Laeuft gerade nichts, landet man auf dem Kanal - dieselbe
+## Adresse in ihrer heutigen Form mit Handle statt Kanal-Kennung.  Das
+## Musikvideo hat seinen eigenen Kasten unten in der Chat-Spalte.
+const URL := "https://www.youtube.com/@djanubis5223/live"
 const ROT := Color(0.95, 0.15, 0.15)
 const ROT_HELL := Color(1.0, 0.35, 0.3)
 

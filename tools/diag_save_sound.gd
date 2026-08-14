@@ -73,7 +73,13 @@ func _ready() -> void:
 		print("--- %s komplett ---" % fall[0])
 		_zaehlen_an()
 		for s in fall[1]:
-			s._on_hit(kugel)
+			# Von vorn und auf das Target zu - anders zaehlt es nicht mehr
+			# (siehe standup.gd).  Die geparkte Kugel taugt dafuer nicht.
+			var schuss: PinBall = _main._spawn_ball(s.global_position
+					+ Vector2.RIGHT.rotated(s.rotation) * 30.0)
+			schuss.linear_velocity = -Vector2.RIGHT.rotated(s.rotation) * 400.0
+			s._on_hit(schuss)
+			schuss.queue_free()
 			# Zwischen zwei Buchstaben muss ein Bild vergehen: nur einer je
 			# Vorbeirollen geht an, und die Sperre faellt erst, wenn keine
 			# Kugel mehr bei der Bank ist (siehe standup.gd).  Die Testkugel

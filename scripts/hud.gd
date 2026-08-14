@@ -9,7 +9,10 @@ signal continue_pressed
 const FIELD_W := 540
 const CHAT_W := 120
 const TOTAL_W := FIELD_W + CHAT_W
-const CHAT_LINES := 17
+const CHAT_LINES := 15
+## Hoehe des Musikvideo-Kastens am unteren Ende der Chat-Spalte.  Der Chat
+## wird dafuer entsprechend kuerzer.
+const VIDEO_H := 76
 
 const PINK := Color(1.0, 0.24, 0.62)
 const GREEN := Color(0.35, 0.95, 0.25)
@@ -317,9 +320,15 @@ func _build_chat() -> void:
 	sb.set_corner_radius_all(6)
 	panel.add_theme_stylebox_override("panel", sb)
 	panel.position = Vector2(FIELD_W + 6, 88)
-	panel.size = Vector2(CHAT_W - 12, 868)
+	panel.size = Vector2(CHAT_W - 12, 868 - VIDEO_H - 8)
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(panel)
+
+	# Darunter der Kasten zum Musikvideo - er nimmt das untere Ende der Spalte
+	# fuer sich, damit er nicht im Chat untergeht.
+	var box := YoutubeBox.new(Vector2(CHAT_W - 12, VIDEO_H))
+	box.position = Vector2(FIELD_W + 6, 88 + panel.size.y + 8)
+	add_child(box)
 
 	var head := _label("LIVE CHAT", Vector2(0, 6), 12, GREEN, panel)
 	head.size = Vector2(CHAT_W - 12, 16)

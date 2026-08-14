@@ -270,10 +270,10 @@ static func build(parent: Node2D) -> Dictionary:
 	gate.watch_horn(horn_l)
 	gate.watch_horn(horn_r)
 	parent.add_child(gate)
-	# Wegweiser in dem freien Band zwischen Bumper-Feld und DAMAGE-Bank: zeigt
-	# schraeg nach oben auf die Luecke zwischen den Hoernern und blinkt mit
+	# Wegweiser senkrecht unter den Hoernern, mittig zwischen ihnen (die
+	# stehen bei x = 227 und 263, der Durchlauf bei 245).  Er blinkt mit
 	# ihnen mit, damit man beim Hurry-Up sieht, wohin.
-	var pfeil := TableDeco.new("arrow", Vector2(196, 528), NEON_GOLD, 0.9, 48.0)
+	var pfeil := TableDeco.new("arrow", Vector2(245, 518), NEON_GOLD, 0.75, 0.0)
 	parent.add_child(pfeil)
 	gate.watch_pfeil(pfeil)
 	refs["gate"] = gate
