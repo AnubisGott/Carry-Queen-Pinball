@@ -49,6 +49,23 @@ func _ready() -> void:
 	print("  Datei wasd-complete: %s   erzeugter Jubel ego_up: %s -> %s"
 			% [str(datei), str(jubel),
 			"OK" if datei and not jubel else "ABWEICHUNG"])
+
+	# Dasselbe fuer die abgeraeumte DAMAGE-Bank
+	print("--- DAMAGE-Bank abgeraeumt ---")
+	# Ueber den echten Weg: eine Kugel trifft jedes Ziel, das Ereignis
+	# "drop_target" laesst main die Bank pruefen.
+	var kugel: PinBall = _main._spawn_ball(Vector2(270, 600))
+	kugel.freeze = true
+	_zaehlen_an()
+	for d in _main.drops:
+		d._on_hit(kugel)
+		await get_tree().physics_frame
+	await get_tree().create_timer(0.4).timeout
+	var datei2: bool = _eigene.has("damage-complete")
+	var modus: bool = _erzeugt.has("mode")
+	print("  Datei damage-complete: %s   erzeugter Klang mode: %s -> %s"
+			% [str(datei2), str(modus),
+			"OK" if datei2 and not modus else "ABWEICHUNG"])
 	get_tree().quit()
 
 

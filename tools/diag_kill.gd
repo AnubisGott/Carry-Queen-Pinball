@@ -44,6 +44,19 @@ func _ready() -> void:
 		main._on_bumper(id)
 		await get_tree().physics_frame
 	print("2. Runde: Kills=%d  EGO x%d" % [Game.kills, Game.ego_mult])
+
+	# Waehrend die Hoerner blinken, spielt man weiter und trifft Bumper.  Ist
+	# das Blinken vorbei, muessen trotzdem alle vier dunkel werden - sonst
+	# bleiben die zwischendurch getroffenen an und die naechste Serie faengt
+	# nicht bei null an.
+	main._on_bumper("W")
+	main._on_bumper("A")
+	await get_tree().physics_frame
+	print("waehrend des Blinkens W und A getroffen: markiert %s" % _marken(main))
+	main.hurry_time = 0.05
+	await get_tree().create_timer(0.4).timeout
+	print("danach: markiert %s -> %s" % [_marken(main),
+			"alle dunkel OK" if _marken(main) == "[]" else "FEHLER"])
 	get_tree().quit()
 
 

@@ -23,9 +23,10 @@ const QUEEN_SPOTT := [
 	"War bestimmt der Ping, ne?",
 ]
 
-## Eigene Aufnahme fuer die volle WSAD-Reihe, liegt in assets/sfx/ unter
-## diesem Namen und ersetzt dort den erzeugten Jubel.
+## Eigene Aufnahmen fuer die beiden vollen Baenke, liegen in assets/sfx/ unter
+## diesen Namen und ersetzen dort den erzeugten Jubel.
 const WSAD_KLANG := "wasd-complete"
+const DAMAGE_KLANG := "damage-complete"
 
 const WIZARD_LINES := [
 	"WER MACHT DEN SCHADEN? ICH.",
@@ -516,7 +517,16 @@ func _check_bank() -> void:
 	Game.discipline_done("DAMAGE")
 	Game.frenzy = true
 	frenzy_time = FRENZY_TIME
-	Sfx.play("mode", -3.0)
+	# Die abgeraeumte DAMAGE-Bank hat wie die volle WSAD-Reihe ihren eigenen
+	# Klang.  Pegel wie dort hergeleitet: der erzeugte "mode" hat einen
+	# Effektivwert von 0,157 und lief mit -3 dB, also -19,1 dBFS; die Datei
+	# liegt bei -23,8 dB.  Gleicher Effektivwert waeren +4,7 dB, das reisst
+	# bei 2 Sekunden Laenge zu weit aus - +1 dB haelt sie neben
+	# wasd-complete.
+	if Sfx.hat_klang(DAMAGE_KLANG):
+		Sfx.play(DAMAGE_KLANG, 1.0)
+	else:
+		Sfx.play("mode", -3.0)
 	# Nur die kleine Zeile: dass die Frenzy laeuft und was sie bringt, steht
 	# oben in der Leiste mit Zeitbalken.
 	hud.show_sub("DAMAGE-FRENZY: alles x2. +" + Hud.fmt(pts), 2.0)
@@ -631,6 +641,12 @@ func _check_ich() -> void:
 ## vier Bumper-Markierungen aus (siehe _update_bumper_marks).
 func _end_hurry() -> void:
 	hurry_active = false
+	# Mit dem Blinken endet auch die angefangene Serie.  Waehrend die Hoerner
+	# blinken, leuchten ohnehin alle vier Bumper; was man in dieser Zeit
+	# trifft, blieb danach als halbe Serie stehen - man sah vier an, dann
+	# zwei, ohne dass sich etwas geaendert haette.  Jetzt geht alles aus und
+	# die naechste Serie faengt sichtbar bei null an.
+	streak_letters.clear()
 	_update_bumper_marks()
 
 

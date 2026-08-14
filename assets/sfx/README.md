@@ -61,11 +61,16 @@ und Lizenz. Das Repo ist öffentlich.
 | `tick` | Ticken (Gassen, Glücksrad) | 10-30 ms | sehr leise und kurz |
 | `over` | Game Over | 800-1000 ms | |
 
-Dazu der eigenständige Klang:
+Dazu die eigenständigen Klänge:
 
 | Name | Wann | Dauer | Pegel |
 |---|---|---|---|
-| `wasd-complete` | alle vier Bumper getroffen | 2,0 s | läuft mit -1 dB, angeglichen an den erzeugten `ego_up` |
+| `wasd-complete` | alle vier Bumper getroffen | 2,0 s | -1 dB, angeglichen an den erzeugten `ego_up` |
+| `damage-complete` | DAMAGE-Bank abgeräumt, Frenzy startet | 2,0 s | +1 dB, angeglichen an den erzeugten `mode` |
+
+Angeglichen heißt: der erzeugte Klang und die Datei wurden gemessen und auf
+denselben Effektivwert gebracht, abzüglich ein paar Dezibel, weil die Dateien
+zwei bis drei Mal so lang sind und ihre lauten Stellen sonst herausstechen.
 
 Sprache und Musik liegen weiterhin in `assets/voice/` und `assets/music/`
 (siehe Haupt-README).
