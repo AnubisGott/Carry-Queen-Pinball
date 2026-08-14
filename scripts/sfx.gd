@@ -1099,7 +1099,10 @@ func _lade_eigene_klaenge() -> void:
 	var d := DirAccess.open("res://assets/sfx")
 	if d == null:
 		return
-	for datei in d.get_files():
+	for eintrag in d.get_files():
+		# Wie bei den Spruechen: im fertigen Spiel steht hier der Zeiger
+		# "x.wav.import" statt der Datei selbst.
+		var datei := eintrag.trim_suffix(".import")
 		var e := datei.get_extension().to_lower()
 		if not e in ["ogg", "wav", "mp3"]:
 			continue
@@ -1165,15 +1168,28 @@ func _load_optional_audio() -> void:
 
 func _load_stream(base: String) -> AudioStream:
 	for e in ["ogg", "wav", "mp3"]:
-		if FileAccess.file_exists(base + "." + e):
-			return _lade_datei(base + "." + e)
+		var p: String = base + "." + str(e)
+		# Im fertigen Spiel gibt es die Datei nicht mehr, nur die importierte
+		# Fassung - deshalb zaehlt auch, was der ResourceLoader kennt.
+		if FileAccess.file_exists(p) or ResourceLoader.exists(p):
+			return _lade_datei(p)
 	return null
 
 
-## Eine einzelne Tondatei laden - an der Endung entscheidet sich, wie.  Die
-## Dateien gehen nicht durch den Import des Editors, sie werden beim Start
-## direkt gelesen; deshalb genuegt es, sie ins Verzeichnis zu legen.
+## Eine einzelne Tondatei laden.
+##
+## Zwei Wege, weil es zwei Zustaende gibt.  Aus dem Projektordner heraus liegt
+## die Datei wirklich da und wird roh gelesen - so genuegt es, eine Aufnahme
+## ins Verzeichnis zu legen.  Im fertigen Spiel gibt es sie nicht mehr: Godot
+## wandelt Tondateien beim Import um und packt nur die umgewandelte Fassung
+## ins Paket, daneben eine .import-Datei als Zeiger.  Dort fuehrt allein der
+## ResourceLoader zum Ziel.  Genau daran fehlten im ersten Windows-Build alle
+## Sprueche der Queen.
 func _lade_datei(pfad: String) -> AudioStream:
+	if ResourceLoader.exists(pfad):
+		var r := ResourceLoader.load(pfad)
+		if r is AudioStream:
+			return r
 	match pfad.get_extension().to_lower():
 		"ogg":
 			return AudioStreamOggVorbis.load_from_file(pfad)
@@ -1203,20 +1219,32 @@ func _sammle_stimmen(pfad: String, gefunden: Dictionary, tiefe: int) -> void:
 			if d.current_is_dir():
 				if tiefe < 3:
 					_sammle_stimmen(voll, gefunden, tiefe + 1)
-			elif n.get_extension().to_lower() in ["ogg", "wav", "mp3"]:
+			else:
+				# Im fertigen Spiel steht hier "x.mp3.import" statt "x.mp3" -
+				# die Tondatei selbst ist beim Import umgewandelt worden.  Der
+				# Zeiger nennt aber denselben Pfad, und ueber den laedt sie.
+				var datei := n.trim_suffix(".import")
+				if not datei.get_extension().to_lower() in ["ogg", "wav", "mp3"]:
+					n = d.get_next()
+					continue
+				voll = pfad + "/" + datei
 				# Erst der Dateiname, dann der Ordner darum: manche Werkzeuge
 				# schreiben in einen schoen benannten Ordner eine Datei mit
 				# kryptischem Namen.
-				var fach := _fach_zu(_texthaken(n.get_basename()))
+				var fach := _fach_zu(_texthaken(datei.get_basename()))
 				if fach == "":
 					fach = _fach_zu(_texthaken(pfad.get_file()))
 				if fach == "":
-					_stimme_offen.append(n)
+					if not datei in _stimme_offen:
+						_stimme_offen.append(datei)
 					n = d.get_next()
 					continue
 				if not gefunden.has(fach):
 					gefunden[fach] = []
-				gefunden[fach].append(voll)
+				# Im Projektordner liegen Datei und Zeiger nebeneinander -
+				# beide ergeben denselben Pfad, gezaehlt wird er einmal.
+				if not voll in gefunden[fach]:
+					gefunden[fach].append(voll)
 		n = d.get_next()
 	d.list_dir_end()
 
