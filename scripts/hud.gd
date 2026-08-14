@@ -98,6 +98,8 @@ func _ready() -> void:
 	_build_controls()
 	_build_chat()
 	_build_messages()
+	# Was sie nicht sprechen kann, weil sie schon spricht, schreibt sie.
+	Sfx.stimme_geschrieben.connect(_auf_geschrieben)
 	_build_power()
 	_build_popup()
 	Game.event.connect(_on_game_event)
@@ -337,6 +339,12 @@ func _build_chat() -> void:
 	_chat_vbox.add_theme_constant_override("separation", 5)
 	panel.add_child(_chat_vbox)
 	chat("gleich geht's los!!", "mod_bot")
+
+
+## Ein Satz, der nicht gesprochen werden konnte, kommt geschrieben im Chat -
+## unter ihrem Namen, damit klar ist, wer da redet.
+func _auf_geschrieben(text: String) -> void:
+	chat(text, "CarryQueen")
 
 
 func chat(msg: String, user: String = "") -> void:

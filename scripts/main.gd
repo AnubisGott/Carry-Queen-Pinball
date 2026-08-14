@@ -122,6 +122,10 @@ func _ready() -> void:
 		_take_shot()
 	if "--autotest" in OS.get_cmdline_user_args():
 		autotest = true
+		# Mitschreiben, welche Ansage geschrieben statt gesprochen wurde - so
+		# laesst sich nachzaehlen, wie oft das im Spiel wirklich vorkommt.
+		Sfx.stimme_geschrieben.connect(
+				func(t: String): print("AUTOTEST geschrieben: ", t))
 		# Ohne randomize() wuerfelt Godot in jedem Lauf gleich - fuer
 		# Messreihen brauchen wir unterschiedliche Spielverlaeufe.
 		randomize()
@@ -751,11 +755,22 @@ func _on_drain(body: Node2D) -> void:
 	call_deferred("_after_drain")
 
 
-## Einen Satz mit Abstand hinterherschicken.  Ist das Spiel bis dahin vorbei
-## oder laeuft schon wieder etwas anderes, faellt er aus.
-func _nachsatz(fach: String, warten: float) -> void:
-	await get_tree().create_timer(warten, false).timeout
-	if not Game.game_over:
+## Einen Satz der Reihe nach hinterherschicken: erst `warten` Sekunden, dann
+## so lange, bis sie wirklich frei ist.  Diese Saetze folgen einem anderen -
+## sie stossen nicht zufaellig dazu, sondern gehoeren dahinter.
+##
+## `geduld` begrenzt das Nachwarten: dauert es laenger, wird nicht mehr
+## gewartet, und Sfx schreibt den Satz nach der ueblichen Regel in den Chat.
+func _nachsatz(fach: String, warten: float, geduld: float = 1.6,
+		auch_am_ende: bool = false) -> void:
+	if warten > 0.0:
+		# Am Spielende laeuft der Baum bald angehalten - dort muss die Uhr
+		# trotzdem ticken, sonst kaeme das Schlusswort nie.
+		await get_tree().create_timer(warten, auch_am_ende).timeout
+	var rest := Sfx.stimme_frei_in()
+	if rest > 0.0 and rest <= geduld:
+		await get_tree().create_timer(rest, auch_am_ende).timeout
+	if auch_am_ende or not Game.game_over:
 		Sfx.say(fach)
 
 
@@ -783,7 +798,9 @@ func _after_drain() -> void:
 		Game.ball_save_armed = false
 		# Kein Jubel-Jingle beim Carry-Save: die Rettung kuendigt sich ohnehin
 		# mit Grollen und Countdown an, der Jubel davor war zu viel.
-		Sfx.say("carry_rettet")
+		# Der Ball wird erst noch festgehalten und heruntergezaehlt - da ist
+		# Platz, den Satz kurz nachzuschieben, falls sie eben noch geredet hat.
+		_nachsatz("carry_rettet", 0.0)
 		hud.show_message("MEIN CARRY RETTET.", "Gern geschehen.", 2.5)
 		Game.emit("save")
 		_save_return()
@@ -874,7 +891,12 @@ func _game_over() -> void:
 	_set_dimmed(true)
 	Game.save_best()
 	Sfx.play("over")
-	Sfx.say("outro")
+	# Der letzte Ball geht mit "Kein Skill." verloren, und das Spielende folgt
+	# im selben Atemzug.  Das Schlusswort wartet deshalb ab, bis sie fertig
+	# ist - geschrieben im Chat waere es an dieser Stelle verschenkt.
+	# Beim Schlusswort ist die Geduld am groessten: das Punktefenster steht
+	# ohnehin, bis jemand eine Taste drueckt.
+	_nachsatz("outro", 0.4, 4.0, true)
 	Game.emit("gameover")
 	hud.show_big_gameover()
 	await get_tree().create_timer(2.2, false).timeout
@@ -883,6 +905,9 @@ func _game_over() -> void:
 
 
 func _restart() -> void:
+	# Das Schlusswort des alten Spiels ist hier zu Ende - sonst draengt es die
+	# Begruessung des neuen in den Chat.
+	Sfx.stille()
 	for b in get_tree().get_nodes_in_group("balls"):
 		b.queue_free()
 	locked_balls.clear()

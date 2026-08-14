@@ -103,18 +103,27 @@ func _ready() -> void:
 			laengen.append("%.2f s" % s.get_length())
 		print("  %-12s %d Fassungen: %s" % [f, liste.size(), ", ".join(laengen)])
 
-	print("--- Wuerfeln: keine Fassung zweimal hintereinander ---")
+	print("--- Ziehen: jede Fassung kommt dran, keine zweimal hintereinander ---")
+	# Aus dem Topf gezogen heisst: in je N Ziehungen sind alle N Fassungen
+	# genau einmal dabei.  Ueber drei Baelle hoert man so alles, statt
+	# zufaellig dreimal dasselbe.
 	for f in faecher:
 		var liste: Array = Sfx._voice[f]
 		if liste.size() < 2:
 			continue
+		Sfx._voice_topf.erase(f)
+		Sfx._voice_letzte.erase(f)
 		var folge := PackedStringArray()
 		var letzte := -1
 		var doppelt := 0
+		var block := {}
+		var luecken := 0
 		for i in 30:
-			# Zwischen zwei Saetzen ist sie still - sonst faellt das Beiwerk
-			# nach der Regel unten aus und wir messen gar nichts.
+			# Zwischen zwei Saetzen ist sie still und die Ruhe danach ist um -
+			# sonst wird nach der Regel unten geschrieben statt gesprochen und
+			# wir messen gar nichts.
 			Sfx._voice_player.stop()
+			Sfx._stimme_frei_ab = 0.0
 			Sfx.say(f)
 			# say() merkt sich die Wahl - genau die lesen wir hier ab.
 			var jetzt := int(Sfx._voice_letzte[f])
@@ -122,55 +131,96 @@ func _ready() -> void:
 				doppelt += 1
 			letzte = jetzt
 			folge.append(str(jetzt + 1))
-		if doppelt > 0:
+			# Blockweise pruefen: N Ziehungen, N verschiedene Fassungen
+			block[jetzt] = true
+			if (i + 1) % liste.size() == 0:
+				if block.size() != liste.size():
+					luecken += 1
+				block.clear()
+		if doppelt > 0 or luecken > 0:
 			fehler += 1
-		print("  %s %s  %s" % ["FEHL" if doppelt > 0 else "ok  ", f,
-				" ".join(folge)])
+		print("  %s %-12s %s" % ["FEHL" if doppelt > 0 or luecken > 0 else "ok  ",
+				f, " ".join(folge)])
+		if luecken > 0:
+			print("       %d von %d Bloecken zu je %d Ziehungen unvollstaendig"
+					% [luecken, 30 / liste.size(), liste.size()])
 
-	print("--- Sie faellt sich nicht selbst ins Wort ---")
-	# Beiwerk (hier: der Ballstart-Satz) muss ausfallen, solange noch ein Satz
-	# laeuft; ein wichtiger Satz darf unterbrechen.
-	for fall in [["ball_start", false], ["beste", true]]:
-		var fach: String = fall[0]
-		var darf: bool = fall[1]
+	print("--- Zwei Ansagen dicht hintereinander: die zweite wird geschrieben ---")
+	# Keine Ausnahme mehr, auch nicht fuer die grossen Ansagen: wer in einen
+	# laufenden Satz faellt, wird nicht gesprochen, sondern erscheint als Text.
+	var geschrieben := []
+	Sfx.stimme_geschrieben.connect(func(t: String): geschrieben.append(t))
+	for fach in ["ball_start", "koop", "bericht", "kein_skill"]:
 		if not Sfx.hat_stimme(fach):
 			continue
 		Sfx._voice_player.stop()
-		Sfx.say("koop")
+		Sfx._stimme_frei_ab = 0.0
+		Sfx.say("spott_1")
 		var vorher: AudioStream = Sfx._voice_player.stream
+		geschrieben.clear()
 		Sfx.say(fach)
-		var kam_durch: bool = Sfx._voice_player.stream != vorher
-		var ok := kam_durch == darf
+		var gesprochen: bool = Sfx._voice_player.stream != vorher
+		var soll_text: String = str(Sfx.VOICE_TEXT.get(fach, ""))
+		var ok: bool = not gesprochen and geschrieben == [soll_text]
 		if not ok:
 			fehler += 1
-		print("  %s %-11s waehrend sie spricht: %s (erwartet: %s)"
+		print("  %s %-11s waehrend sie spricht: %s, geschrieben: %s"
 				% ["ok  " if ok else "FEHL", fach,
-				"unterbricht" if kam_durch else "faellt aus",
-				"unterbricht" if darf else "faellt aus"])
+				"gesprochen" if gesprochen else "still",
+				str(geschrieben) if not geschrieben.is_empty() else "nichts"])
+
+	print("--- Die Ruhe nach dem Satz zaehlt mit ---")
+	# Auch wer erst kurz nach dem Ende ankommt, wird noch geschrieben; danach
+	# darf wieder gesprochen werden.
+	Sfx._voice_player.stop()
+	Sfx._stimme_frei_ab = 0.0
+	Sfx.say("kein_skill")
+	var dauer: float = Sfx._voice_player.stream.get_length()
+	var frei: float = Sfx.stimme_frei_in()
+	var ok_abstand: bool = absf(frei - (dauer + Sfx.STIMME_ABSTAND)) < 0.05
+	if not ok_abstand:
+		fehler += 1
+	print("  %s Aufnahme %.2f s + Ruhe %.2f s -> wieder frei in %.2f s"
+			% ["ok  " if ok_abstand else "FEHL", dauer, Sfx.STIMME_ABSTAND, frei])
+
+	print("--- Jedes Fach hat einen geschriebenen Satz ---")
+	# Ohne Text bliebe die Ansage im Konfliktfall ganz weg.
+	var ohne := []
+	for f in Sfx.VOICE_FILES:
+		if str(Sfx.VOICE_TEXT.get(f, "")) == "":
+			ohne.append(f)
+	if ohne.is_empty():
+		print("  ok   alle %d Faecher" % Sfx.VOICE_FILES.size())
+	else:
+		fehler += 1
+		print("  FEHL ohne Text: %s" % ", ".join(PackedStringArray(ohne)))
 
 	print("--- Ballwechsel: kommt der Spott hinter \"Kein Skill.\" durch? ---")
-	# Der neue Ball folgt dem Ballverlust ohne Pause.  Deshalb wartet der
-	# Spott 1,2 s - laenger als die laengste Kein-Skill-Aufnahme.  Hier wird
-	# genau diese Abfolge in echter Zeit nachgestellt.
+	# Der neue Ball folgt dem Ballverlust ohne Pause.  Der Spott wartet 1,2 s
+	# und danach so lange, bis sie wirklich frei ist - sonst landete er im
+	# Chat, obwohl er hier nur der Reihe nach kommen soll.  Genau diese
+	# Abfolge wird hier in echter Zeit nachgestellt.
 	if Sfx.hat_stimme("kein_skill") and Sfx.hat_stimme("spott_1"):
-		var laengste := 0.0
-		for s in Sfx._voice["kein_skill"] as Array:
-			laengste = maxf(laengste, s.get_length())
 		Sfx._voice_player.stop()
+		Sfx._stimme_frei_ab = 0.0
 		Sfx.say("kein_skill")
+		var dauer2: float = Sfx._voice_player.stream.get_length()
 		Sfx.say("spott_1")
-		var sofort := Sfx._voice_player.stream in (Sfx._voice["spott_1"] as Array)
+		var sofort: bool = Sfx._voice_player.stream in (Sfx._voice["spott_1"] as Array)
 		await get_tree().create_timer(1.2).timeout
+		var rest: float = Sfx.stimme_frei_in()
+		if rest > 0.0:
+			await get_tree().create_timer(rest).timeout
 		Sfx.say("spott_1")
-		var spaeter := Sfx._voice_player.stream in (Sfx._voice["spott_1"] as Array)
-		var ok3 := not sofort and spaeter
+		var spaeter: bool = Sfx._voice_player.stream in (Sfx._voice["spott_1"] as Array)
+		var ok3: bool = not sofort and spaeter
 		if not ok3:
 			fehler += 1
-		print("  %s laengstes \"Kein Skill.\" %.2f s, Wartezeit 1,20 s"
-				% ["ok  " if ok3 else "FEHL", laengste])
-		print("       sofort: %s   nach 1,2 s: %s"
-				% ["kommt durch" if sofort else "faellt aus",
-				"kommt durch" if spaeter else "faellt aus"])
+		print("  %s \"Kein Skill.\" %.2f s, dann 1,20 s Wartezeit + %.2f s Nachwarten"
+				% ["ok  " if ok3 else "FEHL", dauer2, rest])
+		print("       sofort: %s   danach: %s"
+				% ["kommt durch" if sofort else "wird geschrieben",
+				"kommt durch" if spaeter else "wird geschrieben"])
 
 	print("--- Faecher, Verdrahtung, Aufnahmen ---")
 	# Jedes Sfx.say() im Code muss ein Fach treffen; jedes Fach, das nirgends

@@ -81,6 +81,10 @@ var _rakete_pitch := RAKETE_PITCH_START
 var _voice: Dictionary = {}
 ## Fach -> zuletzt gespielte Fassung, damit sie sich nicht wiederholt
 var _voice_letzte := {}
+## Fach -> was von den Fassungen dieser Runde noch aussteht
+var _voice_topf := {}
+## Zeitpunkt, ab dem wieder gesprochen werden darf (Sekunden seit Programmstart)
+var _stimme_frei_ab := 0.0
 ## Tondateien in assets/voice/, die zu keinem Satz passten
 var _stimme_offen: Array = []
 var _duck: Tween
@@ -148,10 +152,42 @@ const VOICE_TEXTE := {
 	"der_knopf_oben_links_nicht_so_schwer": "kanal_5",
 }
 
-## Faecher, die einen laufenden Satz unterbrechen duerfen.  Alles andere ist
-## Beiwerk und schweigt, solange sie noch spricht - sonst redet sie sich
-## selbst tot.
-const VOICE_WICHTIG := ["beste", "koop", "bericht", "carry_rettet", "kein_skill", "outro"]
+## Was sie in jedem Fach sagt.  Gebraucht wird das, wenn sie gerade schon
+## spricht: dann faellt der Satz nicht aus, sondern wird geschrieben.
+const VOICE_TEXT := {
+	"koop": "Multiball.",
+	"beste": "Ich bin die Beste.",
+	"carry_rettet": "Mein Carry rettet.",
+	"gern": "Gern geschehen.",
+	"kein_skill": "Kein Skill.",
+	"kein_plan": "Kein Plan.",
+	"ohne_mich": "Ohne mich waert ihr nichts.",
+	"outro": "Du warst auch dabei. Das war bestimmt schoen fuer dich.",
+	"bericht": "Die Ulti beginnt.",
+	"ball_start": "Zeig doch mal, was du kannst.",
+	"spott_1": "Warst du nicht gut genug?",
+	"spott_2": "Einfach mal besser sein.",
+	"spott_3": "Skill-Issue. Nicht meins.",
+	"spott_4": "Ich haette den gehalten. Locker.",
+	"spott_5": "Reflexe wie ein Ladebildschirm.",
+	"spott_6": "Soll ich das auch noch fuer dich machen?",
+	"spott_7": "Uebung. Ganz viel Uebung.",
+	"spott_8": "War bestimmt der Ping, ne?",
+	"kanal_1": "Oben ist der Kanal. Klicken. Jetzt.",
+	"kanal_2": "Abonnieren kostet nichts. Skill schon.",
+	"kanal_3": "Im Stream mache ich das mit einer Hand.",
+	"kanal_4": "Zuschauen kannst du ja wenigstens.",
+	"kanal_5": "Der Knopf oben links. Nicht so schwer.",
+}
+
+## Nach einem Satz bleibt es so lange still, bevor der naechste gesprochen
+## werden darf.  Was in diese Ruhe faellt, wird geschrieben - zwei Ansagen
+## dicht hintereinander klingen sonst gehetzt.
+const STIMME_ABSTAND := 0.8
+
+## Wird gemeldet, wenn ein Satz nicht gesprochen wurde, weil sie schon redet
+## oder eben erst geredet hat.  Der HUD schreibt ihn dann in den Chat.
+signal stimme_geschrieben(text: String)
 
 
 func _ready() -> void:
@@ -359,24 +395,67 @@ func _rakete_regeln(delta: float) -> void:
 
 ## Einen Satz sprechen.  Gibt es mehrere Fassungen, wird gewuerfelt - nur
 ## nicht dieselbe zweimal hintereinander.
+##
+## Zwei Ansagen dicht hintereinander gibt es nicht: wer in einen laufenden
+## Satz oder in die Ruhe danach faellt, wird nicht gesprochen, sondern
+## geschrieben.  Nichts geht verloren, sie redet nur nicht durcheinander.
 func say(line: String) -> void:
 	var fassungen: Array = _voice.get(line, [])
 	if fassungen.is_empty():
 		return
-	# Beiwerk (Spott, Kanal, Nachsaetze) faellt aus, solange noch ein Satz
-	# laeuft.  Sonst schneidet sie sich selbst das Wort ab.
-	if _voice_player.playing and not (line in VOICE_WICHTIG):
+	if _voice_player.playing or stimme_frei_in() > 0.0:
+		var text := str(VOICE_TEXT.get(line, ""))
+		if text != "":
+			stimme_geschrieben.emit(text)
 		return
-	var i := 0
-	if fassungen.size() > 1:
-		i = _rng.randi_range(0, fassungen.size() - 1)
-		if i == int(_voice_letzte.get(line, -1)):
-			i = (i + 1) % fassungen.size()
+	var i := _waehle(line, fassungen.size())
 	_voice_letzte[line] = i
 	var s: AudioStream = fassungen[i]
 	_voice_player.stream = s
 	_voice_player.play()
+	_stimme_frei_ab = _jetzt() + s.get_length() + STIMME_ABSTAND
 	_ducke(s.get_length())
+
+
+## Welche Fassung ist dran?  Nicht gewuerfelt, sondern gezogen: im Topf liegt
+## jede Fassung einmal, und erst wenn er leer ist, wird neu gefuellt.  Ueber
+## drei Baelle hinweg hoert man so alles, was aufgenommen wurde, statt
+## zufaellig dreimal dieselbe.
+func _waehle(line: String, anzahl: int) -> int:
+	var topf: Array = _voice_topf.get(line, [])
+	if topf.is_empty():
+		for i in anzahl:
+			topf.append(i)
+		# Mischen von hinten nach vorn
+		for i in range(topf.size() - 1, 0, -1):
+			var j := _rng.randi_range(0, i)
+			var t: int = topf[i]
+			topf[i] = topf[j]
+			topf[j] = t
+		# Der neue Topf darf nicht mit der Fassung anfangen, mit der der alte
+		# aufgehoert hat - sonst kaeme sie doch zweimal hintereinander.
+		if anzahl > 1 and topf[0] == int(_voice_letzte.get(line, -1)):
+			topf.append(topf.pop_front())
+		_voice_topf[line] = topf
+	return topf.pop_front()
+
+
+## Mitten im Satz abbrechen und die Ruhe danach aufheben.  Gebraucht beim
+## neuen Spiel: das Schlusswort des alten darf die Begruessung nicht in den
+## Chat draengen.
+func stille() -> void:
+	_voice_player.stop()
+	_stimme_frei_ab = 0.0
+
+
+## Wie lange es noch dauert, bis wieder gesprochen werden darf.  Wer einen
+## Nachsatz plant, wartet das ab, statt ihn an den Chat zu verlieren.
+func stimme_frei_in() -> float:
+	return maxf(0.0, _stimme_frei_ab - _jetzt())
+
+
+func _jetzt() -> float:
+	return Time.get_ticks_msec() / 1000.0
 
 
 ## Liegt fuer dieses Fach ueberhaupt eine Aufnahme? (Fuer die Pruefwerkzeuge.)
