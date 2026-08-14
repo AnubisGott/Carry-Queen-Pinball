@@ -189,6 +189,10 @@ const STIMME_ABSTAND := 0.8
 ## oder eben erst geredet hat.  Der HUD schreibt ihn dann in den Chat.
 signal stimme_geschrieben(text: String)
 
+## Gegenstueck dazu: hier wird tatsaechlich gesprochen.  Nur zum Mitschreiben
+## im Autotest - im Spiel haengt nichts daran.
+signal stimme_gesprochen(fach: String)
+
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -414,6 +418,7 @@ func say(line: String) -> void:
 	_voice_player.stream = s
 	_voice_player.play()
 	_stimme_frei_ab = _jetzt() + s.get_length() + STIMME_ABSTAND
+	stimme_gesprochen.emit(line)
 	_ducke(s.get_length())
 
 

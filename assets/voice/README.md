@@ -117,8 +117,11 @@ zusammen aber sehr oft.
 | S8  | „War bestimmt der Ping, ne?"               | „War bestimmt der Ping, ne?"               |
 
 Jede Zeile hat ein eigenes Fach - sie spricht genau den Spruch, der auch  
-dasteht. Beim Ballwechsel kommt er 1,2 Sekunden versetzt, weil davor noch  
-„Kein Skill." vom Ballverlust läuft.
+dasteht.
+
+Beim Ballverlust spricht sie **eins von beiden**: „Kein Skill." oder den Spott  
+zum nächsten Ball, im Verhältnis 5:1. Vorher kamen beide nacheinander, das war  
+einer zu viel. Auf dem Feld steht der Spott trotzdem jedes Mal.
 
 **Das Kürzel darf vorne stehen.** „s1-warst du nicht gut genug1" landet in  
 `spott_1`, „c4-…" in `kanal_4`. Dabei zählt die Nummer, nicht der Wortlaut -  

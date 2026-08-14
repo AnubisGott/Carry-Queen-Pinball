@@ -82,6 +82,12 @@ var _ohne_treffer := 0.0
 ## Erst ab dem Abschuss zaehlt die Uhr - im Schacht wartet man manchmal.
 var _abgeschossen := false
 
+## Ballverluste seit Programmstart und ob dieser hier den Spott bekommt statt
+## "Kein Skill." - siehe wer_spricht_beim_verlust().  Der Zaehler laeuft ueber
+## Spiele hinweg weiter, sonst kaeme der sechste Fall bei drei Baellen nie.
+var _verluste := 0
+var _spott_dran := false
+
 var _touch_flip := {}
 var _touch_launch := {}
 
@@ -122,8 +128,10 @@ func _ready() -> void:
 		_take_shot()
 	if "--autotest" in OS.get_cmdline_user_args():
 		autotest = true
-		# Mitschreiben, welche Ansage geschrieben statt gesprochen wurde - so
+		# Mitschreiben, was sie sagt und was sie stattdessen schreibt - so
 		# laesst sich nachzaehlen, wie oft das im Spiel wirklich vorkommt.
+		Sfx.stimme_gesprochen.connect(
+				func(f: String): print("AUTOTEST gesprochen: ", f))
 		Sfx.stimme_geschrieben.connect(
 				func(t: String): print("AUTOTEST geschrieben: ", t))
 		# Ohne randomize() wuerfelt Godot in jedem Lauf gleich - fuer
@@ -717,6 +725,15 @@ func _end_wizard() -> void:
 	hud.show_message("AM ENDE STEHT MEIN NAME.", "Eure Namen stehen nicht.", 3.0)
 
 
+## Wer spricht beim Ballverlust?  Nicht beide - fuenfmal "Kein Skill.", beim
+## sechsten Mal stattdessen der Spott zum naechsten Ball.  Abgezaehlt statt
+## gewuerfelt, damit das Verhaeltnis wirklich 5:1 ist und nicht dreimal
+## hintereinander derselbe Fall kommt.
+func wer_spricht_beim_verlust() -> String:
+	_verluste += 1
+	return "spott" if _verluste % 6 == 0 else "kein_skill"
+
+
 ## Ein zufaelliger Spott-Spruch der Queen.
 func spott() -> String:
 	return QUEEN_SPOTT[spott_index()]
@@ -810,7 +827,14 @@ func _after_drain() -> void:
 		return
 	# Der Ballverlust ist der lauteste Moment im Spiel - er soll wehtun.
 	Sfx.play("drain", 4.0)
-	Sfx.say("kein_skill")
+	# Folgt noch ein Ball, spricht sie genau eins von beidem: "Kein Skill."
+	# oder den Spott zum naechsten Ball.  Beim letzten Ball gibt es keinen
+	# Spott mehr, dort bleibt es immer bei "Kein Skill.".
+	_spott_dran = false
+	if god_mode or Game.ball_number < Game.balls_per_game:
+		_spott_dran = wer_spricht_beim_verlust() == "spott"
+	if not _spott_dran:
+		Sfx.say("kein_skill")
 	Game.emit("drain")
 	if god_mode:
 		# Ball kostenlos nachlegen, die Ballnummer bleibt stehen
@@ -962,7 +986,10 @@ func _start_ball(first: bool = false) -> void:
 		# ohne den Abstand fiele der Spott jedes Mal aus.
 		var i := spott_index()
 		hud.show_message("BALL %d" % Game.ball_number, QUEEN_SPOTT[i], 2.5)
-		_nachsatz("spott_%d" % (i + 1), 1.2)
+		# Gesprochen wird der Spruch nur, wenn beim Verlust nicht schon
+		# "Kein Skill." kam.  Auf dem Feld steht er in jedem Fall.
+		if _spott_dran:
+			_nachsatz("spott_%d" % (i + 1), 1.2)
 	_ohne_treffer = 0.0
 	_abgeschossen = false
 
