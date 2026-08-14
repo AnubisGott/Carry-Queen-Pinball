@@ -24,8 +24,8 @@ const FLIP_BASE := 0.66
 ## Abschusswinkel ueber der Waagerechten, zur Tischmitte hin.  Am Blattansatz
 ## steil (geht aufs Oberfeld zu den G-G-E-Z-Gassen), an der Spitze flach
 ## (der klassische Querschuss auf die gegenueberliegende Seite).
-const FLIP_ANGLE_BASE := 82.0
-const FLIP_ANGLE_TIP := 60.0
+const FLIP_ANGLE_BASE := 95.0
+const FLIP_ANGLE_TIP := 68.0
 ## Bis hierhin liegt die Kugel praktisch auf dem Lager.  Dort hat auch ein
 ## echter Flipper keine Hebelwirkung: es gibt keinen Schuss, sondern einen
 ## flachen Pass hinueber aufs Blatt des anderen Hebels.  Ab dieser Entfernung

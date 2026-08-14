@@ -40,6 +40,20 @@ func _ready() -> void:
 	for anteil in [0.25, 0.4, 0.5, 0.6, 0.75, 0.9, 1.0]:
 		ergebnis.append(await _schuss(anteil))
 
+	# Die rechte Seite muss spiegelbildlich dasselbe tun.  Der Tisch spiegelt
+	# an x = 245 (siehe table.gd), aus 220 wird also 270 und aus 443 wird 47.
+	print("--- rechter Hebel, gespiegelt (Achse x=245) ---")
+	for anteil in [0.5, 1.0]:
+		var x := await _schuss(anteil, false)
+		var soll: float = 2.0 * 245.0 - (SOLL_MITTE if anteil < 0.75 else SOLL_SPITZE)
+		print("         gespiegeltes Soll %.0f, Abweichung %.0f"
+				% [soll, absf(float(x[1]) - soll) if float(x[1]) > 0.0 else -1.0])
+
+	# Der Geometrie-Teil aendert sich beim Feilen am Hebel nicht - mit
+	# "-- kurz" bleibt er weg und der Durchlauf ist schneller.
+	if "kurz" in OS.get_cmdline_user_args():
+		_bilanz(ergebnis)
+		return
 	print("--- was kaeme durch, wenn die Richtung stimmt? ---")
 	# Unabhaengig vom Hebel: eine Kugel mit gesetzter Geschwindigkeit vom
 	# Blatt aus losschicken.  So trennt sich die Frage "welchen Winkel gibt
@@ -48,6 +62,10 @@ func _ready() -> void:
 	for grad in [0.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0]:
 		await _freier_schuss(grad)
 
+	_bilanz(ergebnis)
+
+
+func _bilanz(ergebnis: Array) -> void:
 	print("--- Soll ---")
 	print("  bei halbem Blatt senkrecht hoch: x bei y=505 nahe %.0f" % SOLL_MITTE)
 	print("  an der Spitze weit nach rechts:  x bei y=505 nahe %.0f" % SOLL_SPITZE)
@@ -69,26 +87,30 @@ func _ready() -> void:
 
 
 ## Ein Schuss aus dem Stand.  Rueckgabe: [Anteil, x auf Bumperhoehe].
-func _schuss(anteil: float) -> Array:
+func _schuss(anteil: float, links: bool = true) -> Array:
+	var hebel: Flipper = _main.flipper_l if links else _main.flipper_r
+	var taste := "flip_left" if links else "flip_right"
+	var seite := 1.0 if links else -1.0
+	var pivot := PIVOT if links else Vector2(2.0 * 245.0 - PIVOT.x, PIVOT.y)
 	for b in get_tree().get_nodes_in_group("balls"):
 		b.queue_free()
 	await get_tree().physics_frame
-	Input.action_release("flip_left")
+	Input.action_release(taste)
 	# Auf das ruhende Blatt legen: Punkt auf der Blattachse, dann quer nach
 	# oben um Kugelradius plus halbe Blattdicke.
-	var achse := Vector2.RIGHT.rotated(deg_to_rad(_main.flipper_l.rest_deg))
-	var quer := achse.rotated(-PI / 2.0)
-	var ball: PinBall = _main._spawn_ball(PIVOT + achse * (anteil * BLATT) + quer * 20.0)
+	var achse := Vector2(seite, 0.0).rotated(deg_to_rad(hebel.rest_deg))
+	var quer := achse.rotated(-PI / 2.0 * seite)
+	var ball: PinBall = _main._spawn_ball(pivot + achse * (anteil * BLATT) + quer * 20.0)
 	ball.linear_velocity = Vector2.ZERO
 	# Nur kurz setzen lassen - laenger, und sie rollt zur Spitze, dann misst
 	# man nicht mehr die gewaehlte Stelle.
 	for i in 12:
 		await get_tree().physics_frame
-	var abstand: float = (ball.global_position - PIVOT).length()
+	var abstand: float = (ball.global_position - pivot).length()
 	# Ueber die Eingabe, nicht ueber den Hebel: main setzt ihn in jedem
 	# Physikbild aus der Tastatur neu, ein direktes set_pressed() waere im
 	# naechsten Bild wieder weg.
-	Input.action_press("flip_left")
+	Input.action_press(taste)
 
 	var v_ab := Vector2.ZERO
 	var x505 := 0.0
@@ -123,7 +145,7 @@ func _schuss(anteil: float) -> Array:
 			break
 		if i > 60 and ball.linear_velocity.y > 0.0 and ball.global_position.y > 820.0:
 			break
-	Input.action_release("flip_left")
+	Input.action_release(taste)
 	var winkel := 0.0
 	if v_ab != Vector2.ZERO:
 		# Winkel gegen die Senkrechte, positiv nach rechts
