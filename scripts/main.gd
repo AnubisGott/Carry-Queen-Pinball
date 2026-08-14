@@ -793,7 +793,11 @@ func _after_drain() -> void:
 		# Der Ball wird erst noch festgehalten und heruntergezaehlt - da ist
 		# Platz, den Satz kurz nachzuschieben, falls sie eben noch geredet hat.
 		_nachsatz("carry_rettet", 0.0)
-		hud.show_message("MEIN CARRY RETTET.", "Gern geschehen.", 2.5)
+		# Die Meldung muss die ganze Rettung ueberdauern: Klack, Grollen,
+		# Zittern und 3-2-1 dauern zusammen rund drei Sekunden, und der
+		# Abschluss-Klang kam bisher erst, nachdem sie schon weg war - ein
+		# Jubel, zu dem nichts mehr auf dem Feld stand.
+		hud.show_message("MEIN CARRY RETTET.", "Gern geschehen.", 3.4)
 		Game.emit("save")
 		_save_return()
 		# Der Nachsatz kommt erst, wenn der erste Satz durch ist - sonst
