@@ -27,6 +27,8 @@ const QUEEN_SPOTT := [
 ## diesen Namen und ersetzen dort den erzeugten Jubel.
 const WSAD_KLANG := "wasd-complete"
 const DAMAGE_KLANG := "damage-complete"
+## Dieselbe Aufnahme fuer beide Buchstaben-Baenke, I-C-H wie E-G-O
+const BANK_KLANG := "ich-oder-ego-complete"
 
 const WIZARD_LINES := [
 	"WER MACHT DEN SCHADEN? ICH.",
@@ -545,7 +547,12 @@ func _check_ego_bank() -> void:
 	_ego_done = true
 	var pts := Game.add_score(5000)
 	Game.discipline_done("EGO")
-	Sfx.play("jackpot", -6.0)
+	# Volle Bank, eigener Klang - dieselbe Aufnahme wie bei I-C-H.  Zwei
+	# Dezibel leiser als dort, weil E-G-O nur die kleine Zeile bekommt.
+	if Sfx.hat_klang(BANK_KLANG):
+		Sfx.play(BANK_KLANG, -5.0)
+	else:
+		Sfx.play("jackpot", -6.0)
 	# Kleine Zeile statt grosser Meldung: die Lampe oben zeigt es ohnehin an.
 	hud.show_sub("E-G-O komplett. +" + Hud.fmt(pts), 2.0)
 
@@ -633,7 +640,14 @@ func _check_ich() -> void:
 	_ich_done = true
 	var pts := Game.add_score(5000)
 	Game.discipline_done("ICH")
-	Sfx.play("jackpot", -4.0)
+	# Pegel wie bei den anderen beiden hergeleitet: der erzeugte "jackpot"
+	# hat einen Effektivwert von 0,134 und lief hier mit -4 dB, also
+	# -21,5 dBFS.  Die Datei liegt mit -19,0 dB deutlich dichter als
+	# wasd- und damage-complete; gleicher Effektivwert sind -3 dB.
+	if Sfx.hat_klang(BANK_KLANG):
+		Sfx.play(BANK_KLANG, -3.0)
+	else:
+		Sfx.play("jackpot", -4.0)
 	hud.show_message("ICH. WER SONST.", "+" + Hud.fmt(pts), 2.2)
 
 

@@ -17,9 +17,10 @@ Klang.
 Eine Datei, deren Name zu **keinem** erzeugten Klang gehört, steht für sich:
 sie liegt unter nichts und wird mit ihrem Dateinamen abgerufen. Sie läuft
 unverändert, ohne die sonst übliche Streuung in Tonhöhe und Pegel - so etwas
-ist meist ein Jingle und kein Anschlag. Beim Start meldet das Spiel sie als
-`Sfx: eigene Klaenge ...`. Derzeit ist das `wasd-complete`: die volle
-WSAD-Reihe hat damit ihren eigenen Klang statt des erzeugten Jubels `ego_up`.
+ist meist ein Jingle und kein Anschlag. Groß- und Kleinschreibung des
+Dateinamens ist dabei egal. Beim Start meldet das Spiel sie als
+`Sfx: eigene Klaenge ...`; welche es derzeit gibt, steht unten in der zweiten
+Tabelle.
 
 **Formate:** `.ogg`, `.wav` oder `.mp3`, in dieser Reihenfolge gesucht.
 Beispiel: `assets/sfx/flip.ogg` ersetzt das Flipper-Geräusch.
@@ -67,6 +68,7 @@ Dazu die eigenständigen Klänge:
 |---|---|---|---|
 | `wasd-complete` | alle vier Bumper getroffen | 2,0 s | -1 dB, angeglichen an den erzeugten `ego_up` |
 | `damage-complete` | DAMAGE-Bank abgeräumt, Frenzy startet | 2,0 s | +1 dB, angeglichen an den erzeugten `mode` |
+| `ich-oder-ego-complete` | I-C-H-Bank oder E-G-O-Bank komplett | 2,0 s | -3 dB bei I-C-H, -5 dB bei E-G-O; angeglichen an den erzeugten `jackpot` |
 
 Angeglichen heißt: der erzeugte Klang und die Datei wurden gemessen und auf
 denselben Effektivwert gebracht, abzüglich ein paar Dezibel, weil die Dateien

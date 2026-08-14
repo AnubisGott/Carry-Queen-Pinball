@@ -66,6 +66,20 @@ func _ready() -> void:
 	print("  Datei damage-complete: %s   erzeugter Klang mode: %s -> %s"
 			% [str(datei2), str(modus),
 			"OK" if datei2 and not modus else "ABWEICHUNG"])
+
+	# Beide Buchstaben-Baenke teilen sich eine Aufnahme.  Auch hier ueber den
+	# echten Weg: die Kugel trifft jedes Ziel der Bank.
+	for fall in [["I-C-H", _main.standups], ["E-G-O", _main.ego_bank]]:
+		print("--- %s komplett ---" % fall[0])
+		_zaehlen_an()
+		for s in fall[1]:
+			s._on_hit(kugel)
+			await get_tree().physics_frame
+		await get_tree().create_timer(0.4).timeout
+		var d3: bool = _eigene.has("ich-oder-ego-complete")
+		var j3: bool = _erzeugt.has("jackpot")
+		print("  Datei ich-oder-ego-complete: %s   erzeugter jackpot: %s -> %s"
+				% [str(d3), str(j3), "OK" if d3 and not j3 else "ABWEICHUNG"])
 	get_tree().quit()
 
 

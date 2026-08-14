@@ -348,8 +348,9 @@ func play(snd: String, volume_db: float = 0.0, nur_erzeugt: bool = false) -> voi
 	if not _streams.has(snd):
 		# Eine Datei, zu der es keinen erzeugten Klang gibt, laeuft allein -
 		# unveraendert, denn so etwas ist meist ein Jingle und kein Anschlag.
-		if _nur_datei.has(snd):
-			_spiele(_nur_datei[snd], volume_db, 1.0)
+		var k := snd.to_lower()
+		if _nur_datei.has(k):
+			_spiele(_nur_datei[k], volume_db, 1.0)
 		return
 	var tonhoehe := 1.0
 	var pegel := volume_db
@@ -1102,7 +1103,10 @@ func _lade_eigene_klaenge() -> void:
 		var e := datei.get_extension().to_lower()
 		if not e in ["ogg", "wav", "mp3"]:
 			continue
-		var name := datei.get_basename()
+		# Klein geschrieben abgelegt, damit die Schreibweise des Dateinamens
+		# keine Rolle spielt - "Ich-oder-Ego-complete.wav" wird ueber
+		# "ich-oder-ego-complete" gefunden.
+		var name := datei.get_basename().to_lower()
 		if _streams.has(name) or _nur_datei.has(name):
 			continue
 		var s := _lade_datei("res://assets/sfx/" + datei)
@@ -1116,7 +1120,7 @@ func _lade_eigene_klaenge() -> void:
 
 ## Gibt es diesen Klang ueberhaupt - erzeugt oder als eigene Datei?
 func hat_klang(snd: String) -> bool:
-	return _streams.has(snd) or _nur_datei.has(snd)
+	return _streams.has(snd) or _nur_datei.has(snd.to_lower())
 
 
 ## Dauerklaenge muessen in Schleife laufen, sonst brechen sie nach einmal ab.
