@@ -9,6 +9,8 @@ const MAIN := preload("res://scenes/main.tscn")
 var _main: Node2D
 var _aufnahmen := {}
 var _erzeugt := {}
+## Dateien ohne erzeugtes Gegenstueck - die laufen allein
+var _eigene := {}
 
 
 func _ready() -> void:
@@ -33,12 +35,27 @@ func _ready() -> void:
 	Sfx.play("drain", 4.0)
 	await get_tree().create_timer(0.6).timeout
 	_bericht(["drain"], true)
+
+	# Die volle WSAD-Reihe hat eine eigene Aufnahme.  Die soll den erzeugten
+	# Jubel ersetzen, nicht neben ihm laufen.
+	print("--- WSAD komplett ---")
+	_zaehlen_an()
+	for id in ["W", "A", "S", "D"]:
+		_main._on_bumper(id)
+		await get_tree().physics_frame
+	await get_tree().create_timer(0.4).timeout
+	var datei: bool = _eigene.has("wasd-complete")
+	var jubel: bool = _erzeugt.has("ego_up")
+	print("  Datei wasd-complete: %s   erzeugter Jubel ego_up: %s -> %s"
+			% [str(datei), str(jubel),
+			"OK" if datei and not jubel else "ABWEICHUNG"])
 	get_tree().quit()
 
 
 func _zaehlen_an() -> void:
 	_aufnahmen.clear()
 	_erzeugt.clear()
+	_eigene.clear()
 	set_process(true)
 
 
@@ -51,6 +68,9 @@ func _process(_d: float) -> void:
 				_erzeugt[name] = true
 			elif Sfx._aus_datei.has(name) and p.stream == Sfx._aus_datei[name]:
 				_aufnahmen[name] = true
+		for name in Sfx._nur_datei:
+			if p.stream == Sfx._nur_datei[name]:
+				_eigene[name] = true
 
 
 func _bericht(namen: Array, aufnahme_erwartet: bool) -> void:

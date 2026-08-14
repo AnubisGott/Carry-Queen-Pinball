@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://by1ag8ukcsuqa"
+path="res://.godot/imported/mein carry rettet4.MP3-1ec4c65188bfe2424a9940830268609e.mp3str"
+
+[deps]
+
+source_file="res://assets/voice/mein carry rettet4/mein carry rettet4.MP3"
+dest_files=["res://.godot/imported/mein carry rettet4.MP3-1ec4c65188bfe2424a9940830268609e.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

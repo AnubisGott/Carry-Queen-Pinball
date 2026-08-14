@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://8h5y6bi2k7ay"
+path="res://.godot/imported/kein plan1.MP3-1c4cd0f038c10cfa13eb5574a410755b.mp3str"
+
+[deps]
+
+source_file="res://assets/voice/kein plan1/kein plan1.MP3"
+dest_files=["res://.godot/imported/kein plan1.MP3-1c4cd0f038c10cfa13eb5574a410755b.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://kpbckel5qgm7"
+path="res://.godot/imported/du warst auch dabei das bestimmt schoen fuer dich2.MP3-fef88c593c2ab997e530192cb53067b0.mp3str"
+
+[deps]
+
+source_file="res://assets/voice/du warst auch dabei das bestimmt schoen fuer dich2/du warst auch dabei das bestimmt schoen fuer dich2.MP3"
+dest_files=["res://.godot/imported/du warst auch dabei das bestimmt schoen fuer dich2.MP3-fef88c593c2ab997e530192cb53067b0.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

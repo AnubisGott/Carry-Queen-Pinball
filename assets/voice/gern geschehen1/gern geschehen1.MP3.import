@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://jb7kcxh2i484"
+path="res://.godot/imported/gern geschehen1.MP3-8fff091c0968f3bc26adc69469428c0f.mp3str"
+
+[deps]
+
+source_file="res://assets/voice/gern geschehen1/gern geschehen1.MP3"
+dest_files=["res://.godot/imported/gern geschehen1.MP3-8fff091c0968f3bc26adc69469428c0f.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

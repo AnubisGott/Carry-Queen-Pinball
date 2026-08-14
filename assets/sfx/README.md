@@ -8,9 +8,18 @@ bleibt also erhalten, die Aufnahme gibt ihm nur Körper.
 
 Wie leise, steht in `scripts/sfx.gd` als `DATEI_DB`.
 
-**Ausnahme:** die beiden Dauerklänge `roll` und `rakete` hängen an einem
-eigenen Spieler mit geregelter Lautstärke und Tonhöhe - dort *ersetzt* eine
-Datei den erzeugten Klang.
+**Zwei Ausnahmen:**
+
+Die Dauerklänge `roll` und `rakete` hängen an einem eigenen Spieler mit
+geregelter Lautstärke und Tonhöhe - dort *ersetzt* eine Datei den erzeugten
+Klang.
+
+Eine Datei, deren Name zu **keinem** erzeugten Klang gehört, steht für sich:
+sie liegt unter nichts und wird mit ihrem Dateinamen abgerufen. Sie läuft
+unverändert, ohne die sonst übliche Streuung in Tonhöhe und Pegel - so etwas
+ist meist ein Jingle und kein Anschlag. Beim Start meldet das Spiel sie als
+`Sfx: eigene Klaenge ...`. Derzeit ist das `wasd-complete`: die volle
+WSAD-Reihe hat damit ihren eigenen Klang statt des erzeugten Jubels `ego_up`.
 
 **Formate:** `.ogg`, `.wav` oder `.mp3`, in dieser Reihenfolge gesucht.
 Beispiel: `assets/sfx/flip.ogg` ersetzt das Flipper-Geräusch.
@@ -51,6 +60,12 @@ und Lizenz. Das Repo ist öffentlich.
 | `count_go` | Countdown-Ende | 200-300 ms | |
 | `tick` | Ticken (Gassen, Glücksrad) | 10-30 ms | sehr leise und kurz |
 | `over` | Game Over | 800-1000 ms | |
+
+Dazu der eigenständige Klang:
+
+| Name | Wann | Dauer | Pegel |
+|---|---|---|---|
+| `wasd-complete` | alle vier Bumper getroffen | 2,0 s | läuft mit -1 dB, angeglichen an den erzeugten `ego_up` |
 
 Sprache und Musik liegen weiterhin in `assets/voice/` und `assets/music/`
 (siehe Haupt-README).

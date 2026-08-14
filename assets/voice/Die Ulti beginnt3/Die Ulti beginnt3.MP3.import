@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://cxft3y0b6ma26"
+path="res://.godot/imported/Die Ulti beginnt3.MP3-5a5af9e66be7e94c991a4f73f822d54c.mp3str"
+
+[deps]
+
+source_file="res://assets/voice/Die Ulti beginnt3/Die Ulti beginnt3.MP3"
+dest_files=["res://.godot/imported/Die Ulti beginnt3.MP3-5a5af9e66be7e94c991a4f73f822d54c.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

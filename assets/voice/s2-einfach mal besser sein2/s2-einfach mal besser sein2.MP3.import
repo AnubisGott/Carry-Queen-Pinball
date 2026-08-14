@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://bin2o7n7uq1tu"
+path="res://.godot/imported/s2-einfach mal besser sein2.MP3-aa2efb75b336b60f14191f10eb9e1bb2.mp3str"
+
+[deps]
+
+source_file="res://assets/voice/s2-einfach mal besser sein2/s2-einfach mal besser sein2.MP3"
+dest_files=["res://.godot/imported/s2-einfach mal besser sein2.MP3-aa2efb75b336b60f14191f10eb9e1bb2.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

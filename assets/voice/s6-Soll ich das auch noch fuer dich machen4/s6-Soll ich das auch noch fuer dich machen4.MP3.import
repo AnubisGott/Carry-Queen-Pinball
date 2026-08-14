@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://dvr3lxxpwlo3g"
+path="res://.godot/imported/s6-Soll ich das auch noch fuer dich machen4.MP3-6eabd6136c93e85e5b138a5136a52f48.mp3str"
+
+[deps]
+
+source_file="res://assets/voice/s6-Soll ich das auch noch fuer dich machen4/s6-Soll ich das auch noch fuer dich machen4.MP3"
+dest_files=["res://.godot/imported/s6-Soll ich das auch noch fuer dich machen4.MP3-6eabd6136c93e85e5b138a5136a52f48.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

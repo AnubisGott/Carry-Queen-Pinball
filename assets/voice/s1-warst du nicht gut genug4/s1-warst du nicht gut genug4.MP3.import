@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://dvq62do27f0di"
+path="res://.godot/imported/s1-warst du nicht gut genug4.MP3-2ab80c443e74106b0643804e7d5071f1.mp3str"
+
+[deps]
+
+source_file="res://assets/voice/s1-warst du nicht gut genug4/s1-warst du nicht gut genug4.MP3"
+dest_files=["res://.godot/imported/s1-warst du nicht gut genug4.MP3-2ab80c443e74106b0643804e7d5071f1.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

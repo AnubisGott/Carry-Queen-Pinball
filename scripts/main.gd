@@ -23,6 +23,10 @@ const QUEEN_SPOTT := [
 	"War bestimmt der Ping, ne?",
 ]
 
+## Eigene Aufnahme fuer die volle WSAD-Reihe, liegt in assets/sfx/ unter
+## diesem Namen und ersetzt dort den erzeugten Jubel.
+const WSAD_KLANG := "wasd-complete"
+
 const WIZARD_LINES := [
 	"WER MACHT DEN SCHADEN? ICH.",
 	"WER HOLT DIE KILLS? ICH.",
@@ -469,7 +473,16 @@ func _on_bumper(letter: String) -> void:
 		var pts := Game.add_score(3000)
 		# Der Kill ist die einzige Quelle fuer den Ego-Multiplikator.
 		Game.ego_level_up()
-		Sfx.play("ego_up", -3.0)
+		# Die volle WSAD-Reihe hat einen eigenen Klang: assets/sfx/
+		# wasd-complete.wav.  Fehlt die Datei, bleibt es beim erzeugten Jubel.
+		# Der Pegel ist an ihn angeglichen: ego_up hat einen Effektivwert von
+		# 0,140 und lief mit -3 dB, die Datei liegt bei -21,3 dB - macht
+		# rechnerisch +1,2 dB.  Zwei Dezibel darunter, weil die Datei
+		# doppelt so lang ist und ihre lauten Stellen sonst herausstechen.
+		if Sfx.hat_klang(WSAD_KLANG):
+			Sfx.play(WSAD_KLANG, -1.0)
+		else:
+			Sfx.play("ego_up", -3.0)
 		Game.emit("kill")
 		if hurry_active:
 			hud.show_message("KILL BESTAETIGT (%d)" % Game.kills,

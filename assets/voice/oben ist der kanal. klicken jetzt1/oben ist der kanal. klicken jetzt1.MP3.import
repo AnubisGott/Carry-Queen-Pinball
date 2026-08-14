@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://cibbsm2uwjn67"
+path="res://.godot/imported/oben ist der kanal. klicken jetzt1.MP3-3292288733e08abaa84420dafaf8df67.mp3str"
+
+[deps]
+
+source_file="res://assets/voice/oben ist der kanal. klicken jetzt1/oben ist der kanal. klicken jetzt1.MP3"
+dest_files=["res://.godot/imported/oben ist der kanal. klicken jetzt1.MP3-3292288733e08abaa84420dafaf8df67.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

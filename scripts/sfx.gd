@@ -95,6 +95,8 @@ var _bau_task := -1
 var _rng := RandomNumberGenerator.new()
 ## Klangname -> Aufnahme aus assets/sfx/, die zusaetzlich mitlaeuft
 var _aus_datei := {}
+## Dateiname -> Klang, der fuer sich steht (kein erzeugtes Gegenstueck)
+var _nur_datei := {}
 
 const VOICE_FILES := {
 	"koop": "koop_modus",
@@ -344,6 +346,10 @@ func _neuer_bus(bus_name: String) -> int:
 ## weil gerade keine Feder gespannt wird.
 func play(snd: String, volume_db: float = 0.0, nur_erzeugt: bool = false) -> void:
 	if not _streams.has(snd):
+		# Eine Datei, zu der es keinen erzeugten Klang gibt, laeuft allein -
+		# unveraendert, denn so etwas ist meist ein Jingle und kein Anschlag.
+		if _nur_datei.has(snd):
+			_spiele(_nur_datei[snd], volume_db, 1.0)
 		return
 	var tonhoehe := 1.0
 	var pegel := volume_db
@@ -1082,6 +1088,35 @@ func _lade_sfx_dateien() -> void:
 		var namen := _aus_datei.keys()
 		namen.sort()
 		print("Sfx: Aufnahmen liegen unter %s" % ", ".join(PackedStringArray(namen)))
+	_lade_eigene_klaenge()
+
+
+## Dateien in assets/sfx/, zu denen es keinen erzeugten Klang gibt.  Die
+## ersetzen nichts und liegen unter nichts - sie sind ein Klang fuer sich und
+## werden mit ihrem Dateinamen abgerufen, etwa play("wasd-complete").
+func _lade_eigene_klaenge() -> void:
+	var d := DirAccess.open("res://assets/sfx")
+	if d == null:
+		return
+	for datei in d.get_files():
+		var e := datei.get_extension().to_lower()
+		if not e in ["ogg", "wav", "mp3"]:
+			continue
+		var name := datei.get_basename()
+		if _streams.has(name) or _nur_datei.has(name):
+			continue
+		var s := _lade_datei("res://assets/sfx/" + datei)
+		if s != null:
+			_nur_datei[name] = s
+	if not _nur_datei.is_empty():
+		var namen := _nur_datei.keys()
+		namen.sort()
+		print("Sfx: eigene Klaenge %s" % ", ".join(PackedStringArray(namen)))
+
+
+## Gibt es diesen Klang ueberhaupt - erzeugt oder als eigene Datei?
+func hat_klang(snd: String) -> bool:
+	return _streams.has(snd) or _nur_datei.has(snd)
 
 
 ## Dauerklaenge muessen in Schleife laufen, sonst brechen sie nach einmal ab.

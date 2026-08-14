@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://bm205xod56w8c"
+path="res://.godot/imported/s7-Uebung Ganz viel Uebung5.MP3-f0e71269f8061120857bc7c2db326e79.mp3str"
+
+[deps]
+
+source_file="res://assets/voice/s7-Uebung Ganz viel Uebung5/s7-Uebung Ganz viel Uebung5.MP3"
+dest_files=["res://.godot/imported/s7-Uebung Ganz viel Uebung5.MP3-f0e71269f8061120857bc7c2db326e79.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

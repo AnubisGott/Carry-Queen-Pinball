@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://tjag5lurehg2"
+path="res://.godot/imported/s6-Soll ich das auch noch fuer dich machen1.MP3-1fb7c0398d5d23469e9499c1e0c62caf.mp3str"
+
+[deps]
+
+source_file="res://assets/voice/s6-Soll ich das auch noch fuer dich machen1/s6-Soll ich das auch noch fuer dich machen1.MP3"
+dest_files=["res://.godot/imported/s6-Soll ich das auch noch fuer dich machen1.MP3-1fb7c0398d5d23469e9499c1e0c62caf.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

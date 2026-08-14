@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://ddnjsxqs6rrws"
+path="res://.godot/imported/s8-War bestimmt der Ping ne4.MP3-efa2ba04aa0aaf144737acbf0d3dd43b.mp3str"
+
+[deps]
+
+source_file="res://assets/voice/s8-War bestimmt der Ping ne4/s8-War bestimmt der Ping ne4.MP3"
+dest_files=["res://.godot/imported/s8-War bestimmt der Ping ne4.MP3-efa2ba04aa0aaf144737acbf0d3dd43b.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

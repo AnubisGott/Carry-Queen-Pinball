@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://d1fpnfhesgvjg"
+path="res://.godot/imported/kein skill3.MP3-311f9b93108a31e1c187131ed2e959c2.mp3str"
+
+[deps]
+
+source_file="res://assets/voice/kein skill3/kein skill3.MP3"
+dest_files=["res://.godot/imported/kein skill3.MP3-311f9b93108a31e1c187131ed2e959c2.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4
