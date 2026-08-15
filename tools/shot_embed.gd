@@ -7,14 +7,25 @@ extends Node
 ## Fassungen: einmal wie gesehen, einmal abgedunkelt, damit der pinke Knopf in
 ## der Mitte dagegen ankommt.
 ##
-##   godot --path . --resolution 1320x1920 res://tools/shot_embed.tscn -- <ordner>
+##   godot --path . --resolution 662x992 res://tools/shot_embed.tscn -- <ordner>
 ##
-## Die Wunschgroesse ist doppelte Spielgroesse.  Passt sie nicht auf den
-## Bildschirm, verkleinert Windows das Fenster - dann kommt eben weniger heraus
-## (auf einem 1920x1080-Schirm rund 976x1421).  Das genuegt: der Rahmen bei
-## itch.io ist 662x992, das Bild soll nur etwas groesser sein als er.
+## Die Groesse muss genau der Rahmengroesse bei itch.io entsprechen (dort unter
+## "Viewport dimensions", hier 662x992).  Der Rahmen zeigt das Bild 1:1 und
+## mittig - er verkleinert es nicht.  Ein groesseres Bild wird also
+## beschnitten: bei 976x1421 sah man nur den mittleren Ausschnitt des Tisches.
+##
+## Der Tisch selbst misst 660x960.  Die 32 Pixel Unterschied in der Hoehe
+## bleiben als schmaler Rand oben und unten stehen, in der Farbe des
+## Hintergrunds - das faellt neben dem dunklen Tisch nicht auf.
 
 const MAIN := preload("res://scenes/main.tscn")
+
+## Groesse des Rahmens bei itch.io.  Das fertige Bild bekommt genau dieses Mass,
+## egal was das Fenster hergibt: Windows liefert nicht immer die angeforderte
+## Groesse zurueck (bei 662x992 kamen 662x962 heraus, der Rest ging an den
+## Fensterrahmen).  Ein zu grosses Bild wuerde beschnitten, ein zu kleines
+## saesse verrutscht.
+const ZIEL := Vector2i(662, 992)
 
 ## Ereignisse, die der Chat kommentiert.  Die stehen in main.gd nicht in der
 ## Verteilung, koennen also nichts am Spielstand verstellen - hier soll sich
@@ -46,7 +57,7 @@ func _ready() -> void:
 	main._spawn_ball(Vector2(150, 430)).freeze = true
 
 	await RenderingServer.frame_post_draw
-	var bild := get_viewport().get_texture().get_image()
+	var bild := _auf_mass(get_viewport().get_texture().get_image())
 	bild.save_png(ordner.path_join("embed-bg.png"))
 
 	# Zweite Fassung, abgedunkelt.  Eine schwarze Scheibe im Spiel selbst ginge
@@ -64,6 +75,25 @@ func _ready() -> void:
 
 	print("geschrieben: %s (%dx%d)" % [ordner, bild.get_width(), bild.get_height()])
 	get_tree().quit()
+
+
+## Bringt die Aufnahme auf ZIEL: mittig eingesetzt, Rest in der Farbe des
+## Spielhintergrunds.  Ist die Aufnahme groesser, wird mittig ausgeschnitten.
+func _auf_mass(roh: Image) -> Image:
+	if roh.get_size() == ZIEL:
+		return roh
+	var quelle := roh.duplicate() as Image
+	quelle.convert(Image.FORMAT_RGBA8)
+	var neu := Image.create(ZIEL.x, ZIEL.y, false, Image.FORMAT_RGBA8)
+	neu.fill(ProjectSettings.get_setting(
+			"rendering/environment/defaults/default_clear_color", Color.BLACK))
+	var mass := Vector2i(mini(quelle.get_width(), ZIEL.x),
+			mini(quelle.get_height(), ZIEL.y))
+	neu.blit_rect(quelle, Rect2i((quelle.get_size() - mass) / 2, mass),
+			(ZIEL - mass) / 2)
+	print("Aufnahme %dx%d -> %dx%d" % [roh.get_width(), roh.get_height(),
+			ZIEL.x, ZIEL.y])
+	return neu
 
 
 ## Zum Rendern braucht Godot ein echtes Fenster.  Es liegt weit ausserhalb des
