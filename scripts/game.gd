@@ -92,6 +92,21 @@ func discipline_done(disc: String) -> void:
 	emit("all_disciplines")
 
 
+## Eine Disziplin ausdruecklich an- oder abschalten.  Der Regelfall ist
+## `discipline_done`, also "an" - nur der kann den Bericht ausloesen.  Wieder
+## aus geht bisher allein WSAD: die vier Bumper leuchten nicht bis zum Bericht,
+## sondern nur, solange das Hurry-Up laeuft.  Die Leiste oben soll zeigen, was
+## auf dem Feld wirklich ansteht.
+func set_discipline(disc: String, on: bool) -> void:
+	if on:
+		discipline_done(disc)
+		return
+	if not disciplines.get(disc, false):
+		return
+	disciplines[disc] = false
+	emit("discipline", {"name": disc, "an": false})
+
+
 func reset_disciplines() -> void:
 	for k in disciplines:
 		disciplines[k] = false

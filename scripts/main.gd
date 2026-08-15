@@ -499,10 +499,16 @@ func _on_bumper(letter: String) -> void:
 		# moeglich.
 		streak_letters.clear()
 		Game.kills += 1
-		# Alle vier Bumper einmal getroffen - das ist die Disziplin, die oben
-		# in der Leiste als WSAD steht.  Sie bleibt an bis zum Spielende oder
-		# bis der Bericht durch ist (dort setzt _end_wizard sie zurueck).
-		Game.discipline_done("CARRY")
+		# Das Hurry-Up wird zuerst gestartet, denn an ihm haengt beides: die
+		# vier leuchtenden Bumper und die Disziplin WSAD in der Leiste oben
+		# (beides setzt _update_bumper_marks am Ende dieser Funktion).  Meldete
+		# man die Disziplin vorher, koennte der Bericht in einem Moment
+		# losgehen, in dem die Lampen noch aus sind.
+		var lief_schon := hurry_active
+		if not lief_schon:
+			hurry_active = true
+			hurry_value = 25000
+			hurry_time = 12.0
 		var pts := Game.add_score(3000)
 		# Der Kill ist die einzige Quelle fuer den Ego-Multiplikator.
 		Game.ego_level_up()
@@ -517,15 +523,12 @@ func _on_bumper(letter: String) -> void:
 		else:
 			Sfx.play("ego_up", -3.0)
 		Game.emit("kill")
-		if hurry_active:
+		if lief_schon:
 			hud.show_message("KILL BESTAETIGT (%d)" % Game.kills,
 					"EGO x%d. +%s" % [Game.ego_mult, Hud.fmt(pts)], 2.2)
 		else:
-			# Zusaetzlich startet die Serie das Hurry-Up; kassiert wird es am
-			# blinkenden Durchlauf in der Mitte (siehe _on_event "gate").
-			hurry_active = true
-			hurry_value = 25000
-			hurry_time = 12.0
+			# Kassiert wird das Hurry-Up am blinkenden Durchlauf in der Mitte
+			# (siehe _on_event "gate").
 			hud.show_message("KILL BESTAETIGT (%d)" % Game.kills,
 					"EGO x%d - Hurry-Up: ab durch die MITTE!" % Game.ego_mult, 2.5)
 	_update_bumper_marks()
@@ -536,9 +539,16 @@ func _on_bumper(letter: String) -> void:
 ## blinken, bleiben alle vier an: die Serie ist ja komplett und wartet nur
 ## noch darauf, am Durchlauf kassiert zu werden.  Aus gehen sie erst, wenn
 ## das Hurry-Up vorbei ist - kassiert oder abgelaufen.
+##
+## Dieselbe Stelle setzt die Disziplin WSAD: oben in der Leiste soll genau das
+## stehen, was unten auf dem Feld leuchtet.  Anders als DMG, EGO und ICH, die
+## bis zum Ende des Berichts stehen bleiben, raeumt sich WSAD selbst wieder ab
+## - und weil der Bericht alle vier Disziplinen gleichzeitig verlangt, kann er
+## dadurch nur starten, solange die vier Bumper auch wirklich brennen.
 func _update_bumper_marks() -> void:
 	for letter in bumpers:
 		bumpers[letter].set_marked(hurry_active or streak_letters.has(letter))
+	Game.set_discipline("CARRY", hurry_active)
 
 
 func _check_bank() -> void:
@@ -681,8 +691,9 @@ func _check_ich() -> void:
 	hud.show_message("ICH. WER SONST.", "+" + Hud.fmt(pts), 2.2)
 
 
-## Hurry-Up beendet - ob kassiert oder abgelaufen.  Erst jetzt gehen die
-## vier Bumper-Markierungen aus (siehe _update_bumper_marks).
+## Hurry-Up beendet - ob kassiert oder abgelaufen.  Erst jetzt gehen die vier
+## Bumper-Markierungen aus und mit ihnen die Disziplin WSAD in der Leiste
+## (siehe _update_bumper_marks).
 func _end_hurry() -> void:
 	hurry_active = false
 	# Mit dem Blinken endet auch die angefangene Serie.  Waehrend die Hoerner
@@ -726,6 +737,10 @@ func _end_wizard() -> void:
 	for s in ego_bank:
 		s.reset()
 	Game.reset_disciplines()
+	# WSAD haengt nicht am Bericht, sondern an den vier Bumpern.  Laeuft das
+	# Hurry-Up noch, leuchten sie weiter - dann steht die Disziplin auch oben
+	# wieder da.  Sonst zeigte die Leiste Dunkel und das Feld Licht.
+	_update_bumper_marks()
 	for d in drops:
 		d.reset()
 	for s in standups:
@@ -960,8 +975,10 @@ func _restart() -> void:
 	_ich_done = false
 	_ego_done = false
 	streak_letters.clear()
-	_update_bumper_marks()
+	# Erst das Hurry-Up aus, dann die Lampen: _update_bumper_marks liest
+	# hurry_active und setzt danach auch die Disziplin WSAD.
 	hurry_active = false
+	_update_bumper_marks()
 	frenzy_time = 0.0
 	wizard_time = 0.0
 	hud.set_wizard(false)

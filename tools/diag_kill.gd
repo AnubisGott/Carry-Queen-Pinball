@@ -23,18 +23,21 @@ func _ready() -> void:
 	print("WSAD-Lampe oben: %s -> %s" % [str(Game.disciplines["CARRY"]),
 			"OK" if Game.disciplines["CARRY"] else "FEHLER"])
 	fehler += 0 if Game.disciplines["CARRY"] else 1
-	# Ballverlust darf sie nicht loeschen
+	# Der blosse Ballwechsel loescht sie nicht - das Hurry-Up laeuft ja weiter
 	main._start_ball()
 	await get_tree().create_timer(0.3).timeout
 	print("nach Ballwechsel:  %s -> %s" % [str(Game.disciplines["CARRY"]),
 			"bleibt an OK" if Game.disciplines["CARRY"] else "FEHLER"])
 	fehler += 0 if Game.disciplines["CARRY"] else 1
-	# Erst der fertige Bericht setzt sie zurueck
+	# Der Bericht setzt sie NICHT zurueck: WSAD haengt allein an den vier
+	# Bumpern, und die brennen, solange das Hurry-Up laeuft.  Unten stehen die
+	# beiden Faelle, in denen sie ausgeht (Ablauf und weiter unten der zweite
+	# Durchgang); der vollstaendige Nachweis steht in diag_wsad.
 	main._end_wizard()
 	await get_tree().create_timer(0.3).timeout
 	print("nach dem Bericht:  %s -> %s" % [str(Game.disciplines["CARRY"]),
-			"aus OK" if not Game.disciplines["CARRY"] else "FEHLER"])
-	fehler += 1 if Game.disciplines["CARRY"] else 0
+			"bleibt an OK" if Game.disciplines["CARRY"] else "FEHLER"])
+	fehler += 0 if Game.disciplines["CARRY"] else 1
 	# Solange die Hoerner blinken, muessen alle vier Bumper markiert bleiben
 	print("waehrend das Hurry-Up laeuft: markiert %s -> %s" % [
 			_marken(main), "OK" if _alle_markiert(main) else "FEHLER"])
@@ -45,6 +48,10 @@ func _ready() -> void:
 	print("nach Ablauf des Hurry-Ups:    markiert %s -> %s" % [
 			_marken(main), "OK" if _marken(main) == "[]" else "FEHLER"])
 	fehler += 0 if _marken(main) == "[]" else 1
+	# Mit den Lampen geht auch die Anzeige oben aus - beides derselbe Schalter
+	print("WSAD-Lampe oben dazu:         %s -> %s" % [str(Game.disciplines["CARRY"]),
+			"aus OK" if not Game.disciplines["CARRY"] else "FEHLER"])
+	fehler += 1 if Game.disciplines["CARRY"] else 0
 	# Zweite Runde - muss erneut zuenden
 	for id in ["W", "A", "S", "D"]:
 		main._on_bumper(id)
