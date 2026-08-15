@@ -22,6 +22,10 @@ Flipper-Design/
 !/build/test-web.bat
 !/build/test-android.bat
 
+# Eigener Notizzettel - Sitzungs-IDs und was als naechstes ansteht.  Gehoert
+# niemandem ausser dem Schreibtisch.
+todo.txt
+
 # Rohspuren aus dem Gesangs-Export (je rund 33 MB).  Das Spiel liest sie
 # ohnehin nicht - es nimmt nur, was sich einem Satz zuordnen laesst.  Die
 # geschnittenen Faecher darunter (assets/voice/<satz><nr>/) bleiben drin.
